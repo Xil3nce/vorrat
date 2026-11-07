@@ -269,6 +269,27 @@
     <!-- Über -->
     <string name="about_title">Über Vorrat</string>
     <string name="about_version">Version %1$s</string>
+
+    <!-- Selbst-Update über GitHub-Releases -->
+    <string name="update_title">Update auf Version %1$s</string>
+    <string name="update_installed">Installiert ist Version %1$s.</string>
+    <string name="update_data_kept">Dein Bestand bleibt beim Update erhalten.</string>
+    <string name="update_install">Installieren</string>
+    <string name="update_later">Später</string>
+    <string name="update_downloading">Update wird heruntergeladen …</string>
+    <string name="update_installing">Bitte die Installation im Systemdialog bestätigen.</string>
+    <string name="update_permission_text">Damit Vorrat sich selbst aktualisieren kann, muss „Unbekannte Apps installieren“ für Vorrat erlaubt sein. Danach geht es hier automatisch weiter.</string>
+    <string name="update_permission_open">Erlauben</string>
+    <string name="update_error_check">Konnte nicht nach Updates suchen. Besteht eine Internetverbindung?</string>
+    <string name="update_error_download">Download fehlgeschlagen. Bitte später erneut versuchen.</string>
+    <string name="update_error_install">Installation fehlgeschlagen.</string>
+    <string name="update_error_signature">Die APK passt nicht zur installierten App (andere Signatur) und wurde nicht installiert.</string>
+    <string name="settings_update">App-Update</string>
+    <string name="settings_update_check">Nach Updates suchen</string>
+    <string name="settings_update_checking">Suche …</string>
+    <string name="settings_update_current">Version %1$s ist aktuell.</string>
+    <string name="settings_update_installed">Installiert: Version %1$s</string>
+    <string name="settings_update_available">Version %1$s verfügbar – tippen zum Installieren</string>
     <string name="about_description">Vorrat hilft dir, den Überblick über deine Lebensmittelvorräte zu behalten. Der Bestand wird in einem gemeinsamen Haushalt auf zwei Handys synchronisiert und funktioniert auch offline.</string>
     <string name="about_privacy_title">Datenschutz</string>
     <string name="about_privacy_sync">Bestand, Produkte, Orte und Produktbilder des Haushalts werden in Google Firebase (Cloud Firestore, Google Cloud, Region eur3 in der EU) gespeichert und zwischen den Handys des Haushalts synchronisiert. Die Anmeldung erfolgt anonym, ohne Konto, Namen oder E-Mail-Adresse. Zugriff haben nur Geräte, die mit dem Einladungscode beigetreten sind. Erinnerungs-Einstellungen und der Open-Food-Facts-Zwischenspeicher bleiben auf dem jeweiligen Handy.</string>

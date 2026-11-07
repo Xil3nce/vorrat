@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Selbst-Update aus GitHub-Releases (Nutzer bestätigt jede Installation). -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!--
         allowBackup="false": bewusste Entscheidung. Der Bestand liegt im gemeinsamen Haushalt (Firestore);
@@ -48,6 +50,11 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+
+        <!-- Ergebnis der Update-Installation (PackageInstaller-Session). -->
+        <receiver
+            android:name=".data.update.InstallResultReceiver"
+            android:exported="false" />
 
         <!-- WorkManager wird über VorratApp (Configuration.Provider + HiltWorkerFactory) initialisiert. -->
         <provider

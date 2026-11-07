@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Straighten
+import androidx.compose.material.icons.outlined.SystemUpdate
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
@@ -69,6 +70,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
 import de.frelina.vorrat.domain.InviteCode
+import de.frelina.vorrat.ui.update.UpdateViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -83,6 +85,7 @@ fun SettingsScreen(
     onOpenQuantityTypes: () -> Unit,
     onOpenAbout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
+    updates: UpdateViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val reminder by viewModel.reminder.collectAsStateWithLifecycle()
@@ -242,6 +245,31 @@ fun SettingsScreen(
             NavItem(Icons.Outlined.Download, R.string.settings_backup_import, R.string.settings_backup_import_summary) {
                 if (!busy) importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed"))
             }
+            HorizontalDivider()
+
+            // ---------------- App-Update
+            SectionHeader(R.string.settings_update)
+            val update by updates.state.collectAsStateWithLifecycle()
+            ListItem(
+                modifier = Modifier.fillMaxWidth().clickable(enabled = !update.checking) {
+                    if (update.available != null) updates.showPrompt() else updates.checkNow()
+                },
+                leadingContent = { Icon(Icons.Outlined.SystemUpdate, contentDescription = null) },
+                headlineContent = {
+                    Text(
+                        update.available?.let { stringResource(R.string.settings_update_available, it.version) }
+                            ?: stringResource(if (update.checking) R.string.settings_update_checking else R.string.settings_update_check),
+                    )
+                },
+                supportingContent = {
+                    val error = update.error
+                    when {
+                        error != null && !update.prompt -> Text(stringResource(error), color = MaterialTheme.colorScheme.error)
+                        update.checked && update.available == null -> Text(stringResource(R.string.settings_update_current, update.current))
+                        else -> Text(stringResource(R.string.settings_update_installed, update.current))
+                    }
+                },
+            )
             HorizontalDivider()
 
             // ---------------- Über

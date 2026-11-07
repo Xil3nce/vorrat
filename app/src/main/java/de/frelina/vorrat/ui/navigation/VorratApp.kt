@@ -46,6 +46,9 @@ import de.frelina.vorrat.ui.settings.CatalogScreen
 import de.frelina.vorrat.ui.settings.SettingsScreen
 import de.frelina.vorrat.ui.stock.EntryDetailScreen
 import de.frelina.vorrat.ui.stock.StockScreen
+import de.frelina.vorrat.ui.update.UpdateDialog
+import de.frelina.vorrat.ui.update.UpdateViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KClass
 
@@ -64,7 +67,7 @@ private val TOP_LEVEL = listOf(
  * [openSoonFilter] liefert Ereignisse, wenn die App über die Erinnerung geöffnet wird.
  */
 @Composable
-fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
+fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: UpdateViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val snackbar = remember { SnackbarHostState() }
     val resources = LocalResources.current
@@ -86,6 +89,8 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
             if (result == SnackbarResult.ActionPerformed) msg.onAction?.invoke()
         }
     }
+    LaunchedEffect(Unit) { updates.checkAutomatically() }
+    UpdateDialog(updates)
     LaunchedEffect(Unit) {
         openSoonFilter.collect {
             navController.navigate(StockRoute(filter = de.frelina.vorrat.MainActivity.FILTER_SOON)) {

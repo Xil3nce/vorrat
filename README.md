@@ -149,6 +149,21 @@ Voraussetzungen: JDK 17+ (getestet mit Temurin 21), Android SDK mit Plattform **
 5. Erstes Handy: „Haushalt anlegen“; zweites Handy: „Haushalt beitreten“ mit dem Code aus
    Einstellungen → Haushalt.
 
+### Updates über GitHub-Releases
+Ab Version 1.1.0 aktualisiert sich die App selbst; die Handys müssen nicht mehr angeschlossen werden.
+1. `versionCode` (+1) und `versionName` in `app/build.gradle.kts` erhöhen, committen, pushen.
+2. `powershell -ExecutionPolicy Bypass -File scripts\publish-release.ps1 -Notes "Was ist neu"` – baut die
+   signierte APK und legt das Release `v<versionName>` mit der APK in `UPDATE_REPO` an (öffentliches Repo,
+   `gh` angemeldet).
+3. Die App sieht beim Start (höchstens einmal pro Stunde) oder über Einstellungen → „Nach Updates suchen“ das
+   neue Release und bietet „Installieren“ an. Beim ersten Mal fragt Android nach „Unbekannte Apps installieren“
+   für Vorrat und lässt die Installation bestätigen.
+
+Sicherheit: Android installiert das Update nur, wenn Paketname und Signatur zur installierten App passen; eine
+fremde APK im Release würde abgelehnt. Entwürfe und Vorabversionen (Pre-Release) werden ignoriert – damit
+lässt sich ein Release vorbereiten, ohne dass die Handys es sofort sehen. Die Firebase-Konfiguration steckt
+ohnehin in jeder APK und ist kein Geheimnis; geschützt werden die Daten durch `firestore.rules`.
+
 ## Entscheidungen (mit Quellen)
 
 ### Versionen (Stand 2026-11-07)

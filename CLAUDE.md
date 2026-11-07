@@ -40,3 +40,5 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
 - Nie einchecken: `app/google-services.json`, Keystores, `keystore.properties`.
 - Kleine, sprechende Commits auf Deutsch.
 - OFF-Kontaktadresse (User-Agent): `OFF_CONTACT` in `app/build.gradle.kts`.
+- Selbst-Update: `UpdateManager` fragt `releases/latest` von `UPDATE_REPO` ab (Tag `vX.Y.Z`, APK-Asset).
+  Release nur mit `scripts/publish-release.ps1`; vorher `versionCode` +1 und `versionName` erhöhen.

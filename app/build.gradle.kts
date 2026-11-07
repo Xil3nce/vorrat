@@ -27,14 +27,17 @@ android {
         applicationId = "de.frelina.vorrat"
         minSdk = 35
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0.0"
+        // Für ein Update beide erhöhen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
+        versionCode = 2
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Kontaktadresse für den Open-Food-Facts-User-Agent (Pflicht laut OFF-API-Doku).
-        // PLATZHALTER: vor der Nutzung durch eine echte Kontaktadresse ersetzen.
         buildConfigField("String", "OFF_CONTACT", "\"xil3nce@gmail.com\"")
+
+        // Selbst-Update: öffentliches GitHub-Repo, dessen neuestes Release die APK enthält.
+        buildConfigField("String", "UPDATE_REPO", "\"Xil3nce/vorrat\"")
     }
 
     signingConfigs {

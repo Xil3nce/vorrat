@@ -16,3 +16,6 @@ app/google-services.json
 keystore.properties
 *.jks
 *.keystore
+
+# Release-APKs (scripts/publish-release.ps1)
+/dist/
