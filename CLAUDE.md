@@ -39,4 +39,4 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
   (Base64-JPEG ≤ 1024 px, Ziel ≤ 200 KB) über `RemoteWriter`.
 - Nie einchecken: `app/google-services.json`, Keystores, `keystore.properties`.
 - Kleine, sprechende Commits auf Deutsch.
-- Platzhalter: `OFF_CONTACT` in `app/build.gradle.kts`.
+- OFF-Kontaktadresse (User-Agent): `OFF_CONTACT` in `app/build.gradle.kts`.

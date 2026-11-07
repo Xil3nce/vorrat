@@ -43,7 +43,7 @@ import javax.inject.Singleton
 object OffConfig {
     /**
      * Pflicht laut OFF-API-Doku: eigener User-Agent "AppName/Version (Kontakt)".
-     * Die Kontaktadresse ist ein Platzhalter (BuildConfig.OFF_CONTACT in app/build.gradle.kts).
+     * Die Kontaktadresse steht in BuildConfig.OFF_CONTACT (app/build.gradle.kts).
      */
     val USER_AGENT = "Vorrat/${BuildConfig.VERSION_NAME} (${BuildConfig.OFF_CONTACT})"
 }

@@ -34,7 +34,7 @@ android {
 
         // Kontaktadresse für den Open-Food-Facts-User-Agent (Pflicht laut OFF-API-Doku).
         // PLATZHALTER: vor der Nutzung durch eine echte Kontaktadresse ersetzen.
-        buildConfigField("String", "OFF_CONTACT", "\"kontakt@example.com\"")
+        buildConfigField("String", "OFF_CONTACT", "\"xil3nce@gmail.com\"")
     }
 
     signingConfigs {

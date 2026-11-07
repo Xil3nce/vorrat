@@ -6,11 +6,10 @@ derselben Kategorie da ist. Zwei Personen verwalten **einen gemeinsamen Haushalt
 Die Daten werden über Firebase (anonyme Anmeldung + Cloud Firestore, Region eur3) synchronisiert;
 die App funktioniert auch offline. Open Food Facts erhält nur Barcodes.
 
-> **Platzhalter, den du anpassen musst**
-> - **Kontaktadresse im OFF-User-Agent:** `OFF_CONTACT` in `app/build.gradle.kts`
->   (derzeit `kontakt@example.com`). Der User-Agent lautet `Vorrat/<versionName> (<OFF_CONTACT>)`.
->
-> Package / applicationId ist final: `de.frelina.vorrat`.
+> **Konfiguration**
+> - Package / applicationId: `de.frelina.vorrat`.
+> - Kontaktadresse im OFF-User-Agent: `OFF_CONTACT` in `app/build.gradle.kts` (`xil3nce@gmail.com`).
+>   Der User-Agent lautet `Vorrat/<versionName> (<OFF_CONTACT>)`.
 
 ## Funktionen
 
