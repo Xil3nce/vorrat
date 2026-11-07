@@ -34,3 +34,44 @@ Stand: 2026-11-07 – Entscheidungen des Nutzers, noch nicht umgesetzt.
 4. Build → Authentication → Anmeldemethode **Anonym** aktivieren.
 5. Build → Firestore Database → Datenbank erstellen, Standort Europa (z. B. `eur3` oder `europe-west3`),
    **Produktionsmodus** (Regeln liefere ich mit).
+
+## Detailentwurf (für die Umsetzung)
+
+### Abhängigkeiten (verifiziert 2026-11-07 auf dl.google.com / Maven Central)
+- Firebase BoM `35.1.0` → `firebase-auth` 25.0.0, `firebase-firestore` 27.1.0 (keine -ktx-Module mehr).
+- Plugin `com.google.gms.google-services` `4.5.0`.
+- `org.jetbrains.kotlinx:kotlinx-coroutines-play-services` `1.11.0` (für `Task.await()`).
+
+### Haushalt / Beitritt
+- Erststart ohne Haushalt → Onboarding-Screen: „Haushalt anlegen" oder „Haushalt beitreten" (Code eingeben).
+- Anonyme Anmeldung (`signInAnonymously`) automatisch.
+- Einladungscode: 10 Zeichen aus Alphabet ohne 0/O/1/I/L, Anzeige `XXXXX-XXXXX`; Eingabe tolerant
+  (Groß/Klein, Bindestrich/Leerzeichen egal).
+- Einstellungen → Abschnitt „Haushalt": Code anzeigen + teilen (Share-Intent), Mitgliederzahl.
+- Firestore-Struktur:
+  - `households/{hid}` {ownerUid, createdAt}
+  - `households/{hid}/members/{uid}` {code, joinedAt}
+  - `invites/{code}` {householdId, createdBy}
+  - `households/{hid}/{locations|units|quantityTypes|products|entries|images}/{id}`
+- Regeln (`firestore.rules` im Repo, Nutzer fügt sie in der Konsole ein):
+  - `invites/{code}`: get für angemeldete Nutzer, kein list; create nur, wenn Ersteller Mitglied des Haushalts.
+  - `households/{hid}`: create, wenn `ownerUid == auth.uid`; read nur für Mitglieder.
+  - `members/{uid}`: create, wenn `uid == auth.uid` und (Owner des Haushalts **oder**
+    `get(invites/$(code)).data.householdId == hid`); read für Mitglieder.
+  - Alle Daten-Subcollections: read/write nur, wenn `exists(members/$(auth.uid))`.
+- Ersteller: alle lokalen Room-Daten per Batch (≤ 500 Ops) hochladen.
+  Beitretender: Warnung, dann lokale Daten leeren; Listener füllt Room.
+
+### Sync-Mechanik
+- Room bleibt Lesemodell; IDs werden String-UUIDs (Migration v1→v2 mit Test; Schema 2.json committen).
+- Schreiben: Repository schreibt sofort in Room **und** an Firestore (Firestore puffert offline).
+- `SyncManager` (Singleton, startet bei bekanntem Haushalt): Snapshot-Listener je Subcollection →
+  `docChanges` als Upsert/Delete in Room (Transaktion). Echo eigener Schreibvorgänge ist idempotent.
+- Anzahl ±: `FieldValue.increment(delta)` in Firestore, lokal `quantity += delta`; 0 → Doc löschen; Undo legt neu an.
+- Bilder: lokal weiter via `ImageStore`; Sync als `images/{fileName}` {data: Base64-JPEG, max. Kante 1024 px,
+  Ziel ≤ 200 KB}; fehlt eine Datei lokal, wird sie beim Eintreffen des Produkts nachgeladen.
+- Lokal bleiben: OFF-Cache, Erinnerungs-Einstellungen (pro Gerät).
+- ReminderWorker: vor dem Auswerten einmal Daten vom Server holen (mit Timeout), dann Room auswerten.
+- Backup-Import ersetzt die Haushaltsdaten in Firestore (Warnung: betrifft beide Handys); Export unverändert.
+- Firebase hinter Interface (`RemoteStore`), damit Unit-Tests mit Fake laufen.
+- About-/Datenschutztext: Daten liegen in Firebase (Google Cloud, Region eur3).
