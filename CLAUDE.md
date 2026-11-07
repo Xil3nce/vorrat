@@ -23,4 +23,4 @@ SDK-Pfad steht in `local.properties` (nicht eingecheckt).
 - Externe Produktdaten nur über `ProductLookupSource` (derzeit nur Open Food Facts; User-Agent + Rate-Limit beachten).
 - Bilder nur über `ImageStore` (Dateiname in DB, Datei in `filesDir/images`).
 - Kleine, sprechende Commits auf Deutsch.
-- Platzhalter: Package `de.example.vorrat`, `OFF_CONTACT` in `app/build.gradle.kts`.
+- Platzhalter: Package `de.frelina.vorrat`, `OFF_CONTACT` in `app/build.gradle.kts`.

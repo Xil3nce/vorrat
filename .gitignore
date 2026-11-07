@@ -9,3 +9,10 @@
 /captures
 .externalNativeBuild
 .cxx
+
+# Firebase-Konfiguration (projektspezifisch, nicht einchecken)
+app/google-services.json
+# Release-Signatur
+keystore.properties
+*.jks
+*.keystore

@@ -6,8 +6,8 @@ derselben Kategorie da ist. Alle Daten liegen lokal auf dem Gerät; Internet wir
 Barcode-Abfragen bei Open Food Facts genutzt.
 
 > **Platzhalter, die du anpassen musst**
-> - **Package-Name / applicationId:** `de.example.vorrat` (in `app/build.gradle.kts` → `namespace`,
->   `applicationId`, sowie Ordnerstruktur `app/src/*/java/de/example/vorrat`).
+> - **Package-Name / applicationId:** `de.frelina.vorrat` (in `app/build.gradle.kts` → `namespace`,
+>   `applicationId`, sowie Ordnerstruktur `app/src/*/java/de/frelina/vorrat`).
 > - **Kontaktadresse im OFF-User-Agent:** `OFF_CONTACT` in `app/build.gradle.kts`
 >   (derzeit `kontakt@example.com`). Der User-Agent lautet `Vorrat/<versionName> (<OFF_CONTACT>)`.
 
@@ -31,7 +31,7 @@ Barcode-Abfragen bei Open Food Facts genutzt.
   kotlinx.serialization (OFF-API)
 
 ```
-app/src/main/java/de/example/vorrat/
+app/src/main/java/de/frelina/vorrat/
 ├── data/
 │   ├── db/        Entities, DAOs, VorratDatabase (Startwerte, Migrationen), Converters
 │   ├── repo/      CatalogRepository, ProductRepository, StockRepository, ScanRepository

@@ -9,11 +9,11 @@ plugins {
 
 android {
     // Platzhalter – vor einer Veröffentlichung durch eine eigene Domain ersetzen.
-    namespace = "de.example.vorrat"
+    namespace = "de.frelina.vorrat"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "de.example.vorrat"
+        applicationId = "de.frelina.vorrat"
         minSdk = 35
         targetSdk = 37
         versionCode = 1
