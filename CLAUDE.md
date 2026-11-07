@@ -5,12 +5,12 @@ Kotlin 2.4 · AGP 9.5 (eingebautes Kotlin, kein `kotlin-android`-Plugin) · Grad
 Navigation Compose (typsichere `@Serializable`-Routen) · Hilt (KSP) · Room 2.8 (Schema in `app/schemas`) ·
 DataStore · WorkManager (HiltWorker) · CameraX + ML Kit Barcode · Retrofit/OkHttp + kotlinx.serialization · Coil 3 ·
 Firebase (BoM, Auth anonym + Firestore, Plugin `com.google.gms.google-services`).
-minSdk 35, compile/targetSdk 37. Versionen nur in `gradle/libs.versions.toml`.
+minSdk 34 (Melinas Handy: Android 14), compile/targetSdk 37. Versionen nur in `gradle/libs.versions.toml`.
 
 ## Befehle
 ```bash
 ./gradlew assembleDebug        # bauen
-./gradlew testDebugUnitTest    # alle Tests (JVM + Robolectric, sdk=35 in src/test/resources)
+./gradlew testDebugUnitTest    # alle Tests (JVM + Robolectric, sdk=34 in src/test/resources)
 ./gradlew lintDebug            # Lint (soll "No issues found" bleiben)
 ```
 SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-services.json` (beide nicht eingecheckt).

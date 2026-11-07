@@ -8,7 +8,7 @@ in den Regeln; Bilder werden vor dem Produkt geschrieben und bei Bedarf per `get
 - Sync über **Firebase** (Firestore mit Offline-Persistenz + Firebase Auth).
 - Paket-ID / applicationId / namespace: **`de.frelina.vorrat`** (ersetzt Platzhalter `de.example.vorrat`) – umgesetzt.
 - Beitritt per **Einladungscode**, Anmeldung anonym (kein Login/Passwort). Neuinstallation → Code erneut eingeben.
-- Beide Handys haben Android 15+ → minSdk 35 bleibt.
+- Melinas Handy hat Android 14 → minSdk 34 (ursprünglich 35).
 - Installation per Sideload (kein Play Store), signierte Release-APK mit eigenem Keystore
   (`keystore.properties` + Keystore nicht einchecken).
 

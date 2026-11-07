@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 /**
- * Material 3 mit Dynamic Color (minSdk 35 → immer verfügbar).
+ * Material 3 mit Dynamic Color (minSdk 34 → immer verfügbar).
  * Hell/Dunkel folgt der Systemeinstellung.
  */
 @Composable
