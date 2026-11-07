@@ -14,15 +14,12 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_delete">Löschen</string>
     <string name="action_edit">Bearbeiten</string>
-    <string name="action_add">Hinzufügen</string>
     <string name="action_rename">Umbenennen</string>
     <string name="action_undo">Rückgängig</string>
     <string name="action_back">Zurück</string>
     <string name="action_ok">OK</string>
-    <string name="action_close">Schließen</string>
     <string name="action_increase">Anzahl erhöhen</string>
     <string name="action_decrease">Anzahl verringern</string>
-    <string name="action_more">Weitere Optionen</string>
     <string name="action_clear">Eingabe löschen</string>
     <string name="product_image">Produktbild</string>
     <string name="no_image">Kein Bild</string>
@@ -38,7 +35,6 @@
     <string name="error_duplicate_symbol">Dieses Kürzel ist bereits vergeben.</string>
     <string name="error_duplicate_barcode">Ein Produkt mit diesem Barcode existiert bereits.</string>
     <string name="error_location_required">Bitte einen Ort auswählen.</string>
-    <string name="error_generic">Etwas ist schiefgelaufen. Bitte erneut versuchen.</string>
 
     <!-- Bestand -->
     <string name="stock_title">Bestand</string>
@@ -67,7 +63,6 @@
     <string name="expiry_expired">abgelaufen</string>
     <string name="expiry_today">läuft heute ab</string>
     <string name="expiry_soon">läuft bald ab</string>
-    <string name="location_label">%1$s</string>
     <string name="level_label">Ebene %1$d</string>
     <string name="shelf_label">Fach %1$d</string>
     <string name="quantity_label">%1$d %2$s</string>
@@ -97,7 +92,6 @@
     <string name="search_no_results">Keine Treffer für „%1$s“.</string>
 
     <!-- Scannen -->
-    <string name="scan_title">Scannen</string>
     <string name="scan_permission_title">Kamerazugriff benötigt</string>
     <string name="scan_permission_text">Zum Scannen von Barcodes braucht Vorrat Zugriff auf die Kamera. Die Bilder werden nur auf dem Gerät ausgewertet und nicht gespeichert oder übertragen.</string>
     <string name="scan_permission_grant">Kamera erlauben</string>
@@ -213,7 +207,7 @@
     <string name="settings_backup_export_done">Export abgeschlossen.</string>
     <string name="settings_backup_export_failed">Export fehlgeschlagen. Bitte erneut versuchen.</string>
     <string name="settings_backup_import_confirm_title">Bestehende Daten ersetzen?</string>
-    <string name="settings_backup_import_confirm_text">Das Backup enthält %1$d Produkte, %2$d Bestandseinträge und %3$d Orte. Alle aktuellen Daten in der App werden dadurch ersetzt. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_backup_import_confirm_text">Inhalt des Backups – Produkte: %1$d, Bestandseinträge: %2$d, Orte: %3$d. Alle aktuellen Daten in der App werden dadurch ersetzt. Das kann nicht rückgängig gemacht werden.</string>
     <string name="settings_backup_import_replace">Ersetzen</string>
     <string name="settings_backup_import_done">Import abgeschlossen.</string>
     <string name="settings_backup_import_failed">Import fehlgeschlagen. Deine bisherigen Daten sind unverändert.</string>
@@ -222,7 +216,6 @@
     <string name="settings_backup_error_newer">Das Backup stammt aus einer neueren App-Version und kann nicht importiert werden.</string>
     <string name="settings_backup_error_format">Das Backup-Format wird nicht unterstützt.</string>
     <string name="settings_backup_error_invalid">Das Backup ist unvollständig oder fehlerhaft (%1$s). Es wurde nichts verändert.</string>
-    <string name="settings_backup_working">Bitte warten …</string>
     <string name="settings_about">Über</string>
     <string name="settings_about_summary">Version, Datenquelle und Lizenz</string>
 
@@ -260,9 +253,9 @@
         <item quantity="one">%d Produkt läuft ab</item>
         <item quantity="other">%d Produkte laufen ab</item>
     </plurals>
-    <string name="notification_summary">Abgelaufen: %1$d · Heute: %2$d · In %4$d Tagen: %3$d</string>
+    <string name="notification_summary">Abgelaufen: %1$d · Heute: %2$d · Demnächst: %3$d</string>
     <string name="notification_line_expired">Abgelaufen: %1$s</string>
     <string name="notification_line_today">Heute: %1$s</string>
     <string name="notification_line_soon">Bald: %1$s</string>
-    <string name="notification_more">+ %1$d weitere</string>
+    <string name="notification_more">Weitere: %1$d</string>
 </resources>

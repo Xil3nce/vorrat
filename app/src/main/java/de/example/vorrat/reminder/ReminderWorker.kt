@@ -28,7 +28,7 @@ class ReminderWorker @AssistedInject constructor(
 
         val digest = ReminderDigest.from(stockRepository.allItems(), today, s.leadDays)
         if (digest.isEmpty) return Result.success() // nichts steht an → keine Benachrichtigung
-        if (notifications.show(digest, s.leadDays)) {
+        if (notifications.show(digest)) {
             settings.setLastNotifiedDate(today)
         }
         return Result.success()

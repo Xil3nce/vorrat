@@ -37,7 +37,7 @@ class ReminderNotifications @Inject constructor(
             NotificationManagerCompat.from(context).areNotificationsEnabled()
 
     /** @return true, wenn die Benachrichtigung angezeigt wurde. */
-    fun show(digest: ReminderDigest, leadDays: Int): Boolean {
+    fun show(digest: ReminderDigest): Boolean {
         if (!hasPermission()) return false
         createChannel()
 
@@ -69,7 +69,6 @@ class ReminderNotifications @Inject constructor(
             digest.expired.size,
             digest.today.size,
             digest.soon.size,
-            leadDays,
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)

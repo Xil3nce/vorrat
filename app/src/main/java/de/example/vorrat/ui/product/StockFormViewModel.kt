@@ -303,6 +303,5 @@ class StockFormViewModel @Inject constructor(
     override fun onCleared() {
         // Nicht gespeicherte, neu aufgenommene Bilder verwerfen.
         pendingImage?.let { imageStore.file(it).delete() }
-        super.onCleared()
     }
 }

@@ -116,6 +116,5 @@ class SettingsViewModel @Inject constructor(
 
     override fun onCleared() {
         _pendingImport.value?.let(backupManager::discard)
-        super.onCleared()
     }
 }

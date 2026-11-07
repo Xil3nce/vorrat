@@ -23,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -65,17 +65,17 @@ private val TOP_LEVEL = listOf(
 fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
     val navController = rememberNavController()
     val snackbar = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
 
     LaunchedEffect(Unit) {
         messages.messages.collect { msg ->
-            val text = context.getString(msg.text, *msg.args.toTypedArray())
+            val text = resources.getString(msg.text, *msg.args.toTypedArray())
             val result = snackbar.showSnackbar(
                 message = text,
-                actionLabel = msg.actionLabel?.let(context::getString),
+                actionLabel = msg.actionLabel?.let(resources::getString),
                 duration = if (msg.onAction != null) SnackbarDuration.Long else SnackbarDuration.Short,
             )
             if (result == SnackbarResult.ActionPerformed) msg.onAction?.invoke()
