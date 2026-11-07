@@ -23,6 +23,8 @@ import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Remove
@@ -58,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -65,6 +68,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
+import de.frelina.vorrat.domain.InviteCode
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -84,6 +88,8 @@ fun SettingsScreen(
     val reminder by viewModel.reminder.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val pendingImport by viewModel.pendingImport.collectAsStateWithLifecycle()
+    val household by viewModel.household.collectAsStateWithLifecycle()
+    val memberCount by viewModel.memberCount.collectAsStateWithLifecycle()
 
     var allowed by remember { mutableStateOf(notificationsAllowed(context)) }
     var requestedOnce by remember { mutableStateOf(false) }
@@ -111,6 +117,41 @@ fun SettingsScreen(
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.settings_title)) }) }) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+
+            // ---------------- Haushalt
+            household?.let { h ->
+                val formatted = InviteCode.format(h.code)
+                SectionHeader(R.string.settings_household)
+                ListItem(
+                    leadingContent = { Icon(Icons.Outlined.Groups, contentDescription = null) },
+                    headlineContent = {
+                        Text(formatted, style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
+                    },
+                    overlineContent = { Text(stringResource(R.string.settings_household_code)) },
+                    supportingContent = {
+                        Text(
+                            memberCount?.let { pluralStringResource(R.plurals.settings_household_members, it, it) }
+                                ?: stringResource(R.string.settings_household_members_unknown),
+                        )
+                    },
+                    trailingContent = {
+                        val shareText = stringResource(R.string.settings_household_share_text, formatted)
+                        val chooserTitle = stringResource(R.string.settings_household_share)
+                        IconButton(onClick = {
+                            val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, shareText)
+                            context.startActivity(Intent.createChooser(send, chooserTitle))
+                        }) {
+                            Icon(Icons.Outlined.Share, contentDescription = chooserTitle)
+                        }
+                    },
+                )
+                Text(
+                    stringResource(R.string.settings_household_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                )
+                HorizontalDivider()
+            }
 
             // ---------------- Stammdaten
             SectionHeader(R.string.settings_catalogs)

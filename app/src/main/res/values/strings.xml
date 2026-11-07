@@ -178,8 +178,35 @@
         <item quantity="other">„%2$s“ kann nicht gelöscht werden: %1$d Bestandseinträge liegen noch dort. Verschiebe oder entferne sie zuerst.</item>
     </plurals>
 
+    <!-- Haushalt / Onboarding -->
+    <string name="onboarding_title">Gemeinsamer Haushalt</string>
+    <string name="onboarding_text">Vorrat verwaltet deinen Bestand in einem Haushalt, den du mit einer zweiten Person auf einem anderen Handy teilen kannst. Lege einen neuen Haushalt an oder tritt mit dem Einladungscode eines bestehenden Haushalts bei.</string>
+    <string name="onboarding_create">Haushalt anlegen</string>
+    <string name="onboarding_create_hint">Bereits auf diesem Handy erfasste Daten werden in den neuen Haushalt übernommen.</string>
+    <string name="onboarding_or">oder</string>
+    <string name="onboarding_code_label">Einladungscode</string>
+    <string name="onboarding_code_placeholder">XXXXX-XXXXX</string>
+    <string name="onboarding_join">Haushalt beitreten</string>
+    <string name="onboarding_join_confirm_title">Haushalt beitreten?</string>
+    <string name="onboarding_join_confirm_text">Die auf diesem Handy gespeicherten Daten (Bestand, Produkte, Orte, Einheiten, Menge-Arten) werden durch die Daten des Haushalts ersetzt. Exportiere vorher ein Backup, wenn du sie behalten möchtest.</string>
+    <string name="onboarding_join_confirm">Beitreten und ersetzen</string>
+    <string name="onboarding_error_invalid">Der Code besteht aus 10 Zeichen (Buchstaben und Ziffern ohne 0, O, 1, I und L).</string>
+    <string name="onboarding_error_unknown">Zu diesem Code gibt es keinen Haushalt. Bitte prüfe die Eingabe.</string>
+    <string name="onboarding_error_failed">Das hat nicht geklappt. Bitte prüfe die Internetverbindung und versuche es erneut.</string>
+    <string name="onboarding_privacy">Die Daten werden in Firebase (Google Cloud, Region eur3 in der EU) gespeichert. Die Anmeldung erfolgt anonym – ohne Konto und Passwort.</string>
+
     <!-- Einstellungen -->
     <string name="settings_title">Einstellungen</string>
+    <string name="settings_household">Haushalt</string>
+    <string name="settings_household_code">Einladungscode</string>
+    <string name="settings_household_share">Einladungscode teilen</string>
+    <string name="settings_household_share_text">Tritt unserem Vorrat-Haushalt bei: Code %1$s</string>
+    <plurals name="settings_household_members">
+        <item quantity="one">%d Mitglied</item>
+        <item quantity="other">%d Mitglieder</item>
+    </plurals>
+    <string name="settings_household_members_unknown">Mitgliederzahl wird geladen …</string>
+    <string name="settings_household_hint">Auf dem zweiten Handy beim ersten Start „Haushalt beitreten“ wählen und diesen Code eingeben. Nach einer Neuinstallation muss der Code erneut eingegeben werden.</string>
     <string name="settings_catalogs">Stammdaten</string>
     <string name="settings_units">Packungseinheiten</string>
     <string name="settings_units_summary">g, kg, ml, l …</string>
@@ -207,7 +234,7 @@
     <string name="settings_backup_export_done">Export abgeschlossen.</string>
     <string name="settings_backup_export_failed">Export fehlgeschlagen. Bitte erneut versuchen.</string>
     <string name="settings_backup_import_confirm_title">Bestehende Daten ersetzen?</string>
-    <string name="settings_backup_import_confirm_text">Inhalt des Backups – Produkte: %1$d, Bestandseinträge: %2$d, Orte: %3$d. Alle aktuellen Daten in der App werden dadurch ersetzt. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_backup_import_confirm_text">Inhalt des Backups – Produkte: %1$d, Bestandseinträge: %2$d, Orte: %3$d. Alle aktuellen Daten des gemeinsamen Haushalts werden dadurch ersetzt – auf beiden Handys. Das kann nicht rückgängig gemacht werden.</string>
     <string name="settings_backup_import_replace">Ersetzen</string>
     <string name="settings_backup_import_done">Import abgeschlossen.</string>
     <string name="settings_backup_import_failed">Import fehlgeschlagen. Deine bisherigen Daten sind unverändert.</string>
@@ -239,12 +266,14 @@
     <!-- Über -->
     <string name="about_title">Über Vorrat</string>
     <string name="about_version">Version %1$s</string>
-    <string name="about_description">Vorrat hilft dir, den Überblick über deine Lebensmittelvorräte zu behalten. Alle Daten bleiben lokal auf deinem Gerät; das Internet wird nur für Produktabfragen per Barcode genutzt.</string>
+    <string name="about_description">Vorrat hilft dir, den Überblick über deine Lebensmittelvorräte zu behalten. Der Bestand wird in einem gemeinsamen Haushalt auf zwei Handys synchronisiert und funktioniert auch offline.</string>
+    <string name="about_privacy_title">Datenschutz</string>
+    <string name="about_privacy_sync">Bestand, Produkte, Orte und Produktbilder des Haushalts werden in Google Firebase (Cloud Firestore, Google Cloud, Region eur3 in der EU) gespeichert und zwischen den Handys des Haushalts synchronisiert. Die Anmeldung erfolgt anonym, ohne Konto, Namen oder E-Mail-Adresse. Zugriff haben nur Geräte, die mit dem Einladungscode beigetreten sind. Erinnerungs-Einstellungen und der Open-Food-Facts-Zwischenspeicher bleiben auf dem jeweiligen Handy.</string>
     <string name="about_off_title">Datenquelle: Open Food Facts</string>
     <string name="about_off_text">Produktdaten (Name, Marke, Menge, Kategorien, Bilder) stammen von Open Food Facts (openfoodfacts.org), einer freien, gemeinschaftlich gepflegten Lebensmitteldatenbank. Die Datenbank steht unter der Open Database License (ODbL) v1.0, die einzelnen Inhalte unter der Database Contents License (DbCL) v1.0. Produktbilder stehen unter Creative Commons Attribution ShareAlike (CC BY-SA) 3.0.</string>
     <string name="about_off_link">openfoodfacts.org öffnen</string>
     <string name="about_license_link">ODbL-Lizenztext öffnen</string>
-    <string name="about_privacy">Beim Scannen eines unbekannten Barcodes wird nur der Barcode an Open Food Facts übertragen.</string>
+    <string name="about_privacy">Beim Scannen eines unbekannten Barcodes wird nur der Barcode an Open Food Facts übertragen. Kamerabilder werden nur auf dem Gerät ausgewertet.</string>
 
     <!-- Benachrichtigungen -->
     <string name="notification_channel_name">Ablauf-Erinnerungen</string>

@@ -10,6 +10,8 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.data.backup.BackupException
 import de.frelina.vorrat.data.backup.BackupManager
 import de.frelina.vorrat.data.backup.ParsedBackup
+import de.frelina.vorrat.data.household.Household
+import de.frelina.vorrat.data.household.HouseholdRepository
 import de.frelina.vorrat.data.settings.ReminderSettings
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.reminder.ReminderScheduler
@@ -31,7 +33,15 @@ class SettingsViewModel @Inject constructor(
     private val scheduler: ReminderScheduler,
     private val backupManager: BackupManager,
     private val messages: UiMessages,
+    householdRepository: HouseholdRepository,
 ) : ViewModel() {
+
+    val household: StateFlow<Household?> =
+        householdRepository.household.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /** Mitgliederzahl (null, solange unbekannt, z. B. offline beim ersten Laden). */
+    val memberCount: StateFlow<Int?> =
+        householdRepository.memberCount.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val reminder: StateFlow<ReminderSettings> =
         settings.reminderSettings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ReminderSettings())

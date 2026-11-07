@@ -12,9 +12,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!--
-        allowBackup="false": bewusste Entscheidung. Alle Daten bleiben lokal; Sicherungen
-        erfolgen ausschließlich manuell über Einstellungen → Backup (ZIP per Dateiauswahl).
-        Siehe README, Abschnitt "Entscheidungen".
+        allowBackup="false": bewusste Entscheidung. Der Bestand liegt im gemeinsamen Haushalt (Firestore);
+        lokal sind nur Spiegel und Geräte-Einstellungen. Zusätzliche Sicherungen erfolgen manuell über
+        Einstellungen → Backup (ZIP per Dateiauswahl). Siehe README, Abschnitt "Entscheidungen".
     -->
     <application
         android:name=".VorratApp"

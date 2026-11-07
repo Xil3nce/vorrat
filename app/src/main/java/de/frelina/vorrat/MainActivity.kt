@@ -5,8 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import de.frelina.vorrat.ui.components.UiMessages
+import de.frelina.vorrat.ui.household.HouseholdViewModel
+import de.frelina.vorrat.ui.household.OnboardingScreen
+import de.frelina.vorrat.ui.household.RootState
 import de.frelina.vorrat.ui.navigation.VorratRoot
 import de.frelina.vorrat.ui.theme.VorratTheme
 import kotlinx.coroutines.channels.Channel
@@ -27,7 +33,13 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) handleIntent(intent)
         setContent {
             VorratTheme {
-                VorratRoot(messages = messages, openSoonFilter = openSoonFilter.receiveAsFlow())
+                val household: HouseholdViewModel = hiltViewModel()
+                val root by household.root.collectAsStateWithLifecycle()
+                when (root) {
+                    RootState.LOADING -> Unit
+                    RootState.NEEDS_HOUSEHOLD -> OnboardingScreen(household)
+                    RootState.READY -> VorratRoot(messages = messages, openSoonFilter = openSoonFilter.receiveAsFlow())
+                }
             }
         }
     }

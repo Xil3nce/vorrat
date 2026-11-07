@@ -52,6 +52,8 @@ fun AboutScreen(onBack: () -> Unit) {
             Text(stringResource(R.string.about_description))
             Text(stringResource(R.string.about_off_title), style = MaterialTheme.typography.titleMedium)
             Text(stringResource(R.string.about_off_text))
+            Text(stringResource(R.string.about_privacy_title), style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.about_privacy_sync))
             Text(stringResource(R.string.about_privacy), style = MaterialTheme.typography.bodySmall)
             OutlinedButton(onClick = { uriHandler.openUri(OFF_URL) }) { Text(stringResource(R.string.about_off_link)) }
             OutlinedButton(onClick = { uriHandler.openUri(ODBL_URL) }) { Text(stringResource(R.string.about_license_link)) }
