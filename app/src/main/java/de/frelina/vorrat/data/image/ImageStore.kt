@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
+import androidx.core.graphics.scale
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -69,11 +70,9 @@ class ImageStore(private val dir: File) {
         val longest = maxOf(decoded.width, decoded.height)
         val bitmap = if (longest > SYNC_MAX_EDGE) {
             val scale = SYNC_MAX_EDGE.toFloat() / longest
-            Bitmap.createScaledBitmap(
-                decoded,
+            decoded.scale(
                 (decoded.width * scale).toInt().coerceAtLeast(1),
                 (decoded.height * scale).toInt().coerceAtLeast(1),
-                true,
             ).also { if (it !== decoded) decoded.recycle() }
         } else {
             decoded
