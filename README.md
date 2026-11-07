@@ -2,14 +2,15 @@
 
 Android-App zur Übersicht über die eigenen Lebensmittelvorräte. Hauptfall: im Laden ein Produkt
 scannen und sofort sehen, ob und wo es zuhause noch vorhanden ist – oder ob ein Alternativprodukt
-derselben Kategorie da ist. Alle Daten liegen lokal auf dem Gerät; Internet wird nur für
-Barcode-Abfragen bei Open Food Facts genutzt.
+derselben Kategorie da ist. Zwei Personen verwalten **einen gemeinsamen Haushalt** auf zwei Handys:
+Die Daten werden über Firebase (anonyme Anmeldung + Cloud Firestore, Region eur3) synchronisiert;
+die App funktioniert auch offline. Open Food Facts erhält nur Barcodes.
 
-> **Platzhalter, die du anpassen musst**
-> - **Package-Name / applicationId:** `de.frelina.vorrat` (in `app/build.gradle.kts` → `namespace`,
->   `applicationId`, sowie Ordnerstruktur `app/src/*/java/de/frelina/vorrat`).
+> **Platzhalter, den du anpassen musst**
 > - **Kontaktadresse im OFF-User-Agent:** `OFF_CONTACT` in `app/build.gradle.kts`
 >   (derzeit `kontakt@example.com`). Der User-Agent lautet `Vorrat/<versionName> (<OFF_CONTACT>)`.
+>
+> Package / applicationId ist final: `de.frelina.vorrat`.
 
 ## Funktionen
 
@@ -19,13 +20,16 @@ Barcode-Abfragen bei Open Food Facts genutzt.
 | **Suche** | Teilstring-Suche (Groß-/Kleinschreibung egal, auch Umlaute) über Produktname, Marke, Barcode, Ortsname, Notiz. |
 | **Scannen** | CameraX + ML Kit (EAN-13, EAN-8, UPC-A, UPC-E), automatische Erkennung, großer „Neu scannen“-Button unten, Taschenlampe, Barcode-Eingabe per Tastatur. Ergebnis: (1) im Bestand, (2) Alternativprodukte in eigenem, deutlich markiertem Abschnitt, (3) nichts vorrätig. „Zum Bestand hinzufügen“ inkl. Abfrage „Anzahl erhöhen oder neuer Eintrag“. „Produkt manuell anlegen“ ohne Scan. |
 | **Orte** | Anlegen, umbenennen, löschen (Löschschutz). Beim Erfassen Auswahl aus der Liste + direktes Neuanlegen. |
-| **Einstellungen** | Packungseinheiten & Menge-Arten (mit Löschschutz), Erinnerungen (an/aus, Uhrzeit, Vorlauf), Backup (Export/Import), Über (Version, OFF-Attribution). |
+| **Haushalt** | Erststart: „Haushalt anlegen“ (vorhandene lokale Daten werden hochgeladen) oder „Haushalt beitreten“ per Einladungscode (lokale Daten werden nach Warnung ersetzt). Einstellungen → Haushalt: Code `XXXXX-XXXXX` anzeigen/teilen, Mitgliederzahl. |
+| **Einstellungen** | Haushalt, Packungseinheiten & Menge-Arten (mit Löschschutz), Erinnerungen (an/aus, Uhrzeit, Vorlauf – pro Gerät), Backup (Export/Import), Über (Version, OFF-Attribution, Datenschutz). |
 
 ## Architektur
 
 - Kotlin, Jetpack Compose, Material 3 (Dynamic Color, Dark Mode folgt System), Single-Activity,
   Navigation Compose (typsichere `@Serializable`-Routen)
-- MVVM: Compose-Screens → `@HiltViewModel` → Repositories → Room-DAOs / OFF-Quelle
+- MVVM: Compose-Screens → `@HiltViewModel` → Repositories → Room-DAOs / OFF-Quelle / `RemoteWriter`
+- Firebase Auth (anonym) + Cloud Firestore hinter der Schnittstelle `RemoteStore`
+  (Implementierung `FirestoreRemoteStore`, in Tests `FakeRemoteStore`)
 - Hilt (DI), Kotlin Coroutines/Flow, Room (Schema-Export nach `app/schemas`), DataStore (Einstellungen),
   WorkManager (Erinnerungen), Coil 3 (Bilder aus dem internen Speicher), Retrofit + OkHttp +
   kotlinx.serialization (OFF-API)
@@ -37,25 +41,71 @@ app/src/main/java/de/frelina/vorrat/
 │   ├── repo/      CatalogRepository, ProductRepository, StockRepository, ScanRepository
 │   ├── off/       ProductLookupSource (Interface), OpenFoodFactsSource, OffApi, RateLimiter
 │   ├── backup/    BackupManager (ZIP-Export/-Import), BackupModels (JSON)
-│   ├── image/     ImageStore (Bilder in filesDir/images)
+│   ├── image/     ImageStore (Bilder in filesDir/images, JPEG-Verkleinerung für den Sync)
+│   ├── household/ HouseholdStore (Haushalt pro Gerät, DataStore), HouseholdRepository (anlegen/beitreten)
+│   ├── sync/      RemoteStore (Interface), FirestoreRemoteStore, RemoteMapper, RemoteWriter,
+│   │              SyncApplier (Firestore → Room), SyncManager (Snapshot-Listener)
 │   └── settings/  SettingsRepository (DataStore)
 ├── domain/        reine Logik: ExpiryLogic, AlternativeMatcher, QuantityParser,
-│                  CategoryResolver, StockQueries (Sortierung/Filter/Suche), Validation
+│                  CategoryResolver, StockQueries (Sortierung/Filter/Suche), Validation, InviteCode
 ├── reminder/      ReminderWorker, ReminderScheduler, ReminderNotifications, RescheduleReceiver
 ├── di/            Hilt-Module
-└── ui/            theme, navigation, components, stock, search, scan, product, locations, settings
+└── ui/            theme, navigation, components, household (Onboarding), stock, search, scan, product,
+                   locations, settings
 ```
 
-### Datenmodell (Room, Version 1)
+### Sync (gemeinsamer Haushalt)
+
+- **Room bleibt das Lesemodell** für UI, Suche und Erinnerungen. Repositories schreiben sofort in Room
+  **und** über `RemoteWriter` an Firestore (Firestore puffert offline, auch über App-Neustarts).
+- **`SyncManager`** (Singleton, Start in `VorratApp`) hängt bei bekanntem Haushalt je Sammlung einen
+  Snapshot-Listener an; `SyncApplier` übernimmt `docChanges` als Upsert/Delete in einer Room-Transaktion.
+  Das Echo eigener Schreibvorgänge ist idempotent. Da die Sammlungen unabhängig eintreffen, werden
+  Datensätze ohne Elterndatensatz (z. B. Eintrag vor seinem Produkt) zurückgestellt, bis die
+  Fremdschlüssel erfüllt sind. Beim ersten Server-Stand je Sammlung werden lokale Datensätze ohne
+  Gegenstück entfernt (z. B. gelöscht, während die App geschlossen war).
+- **Anzahl ±** per `FieldValue.increment` (gleichzeitige Änderungen addieren sich); bei 0 wird das
+  Dokument gelöscht, „Rückgängig“ legt es neu an. Konflikte sonst: last-write-wins pro Dokument.
+- **Bilder** bleiben lokal im `ImageStore`; jedes Produktbild liegt zusätzlich als `images/{dateiname}`
+  (Base64-JPEG, längste Kante ≤ 1024 px, Ziel ≤ 200 KB; Firestore-Limit 1 MiB pro Dokument).
+  Das Bild wird vor dem Produkt geschrieben; fehlt die Datei auf dem anderen Handy, wird sie beim
+  Eintreffen des Produkts nachgeladen. Kein Cloud Storage (bräuchte ggf. den Blaze-Tarif).
+- **Pro Gerät** (nicht synchronisiert): Open-Food-Facts-Cache, Erinnerungs-Einstellungen, Haushaltszuordnung.
+- **ReminderWorker** wartet vor dem Auswerten bis zu 20 s auf einen Server-Stand (offline: lokaler Stand).
+- **Haushalt anlegen**: anonyme Anmeldung, ein Batch `households/{hid}` + `members/{uid}` + `invites/{code}`,
+  danach alle lokalen Daten in Batches (≤ 500 Operationen, ≤ 8 MiB) hochladen.
+  **Beitreten**: Code prüfen (`invites/{code}`), sich als Mitglied eintragen (Regeln prüfen den Code),
+  lokale Daten leeren – der Listener füllt Room. Geht die anonyme Anmeldung verloren, trägt sich die App
+  mit dem gespeicherten Code automatisch erneut ein; nach einer Neuinstallation muss der Code neu
+  eingegeben werden.
+- **Einladungscode**: 10 Zeichen aus `23456789ABCDEFGHJKMNPQRSTUVWXYZ` (ohne 0/O/1/I/L), Anzeige
+  `XXXXX-XXXXX`, Eingabe tolerant (Groß/Klein, Bindestrich/Leerzeichen egal).
+
+Firestore-Struktur und Regeln (`firestore.rules` im Repo):
+
+| Pfad | Inhalt | Zugriff |
+|---|---|---|
+| `invites/{code}` | householdId, createdBy | `get` für Angemeldete, kein `list`; anlegen nur durch Mitglied des Haushalts |
+| `households/{hid}` | ownerUid, createdAt | lesen nur Mitglieder; anlegen nur mit eigener `ownerUid` |
+| `households/{hid}/members/{uid}` | code, joinedAt | lesen Mitglieder; anlegen nur für sich selbst als Besitzer oder mit Code, der auf `hid` zeigt |
+| `households/{hid}/{locations,units,quantityTypes,products,entries,images}/{id}` | Datensätze (Felder wie Room, Datum/Dezimal als Text) | lesen/schreiben nur Mitglieder |
+
+Alles andere ist verboten (insbesondere jeder Zugriff von Nicht-Mitgliedern).
+
+### Datenmodell (Room, Version 2)
+
+IDs sind seit Schema 2 Text-UUIDs (Migration 1 → 2 wandelt bestehende Zahlen-IDs in Text um, Fremdschlüssel
+bleiben erhalten). UNIQUE-Indizes auf Name/Kürzel/Barcode gibt es nicht mehr: Room spiegelt Firestore, und
+zwei Handys können offline denselben Namen anlegen. Die Eindeutigkeit prüfen Repositories bzw. Formular.
 
 | Tabelle | Felder | Hinweise |
 |---|---|---|
-| `locations` | id, name | `name` eindeutig (NOCASE) |
-| `units` | id, symbol (Kürzel), name | Start: g, kg, ml, l; `symbol` eindeutig |
+| `locations` | id, name | Name eindeutig (NOCASE, geprüft im Repository) |
+| `units` | id, symbol (Kürzel), name | Start: g, kg, ml, l |
 | `quantity_types` | id, symbol, name | Start: Stck. (Stück), Pck. (Packungen) |
-| `products` | id, barcode?, name, brand?, category?, packageSize? (Dezimal als Text), unitId?, imagePath?, source (OPEN_FOOD_FACTS/MANUAL), createdAt, updatedAt | `barcode` UNIQUE (mehrere NULL erlaubt), FK `unitId` → units (RESTRICT) |
+| `products` | id, barcode?, name, brand?, category?, packageSize? (Dezimal als Text), unitId?, imagePath?, source (OPEN_FOOD_FACTS/MANUAL), createdAt, updatedAt | Barcode eindeutig (geprüft im Formular), FK `unitId` → units (RESTRICT) |
 | `stock_entries` | id, productId, locationId, level?, shelf?, expiryDate?, quantity (>0), quantityTypeId, note? | FK product (CASCADE), location & quantity_type (RESTRICT); Indizes auf allen FKs + expiryDate |
-| `lookup_cache` | barcode, found, name, brand, category, packageSize, unitSymbol, imagePath, fetchedAt | Cache der OFF-Abfragen |
+| `lookup_cache` | barcode, found, name, brand, category, packageSize, unitSymbol, imagePath, fetchedAt | Cache der OFF-Abfragen (pro Gerät) |
 
 - Löschschutz: Repository prüft Verwendungen und liefert eine verständliche Meldung;
   der Fremdschlüssel (RESTRICT) ist zusätzliche Absicherung.
@@ -64,10 +114,23 @@ app/src/main/java/de/frelina/vorrat/
 - Bilder liegen in `filesDir/images`; in der DB steht nur der Dateiname. OFF-Bilder werden beim
   ersten Abruf heruntergeladen. Verwaiste Bilder werden beim App-Start entfernt.
 
+## Einrichtung (Firebase)
+
+1. [console.firebase.google.com](https://console.firebase.google.com) → Projekt anlegen
+   (hier: `frelina-vorrat-app`; Google Analytics kann aus bleiben).
+2. Android-App hinzufügen, Paketname `de.frelina.vorrat` (SHA-1 ist für die anonyme Anmeldung nicht nötig).
+3. `google-services.json` herunterladen und nach **`app/google-services.json`** legen.
+   Die Datei ist in `.gitignore` und wird **nicht eingecheckt**; ohne sie schlägt der Build fehl
+   (Task `processDebugGoogleServices`).
+4. Build → Authentication → Anmeldemethode **Anonym** aktivieren.
+5. Build → Firestore Database → Datenbank erstellen, Standort `eur3` (Europa), **Produktionsmodus**.
+6. Firestore Database → **Regeln**: Inhalt von [`firestore.rules`](firestore.rules) einfügen und
+   **Veröffentlichen**. Ohne diese Regeln verweigert der Produktionsmodus jeden Zugriff.
+
 ## Build & Run
 
 Voraussetzungen: JDK 17+ (getestet mit Temurin 21), Android SDK mit Plattform **android-37**
-(`sdk.dir` in `local.properties`).
+(`sdk.dir` in `local.properties`), `app/google-services.json` (siehe oben).
 
 ```bash
 ./gradlew assembleDebug          # Debug-APK: app/build/outputs/apk/debug/app-debug.apk
@@ -76,6 +139,16 @@ Voraussetzungen: JDK 17+ (getestet mit Temurin 21), Android SDK mit Plattform **
 ./gradlew assembleRelease        # Release mit R8 (unsigniert – Signatur selbst konfigurieren)
 ./gradlew installDebug           # auf verbundenes Gerät/Emulator installieren
 ```
+
+### Installation per Sideload (ohne Play Store)
+1. APK bauen (Debug: `app/build/outputs/apk/debug/app-debug.apk`; Release erst nach eingerichteter Signatur).
+2. APK aufs Handy kopieren (USB, Cloud, Messenger) oder per `adb install -r <apk>` installieren.
+3. Beim ersten Öffnen der APK „Installation aus dieser Quelle zulassen“ erlauben.
+4. Beide Handys müssen mit **demselben Signaturschlüssel** signierte APKs nutzen, sonst sind Updates
+   über die bestehende Installation nicht möglich (Deinstallation löscht die Haushaltszuordnung –
+   danach den Einladungscode erneut eingeben).
+5. Erstes Handy: „Haushalt anlegen“; zweites Handy: „Haushalt beitreten“ mit dem Code aus
+   Einstellungen → Haushalt.
 
 ## Entscheidungen (mit Quellen)
 
@@ -90,6 +163,10 @@ Google Maven bzw. Maven Central als neueste stabile Version ermittelt.
 - **Room 2.8.5** statt Room 3.x: Room 3 erscheint unter der neuen Gruppe `androidx.room3` mit
   geändertem API (Treiber-basiert). 2.8.x ist die gepflegte stabile Linie der klassischen Artefakte.
 - Material-Icons: `material-icons-extended` 1.7.8 ist im Compose-BOM 2026.09.00 enthalten (eingefroren).
+- Firebase BoM **35.1.0** (→ `firebase-auth` 25.0.0, `firebase-firestore` 27.1.0; keine `-ktx`-Module mehr),
+  Plugin `com.google.gms.google-services` **4.5.0** (funktioniert mit AGP 9.5.1),
+  `kotlinx-coroutines-play-services` 1.11.0 (`Task.await()`), alles gegen `dl.google.com` bzw.
+  Maven Central geprüft.
 
 ### Open Food Facts
 Quellen: [API-Einführung](https://openfoodfacts.github.io/openfoodfacts-server/api/),
@@ -152,31 +229,53 @@ Kategorien – eine Übereinstimmung mit OFF-Produkten entsteht nur, wenn diesel
   `images/<datei>`; Speichern über den SAF-Dialog (`CreateDocument`) – keine Speicherberechtigungen.
 - Import: `OpenDocument` → ZIP lesen → vollständig validieren (Format-/Schema-Version, Pflichtfelder,
   Referenzen, Eindeutigkeit, Anzahl ≥ 1, Datumsformat; Schutz vor „Zip Slip“) → Rückfrage
-  „Bestehende Daten ersetzen?“ → Ersetzen in **einer Room-Transaktion**. Bei Fehlern rollt die
-  Transaktion zurück; Bilder werden erst nach erfolgreichem Commit übernommen.
-- **`android:allowBackup="false"`** + `dataExtractionRules` schließen Cloud-Backup und
-  Gerätetransfer bewusst aus: Die Daten sollen lokal bleiben, gesichert wird nur manuell.
-  Wer Android-Cloud-Backup möchte, kann das im Manifest ändern.
+  „Bestehende Daten ersetzen?“ (Hinweis: betrifft beide Handys) → Ersetzen in **einer Room-Transaktion**.
+  Bei Fehlern rollt die Transaktion zurück; Bilder werden erst nach erfolgreichem Commit übernommen.
+  Danach werden die Haushaltsdaten in Firestore ersetzt (nicht mehr vorhandene Dokumente gelöscht,
+  alle übrigen geschrieben) – das andere Handy übernimmt den Stand über seinen Listener.
+- Backups aus Schema 1 (Zahlen-IDs) werden weiterhin gelesen; die IDs werden wie bei der Migration
+  als Text übernommen. Export unverändert (`formatVersion` 1, `schemaVersion` = Room-Version, jetzt 2).
+- **`android:allowBackup="false"`** + `dataExtractionRules` schließen Android-Cloud-Backup und
+  Gerätetransfer bewusst aus: Der Bestand liegt im gemeinsamen Haushalt (Firestore), zusätzlich
+  wird manuell gesichert.
 
 ## Tests
 
-`./gradlew testDebugUnitTest` – 52 Tests, alle grün (Stand dieses Commits):
+`./gradlew testDebugUnitTest` – 76 Tests, alle grün (Stand dieses Commits):
 - `ExpiryLogicTest` – bald/abgelaufen/Grenzen, Filter, Sortierung, Sammelbenachrichtigung, Startzeit
 - `AlternativeMatcherTest` – Kategorie-Matching inkl. Negativfälle
 - `QuantityParserTest` – Mengen-Parsing, OFF-JSON-Mapping (echte Beispielantwort), Kategorie-Auswahl
 - `ValidationAndSearchTest` – Eingabevalidierung, Textsuche, Rate-Limiter
-- `DaoAndRepositoryTest` (Robolectric, In-Memory-Room) – Startwerte, Joins, Eindeutigkeit,
+- `DaoAndRepositoryTest` (Robolectric, In-Memory-Room) – Startwerte, Joins, Eindeutigkeit (Repository),
   Löschschutz, **Löschen bei Anzahl 0** inkl. Rückgängig, Kategorien
+- `InviteCodeTest` – Alphabet, Erzeugung, Anzeige, tolerante Eingabe, ungültige Codes
+- `SyncApplierTest` (Robolectric) – docChanges → Room, idempotentes Echo, Zurückstellen bei fehlenden
+  Eltern, verzögertes Löschen verwendeter Orte, Abgleich beim ersten Server-Stand, fehlerhafte Dokumente
+- `RemoteWriteTest` (Robolectric, `FakeRemoteStore`) – Anzahl per Increment, gleichzeitige Änderungen,
+  0 → Dokument löschen, Rückgängig legt neu an, Stammdaten, ohne Haushalt kein Schreiben,
+  Haushalt anlegen (Upload) / beitreten (Ersetzen, falscher Code), Batch-Größen
+- `MigrationTest` (Robolectric) – DB exakt nach `schemas/…/1.json` anlegen, Room migriert auf 2 und
+  prüft gegen das erwartete Schema; Werte, Joins und Fremdschlüssel bleiben erhalten
 - `ScanRepositoryTest` (Robolectric) – offline/online-Auflösung, Alternativen, Cache
 - `BackupRoundTripTest` (Robolectric) – Export→Import identisch inkl. Bild, ungültige Daten,
-  neuere Schema-Version, Fehler mitten in der Transaktion → Daten unverändert
+  neuere Schema-Version, Fehler mitten in der Transaktion → Daten unverändert, Schema-1-Backup
+  (Zahlen-IDs) lesen und Firestore ersetzen
+
+Die Firestore-Regeln wurden zusätzlich mit dem Firestore-Emulator geprüft (firebase-tools 15.34.0,
+`@firebase/rules-unit-testing` 6.0.0, Projekt `demo-vorrat`, ohne Login): Anlegen im Batch, Beitritt mit
+gültigem/falschem Code, kein Auflisten der Einladungen, kein Zugriff für Nicht-Mitglieder.
 
 ## Offene Punkte
 
-- Nicht auf einem Gerät/Emulator ausgeführt – nur kompiliert, Lint ohne Befunde, Unit-/Robolectric-Tests.
-  Kamera, ML Kit, Benachrichtigungen, SAF-Dialoge und die Compose-Oberfläche sind ungeprüft.
-- Keine Instrumentierungs-/UI-Tests (Compose-Tests) und kein Room-`MigrationTest` (es gibt erst Schema 1;
-  ab Version 2 Migration in `VorratDatabase.MIGRATIONS` ergänzen und testen).
+- Sync mit echtem Firebase-Projekt auf zwei Geräten noch nicht getestet (nur Fake + Regel-Emulator).
+- Keine Instrumentierungs-/UI-Tests (Compose-Tests).
+- Haushalt verlassen / Mitglied entfernen / Code erneuern gibt es noch nicht. Wer den Code kennt, kann
+  beitreten (31^10 Möglichkeiten, Einladungen nicht auflistbar).
+- Snapshot-Listener bleiben aktiv, solange der App-Prozess lebt (auch nach einem Erinnerungs-Lauf im
+  Hintergrund); Android beendet den Prozess später selbst.
+- Wird eine Anzahl auf einem Handy auf 0 gesetzt, während das andere sie gleichzeitig erhöht, gewinnt
+  das Löschen (Increment auf ein gelöschtes Dokument schlägt fehl).
+- Google-`datatransport`-Job (vermutlich ML Kit/Firebase) für den Datenschutztext noch nicht geprüft.
 - Release-Signatur ist nicht konfiguriert; Release-Build (R8) nur gebaut, nicht gestartet.
 - Kategorie-Reihenfolge in `categories_tags` ist in der OFF-Doku nicht ausdrücklich garantiert
   (siehe oben). Eine robustere Variante wäre der Abgleich mit der OFF-Taxonomie.

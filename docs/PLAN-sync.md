@@ -1,6 +1,8 @@
 # Plan: Gemeinsamer Haushalt (Sync über Firebase)
 
-Stand: 2026-11-07 – Entscheidungen des Nutzers, noch nicht umgesetzt.
+Stand: 2026-11-07 – umgesetzt (siehe README, Abschnitt „Sync“). Abweichungen vom Entwurf:
+Room-UNIQUE-Indizes entfallen (Room spiegelt Firestore); Ersteller-Batch nutzt `getAfter`/`existsAfter`
+in den Regeln; Bilder werden vor dem Produkt geschrieben und bei Bedarf per `get` nachgeladen.
 
 ## Entscheidungen
 - Sync über **Firebase** (Firestore mit Offline-Persistenz + Firebase Auth).
