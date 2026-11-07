@@ -138,6 +138,39 @@ class BackupRoundTripTest : DbTestBase() {
         assertNotNull(db.productDao().getByBarcode("3017624010701"))
     }
 
+    @Test fun `Backup mit Schema 1 (Zahlen-IDs) wird gelesen und ersetzt auch Firestore`() = runBlocking {
+        // Vorher: anderer Stand in Room und Firestore
+        val oldLoc = location("Garage")
+        val old = db.locationDao().getById(oldLoc)!!
+        writer.putLocation(old)
+
+        val v1 = """
+            {"formatVersion": 1, "schemaVersion": 1, "exportedAt": 1, "appVersion": "1.0.0",
+             "locations": [{"id": 1, "name": "Keller"}],
+             "units": [{"id": 1, "symbol": "g", "name": "Gramm"}],
+             "quantityTypes": [{"id": 1, "symbol": "Stck.", "name": "Stück"}],
+             "products": [{"id": 7, "barcode": "111", "name": "Nudeln", "packageSize": "500", "unitId": 1,
+                           "source": "MANUAL", "createdAt": 1, "updatedAt": 2}],
+             "stockEntries": [{"id": 3, "productId": 7, "locationId": 1, "quantity": 2, "quantityTypeId": 1,
+                               "expiryDate": "2027-01-31"}]}
+        """.trimIndent()
+        val parsed = backup.read(ByteArrayInputStream(zipOf(v1)))
+        assertEquals(1, parsed.productCount)
+        backup.replaceAll(parsed)
+
+        val item = db.stockEntryDao().getAllItems().single()
+        assertEquals("3", item.entryId)
+        assertEquals("7", item.productId)
+        assertEquals("Keller", item.locationName)
+        assertEquals("1", db.productDao().getById("7")!!.unitId)
+
+        // Firestore: alter Ort gelöscht, neuer Stand geschrieben
+        assertEquals(null, remote.doc(de.frelina.vorrat.data.sync.RemoteCollection.LOCATIONS, oldLoc))
+        assertEquals("Keller", remote.doc(de.frelina.vorrat.data.sync.RemoteCollection.LOCATIONS, "1")!!["name"])
+        assertEquals(2L, remote.doc(de.frelina.vorrat.data.sync.RemoteCollection.ENTRIES, "3")!!["quantity"])
+        assertEquals("Nudeln", remote.doc(de.frelina.vorrat.data.sync.RemoteCollection.PRODUCTS, "7")!!["name"])
+    }
+
     private fun unzipJson(zip: ByteArray): ByteArray {
         ZipInputStream(ByteArrayInputStream(zip)).use { z ->
             while (true) {
