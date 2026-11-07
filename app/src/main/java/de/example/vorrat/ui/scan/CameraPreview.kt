@@ -43,7 +43,11 @@ fun CameraPreview(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER } }
+    val previewView = remember { PreviewView(context).apply {
+            // TextureView statt SurfaceView: wird von Compose korrekt beschnitten (kein Durchscheinen ins Ergebnis).
+            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+        } }
     val currentOnBarcode by rememberUpdatedState(onBarcode)
     val analyzingState = rememberUpdatedState(analyzing)
     var camera by remember { mutableStateOf<Camera?>(null) }

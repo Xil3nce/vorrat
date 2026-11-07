@@ -8,6 +8,7 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -116,7 +118,8 @@ fun ScanScreen(
         Box(
             Modifier
                 .fillMaxWidth()
-                .weight(if (state is ScanUiState.Idle) 1f else 0.45f),
+                .weight(if (state is ScanUiState.Idle) 1f else 0.45f)
+                .clipToBounds(), // PreviewView skaliert sein TextureView – ohne Clip ragt das Bild ins Ergebnis
         ) {
             if (hasPermission) {
                 CameraPreview(
@@ -260,6 +263,7 @@ private fun ResultPanel(
     Column(
         modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

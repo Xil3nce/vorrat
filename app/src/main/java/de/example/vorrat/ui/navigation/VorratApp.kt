@@ -22,6 +22,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -69,6 +71,9 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
+    // Screens mit FAB bzw. unterer Bedienleiste: Snackbar darüber anzeigen, damit sie nichts verdeckt.
+    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class)
+        .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
 
     LaunchedEffect(Unit) {
         messages.messages.collect { msg ->
@@ -91,7 +96,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) },
+        snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) 72.dp else 0.dp)) },
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar {
@@ -101,7 +106,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
                             selected = selected,
                             onClick = { navController.navigateTopLevel(item.route) },
                             icon = { Icon(item.icon, contentDescription = null) },
-                            label = { Text(stringResource(item.label)) },
+                            label = { Text(stringResource(item.label), maxLines = 1, softWrap = false, overflow = TextOverflow.Visible) },
                         )
                     }
                 }

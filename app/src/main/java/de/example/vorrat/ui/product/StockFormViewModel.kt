@@ -87,6 +87,9 @@ class StockFormViewModel @Inject constructor(
         savedStateHandle.get<Long>("productId")?.takeIf { it != AddStockRoute.NONE }
     private val barcodeArg: String? = savedStateHandle.get<String>("barcode")?.takeIf { it.isNotBlank() }
 
+    /** Neues Produkt aus einem Scan (Barcode als Routen-Argument) – steuert nur den Titel, nicht die Eingabe. */
+    val fromScan: Boolean = barcodeArg != null
+
     private val _state = MutableStateFlow(StockFormState())
     val state: StateFlow<StockFormState> = _state.asStateFlow()
 
