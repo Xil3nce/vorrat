@@ -35,8 +35,8 @@ class ScanRepositoryTest : DbTestBase() {
     @Before
     fun setUpRepo() {
         source = FakeSource(LookupResult.Failed(LookupErrorKind.NO_NETWORK))
-        val images = ImageStore(File(context.cacheDir, "scan-images").apply { deleteRecursively() })
-        repo = ScanRepository(db.productDao(), db.stockEntryDao(), db.lookupCacheDao(), source, images)
+        val scanImages = ImageStore(File(context.cacheDir, "scan-images").apply { deleteRecursively() })
+        repo = ScanRepository(db.productDao(), db.stockEntryDao(), db.lookupCacheDao(), source, scanImages)
     }
 
     @Test fun `lokal bekannter Barcode wird offline aufgeloest (exakter Treffer)`() = runBlocking {

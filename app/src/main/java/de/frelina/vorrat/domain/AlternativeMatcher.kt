@@ -19,7 +19,7 @@ object AlternativeMatcher {
     fun findAlternatives(
         scannedCategory: String?,
         scannedBarcode: String?,
-        scannedProductId: Long?,
+        scannedProductId: String?,
         stock: List<StockItem>,
     ): List<StockItem> {
         val wanted = normalize(scannedCategory) ?: return emptyList()

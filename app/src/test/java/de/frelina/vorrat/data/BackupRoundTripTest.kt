@@ -29,7 +29,13 @@ class BackupRoundTripTest : DbTestBase() {
     @Before
     fun setUpBackup() {
         imageStore = ImageStore(File(context.cacheDir, "images-test").apply { deleteRecursively() })
-        backup = BackupManager(db, imageStore, "test", File(context.cacheDir, "staging").apply { mkdirs() })
+        backup = BackupManager(
+            db,
+            imageStore,
+            "test",
+            File(context.cacheDir, "staging").apply { mkdirs() },
+            de.frelina.vorrat.data.sync.RemoteWriter(remote, householdStore, imageStore),
+        )
     }
 
     private suspend fun exportBytes(): ByteArray = ByteArrayOutputStream().also { backup.export(it) }.toByteArray()

@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 /**
  * Inhalt von backup.json im Export-ZIP.
  * formatVersion: Version dieses JSON-Formats; schemaVersion: Room-Datenbankversion beim Export.
+ * Ab schemaVersion 2 sind IDs Text (UUIDs); Backups mit schemaVersion 1 enthalten Zahlen-IDs und werden
+ * beim Lesen (lenient) als Text übernommen – dieselbe Umwandlung wie in der Room-Migration 1 → 2.
  */
 @Serializable
 data class BackupData(
@@ -20,24 +22,24 @@ data class BackupData(
 )
 
 @Serializable
-data class LocationDto(val id: Long, val name: String)
+data class LocationDto(val id: String, val name: String)
 
 @Serializable
-data class UnitDto(val id: Long, val symbol: String, val name: String)
+data class UnitDto(val id: String, val symbol: String, val name: String)
 
 @Serializable
-data class QuantityTypeDto(val id: Long, val symbol: String, val name: String)
+data class QuantityTypeDto(val id: String, val symbol: String, val name: String)
 
 @Serializable
 data class ProductDto(
-    val id: Long,
+    val id: String,
     val barcode: String? = null,
     val name: String,
     val brand: String? = null,
     val category: String? = null,
     /** Dezimalzahl als Text (verlustfrei), z. B. "1.5" */
     val packageSize: String? = null,
-    val unitId: Long? = null,
+    val unitId: String? = null,
     /** Dateiname im ZIP unter images/ */
     val imagePath: String? = null,
     val source: String,
@@ -47,15 +49,15 @@ data class ProductDto(
 
 @Serializable
 data class StockEntryDto(
-    val id: Long,
-    val productId: Long,
-    val locationId: Long,
+    val id: String,
+    val productId: String,
+    val locationId: String,
     val level: Int? = null,
     val shelf: Int? = null,
     /** ISO-8601, z. B. "2026-12-31" */
     val expiryDate: String? = null,
     val quantity: Int,
-    val quantityTypeId: Long,
+    val quantityTypeId: String,
     val note: String? = null,
 )
 

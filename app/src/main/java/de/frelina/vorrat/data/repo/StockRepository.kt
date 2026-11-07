@@ -7,6 +7,8 @@ import de.frelina.vorrat.data.db.StockEntryDao
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.data.db.VorratDatabase
+import de.frelina.vorrat.data.sync.RemoteCollection
+import de.frelina.vorrat.data.sync.RemoteWriter
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,60 +27,82 @@ class StockRepository @Inject constructor(
     private val db: VorratDatabase,
     private val stockDao: StockEntryDao,
     private val productDao: ProductDao,
+    private val remote: RemoteWriter,
 ) {
     fun observeItems(): Flow<List<StockItem>> = stockDao.observeAllItems()
 
-    fun observeItem(entryId: Long): Flow<StockItem?> = stockDao.observeItem(entryId)
+    fun observeItem(entryId: String): Flow<StockItem?> = stockDao.observeItem(entryId)
 
     suspend fun allItems(): List<StockItem> = stockDao.getAllItems()
 
-    suspend fun itemsForProduct(productId: Long): List<StockItem> = stockDao.getItemsForProduct(productId)
+    suspend fun itemsForProduct(productId: String): List<StockItem> = stockDao.getItemsForProduct(productId)
 
-    suspend fun getEntry(id: Long): StockEntryEntity? = stockDao.getById(id)
+    suspend fun getEntry(id: String): StockEntryEntity? = stockDao.getById(id)
 
-    suspend fun addEntry(entry: StockEntryEntity): Long {
+    suspend fun addEntry(entry: StockEntryEntity): String {
         require(entry.quantity > 0) { "Anzahl muss mindestens 1 sein" }
-        return stockDao.insert(entry.copy(id = 0))
+        stockDao.insert(entry)
+        remote.putEntry(entry)
+        return entry.id
     }
 
     /** Legt ein neues Produkt und den ersten Bestandseintrag in einer Transaktion an. */
-    suspend fun addProductWithEntry(product: ProductEntity, entry: StockEntryEntity): Long {
+    suspend fun addProductWithEntry(product: ProductEntity, entry: StockEntryEntity): String {
         require(entry.quantity > 0) { "Anzahl muss mindestens 1 sein" }
-        return db.withTransaction {
-            val productId = productDao.insert(product)
-            stockDao.insert(entry.copy(id = 0, productId = productId))
+        val newEntry = entry.copy(productId = product.id)
+        db.withTransaction {
+            productDao.insert(product)
+            stockDao.insert(newEntry)
         }
+        remote.putProduct(product)
+        remote.putEntry(newEntry)
+        return newEntry.id
     }
 
     suspend fun updateEntry(entry: StockEntryEntity) {
         require(entry.quantity > 0) { "Anzahl muss mindestens 1 sein" }
         stockDao.update(entry)
+        remote.putEntry(entry)
     }
 
     /**
      * Ändert die Anzahl um [delta]. Fällt sie auf 0 (oder darunter), wird der Bestandseintrag
      * gelöscht; das Produkt (inkl. Bild) bleibt erhalten, damit spätere Scans es wiedererkennen.
      */
-    suspend fun changeQuantity(entryId: Long, delta: Int): QuantityChange = db.withTransaction {
-        val entry = stockDao.getById(entryId) ?: return@withTransaction QuantityChange.NotFound
-        val newQuantity = entry.quantity + delta
-        if (newQuantity <= 0) {
-            stockDao.deleteById(entryId)
-            QuantityChange.Removed(entry)
-        } else {
-            stockDao.update(entry.copy(quantity = newQuantity))
-            QuantityChange.Updated(newQuantity)
+    suspend fun changeQuantity(entryId: String, delta: Int): QuantityChange {
+        val result = db.withTransaction {
+            val entry = stockDao.getById(entryId) ?: return@withTransaction QuantityChange.NotFound
+            val newQuantity = entry.quantity + delta
+            if (newQuantity <= 0) {
+                stockDao.deleteById(entryId)
+                QuantityChange.Removed(entry)
+            } else {
+                stockDao.update(entry.copy(quantity = newQuantity))
+                QuantityChange.Updated(newQuantity)
+            }
         }
+        // Firestore: atomar per FieldValue.increment (Änderungen beider Handys addieren sich); 0 → Dokument löschen.
+        when (result) {
+            is QuantityChange.Updated -> remote.incrementQuantity(entryId, delta)
+            is QuantityChange.Removed -> remote.delete(RemoteCollection.ENTRIES, entryId)
+            QuantityChange.NotFound -> Unit
+        }
+        return result
     }
 
-    suspend fun deleteEntry(entryId: Long): StockEntryEntity? = db.withTransaction {
-        val entry = stockDao.getById(entryId)
-        if (entry != null) stockDao.deleteById(entryId)
-        entry
+    suspend fun deleteEntry(entryId: String): StockEntryEntity? {
+        val entry = db.withTransaction {
+            val entry = stockDao.getById(entryId)
+            if (entry != null) stockDao.deleteById(entryId)
+            entry
+        }
+        if (entry != null) remote.delete(RemoteCollection.ENTRIES, entryId)
+        return entry
     }
 
-    /** Rückgängig nach Löschen: Eintrag mit derselben ID wiederherstellen. */
+    /** Rückgängig nach Löschen: Eintrag mit derselben ID wiederherstellen (legt auch das Dokument neu an). */
     suspend fun restoreEntry(entry: StockEntryEntity) {
-        stockDao.insert(entry)
+        stockDao.upsert(entry)
+        remote.putEntry(entry)
     }
 }

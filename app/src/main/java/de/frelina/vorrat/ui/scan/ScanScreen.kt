@@ -51,7 +51,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -86,9 +85,9 @@ import java.time.LocalDate
 
 @Composable
 fun ScanScreen(
-    onOpenEntry: (Long) -> Unit,
+    onOpenEntry: (String) -> Unit,
     onAddNewProduct: (barcode: String) -> Unit,
-    onAddEntryForProduct: (productId: Long) -> Unit,
+    onAddEntryForProduct: (productId: String) -> Unit,
     onCreateManual: () -> Unit,
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
@@ -254,7 +253,7 @@ private fun PermissionRequest(denied: Boolean, onRequest: () -> Unit, onOpenSett
 private fun ResultPanel(
     outcome: ScanOutcome,
     leadDays: Int,
-    onOpenEntry: (Long) -> Unit,
+    onOpenEntry: (String) -> Unit,
     onRetry: () -> Unit,
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
@@ -404,10 +403,10 @@ private fun ExistingEntryDialog(
     entries: List<StockItem>,
     leadDays: Int,
     onDismiss: () -> Unit,
-    onIncrease: (entryId: Long, amount: Int) -> Unit,
+    onIncrease: (entryId: String, amount: Int) -> Unit,
     onNewEntry: () -> Unit,
 ) {
-    var selected by remember { mutableLongStateOf(entries.first().entryId) }
+    var selected by remember { mutableStateOf(entries.first().entryId) }
     var amount by rememberSaveable { mutableStateOf("1") }
     val validated = Validation.quantity(amount)
     val today = LocalDate.now()

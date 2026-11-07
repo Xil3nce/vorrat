@@ -3,6 +3,7 @@ package de.frelina.vorrat.ui.product
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.StockEntryEntity
+import de.frelina.vorrat.data.db.newId
 import de.frelina.vorrat.domain.Validated
 import de.frelina.vorrat.domain.Validation
 import de.frelina.vorrat.domain.ValidationError
@@ -12,7 +13,7 @@ data class ProductForm(
     val brand: String = "",
     val category: String = "",
     val packageSize: String = "",
-    val unitId: Long? = null,
+    val unitId: String? = null,
     val barcode: String = "",
     val imagePath: String? = null,
     val nameError: ValidationError? = null,
@@ -57,7 +58,7 @@ data class ProductFields(
     val brand: String?,
     val category: String?,
     val packageSize: java.math.BigDecimal?,
-    val unitId: Long?,
+    val unitId: String?,
     val barcode: String?,
 ) {
     fun toNewEntity(imagePath: String?, source: ProductSource, now: Long) = ProductEntity(
@@ -85,12 +86,12 @@ data class ProductFields(
 }
 
 data class EntryForm(
-    val locationId: Long? = null,
+    val locationId: String? = null,
     val level: String = "",
     val shelf: String = "",
     val expiry: String = "",
     val quantity: String = "1",
-    val quantityTypeId: Long? = null,
+    val quantityTypeId: String? = null,
     val note: String = "",
     val locationMissing: Boolean = false,
     val levelError: ValidationError? = null,
@@ -99,7 +100,7 @@ data class EntryForm(
     val quantityError: ValidationError? = null,
     val quantityTypeMissing: Boolean = false,
 ) {
-    fun validate(entryId: Long = 0, productId: Long = 0): Pair<EntryForm, StockEntryEntity?> {
+    fun validate(entryId: String = newId(), productId: String = ""): Pair<EntryForm, StockEntryEntity?> {
         val levelV = Validation.optionalWholeNumber(level)
         val shelfV = Validation.optionalWholeNumber(shelf)
         val expiryV = Validation.optionalDate(expiry)

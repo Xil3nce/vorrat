@@ -33,13 +33,13 @@ data class StockUiState(
     val soonCount: Int = 0,
     val sort: StockSort = StockSort.EXPIRY,
     val filter: StockFilter = StockFilter.ALL,
-    val locationId: Long? = null,
+    val locationId: String? = null,
     val locations: List<LocationEntity> = emptyList(),
     val today: LocalDate = LocalDate.now(),
     val leadDays: Int = ExpiryLogic.DEFAULT_LEAD_DAYS,
 )
 
-private data class Controls(val sort: StockSort, val filter: StockFilter, val locationId: Long?)
+private data class Controls(val sort: StockSort, val filter: StockFilter, val locationId: String?)
 
 @HiltViewModel
 class StockViewModel @Inject constructor(
@@ -82,5 +82,5 @@ class StockViewModel @Inject constructor(
 
     fun setSort(sort: StockSort) = controls.value.let { controls.value = it.copy(sort = sort) }
     fun setFilter(filter: StockFilter) = controls.value.let { controls.value = it.copy(filter = filter) }
-    fun setLocation(id: Long?) = controls.value.let { controls.value = it.copy(locationId = id) }
+    fun setLocation(id: String?) = controls.value.let { controls.value = it.copy(locationId = id) }
 }

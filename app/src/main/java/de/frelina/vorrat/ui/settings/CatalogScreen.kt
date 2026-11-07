@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** Einheitliche Darstellung für Packungseinheiten und Menge-Arten. */
-data class CatalogItem(val id: Long, val symbol: String, val name: String)
+data class CatalogItem(val id: String, val symbol: String, val name: String)
 
 data class CatalogInUse(val symbol: String, val usages: Int)
 
@@ -81,7 +81,7 @@ class CatalogViewModel @Inject constructor(
     private val _inUse = MutableStateFlow<CatalogInUse?>(null)
     val inUse: StateFlow<CatalogInUse?> = _inUse.asStateFlow()
 
-    suspend fun save(id: Long?, symbol: String, name: String): SaveResult =
+    suspend fun save(id: String?, symbol: String, name: String): SaveResult =
         if (isUnits) repository.saveUnit(id, symbol, name) else repository.saveQuantityType(id, symbol, name)
 
     fun delete(item: CatalogItem) = viewModelScope.launch {

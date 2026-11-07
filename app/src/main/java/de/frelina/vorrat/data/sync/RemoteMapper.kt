@@ -1,0 +1,111 @@
+package de.frelina.vorrat.data.sync
+
+import de.frelina.vorrat.data.db.LocationEntity
+import de.frelina.vorrat.data.db.ProductEntity
+import de.frelina.vorrat.data.db.ProductSource
+import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.StockEntryEntity
+import de.frelina.vorrat.data.db.UnitEntity
+import java.time.LocalDate
+
+/**
+ * Umwandlung Room-Entity ↔ Firestore-Dokument (Map). Die Dokument-ID ist die Entity-ID.
+ * Dezimalzahlen und Datumswerte werden als Text gespeichert (verlustfrei, lesbar in der Konsole).
+ * Unvollständige oder fehlerhafte Dokumente ergeben null und werden beim Spiegeln ignoriert.
+ */
+object RemoteMapper {
+    const val FIELD_QUANTITY = "quantity"
+
+    fun toMap(e: LocationEntity): Map<String, Any?> = mapOf("name" to e.name)
+
+    fun toMap(e: UnitEntity): Map<String, Any?> = mapOf("symbol" to e.symbol, "name" to e.name)
+
+    fun toMap(e: QuantityTypeEntity): Map<String, Any?> = mapOf("symbol" to e.symbol, "name" to e.name)
+
+    fun toMap(p: ProductEntity): Map<String, Any?> = mapOf(
+        "barcode" to p.barcode,
+        "name" to p.name,
+        "brand" to p.brand,
+        "category" to p.category,
+        "packageSize" to p.packageSize?.toPlainString(),
+        "unitId" to p.unitId,
+        "imagePath" to p.imagePath,
+        "source" to p.source.name,
+        "createdAt" to p.createdAt,
+        "updatedAt" to p.updatedAt,
+    )
+
+    fun toMap(e: StockEntryEntity): Map<String, Any?> = mapOf(
+        "productId" to e.productId,
+        "locationId" to e.locationId,
+        "level" to e.level?.toLong(),
+        "shelf" to e.shelf?.toLong(),
+        "expiryDate" to e.expiryDate?.toString(),
+        FIELD_QUANTITY to e.quantity.toLong(),
+        "quantityTypeId" to e.quantityTypeId,
+        "note" to e.note,
+    )
+
+    fun location(id: String, m: Map<String, Any?>): LocationEntity? {
+        val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
+        return LocationEntity(id, name)
+    }
+
+    fun unit(id: String, m: Map<String, Any?>): UnitEntity? {
+        val symbol = m.str("symbol")?.takeIf(String::isNotBlank) ?: return null
+        val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
+        return UnitEntity(id, symbol, name)
+    }
+
+    fun quantityType(id: String, m: Map<String, Any?>): QuantityTypeEntity? {
+        val symbol = m.str("symbol")?.takeIf(String::isNotBlank) ?: return null
+        val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
+        return QuantityTypeEntity(id, symbol, name)
+    }
+
+    fun product(id: String, m: Map<String, Any?>): ProductEntity? {
+        val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
+        val source = m.str("source")?.let { s -> ProductSource.entries.firstOrNull { it.name == s } }
+            ?: ProductSource.MANUAL
+        return ProductEntity(
+            id = id,
+            barcode = m.str("barcode")?.takeIf(String::isNotBlank),
+            name = name,
+            brand = m.str("brand"),
+            category = m.str("category"),
+            packageSize = m.str("packageSize")?.toBigDecimalOrNull()?.takeIf { it.signum() > 0 },
+            unitId = m.str("unitId"),
+            imagePath = m.str("imagePath")?.takeIf(::isSafeFileName),
+            source = source,
+            createdAt = m.long("createdAt") ?: 0,
+            updatedAt = m.long("updatedAt") ?: 0,
+        )
+    }
+
+    fun entry(id: String, m: Map<String, Any?>): StockEntryEntity? {
+        val productId = m.str("productId") ?: return null
+        val locationId = m.str("locationId") ?: return null
+        val typeId = m.str("quantityTypeId") ?: return null
+        val quantity = m.long(FIELD_QUANTITY)?.toInt()?.takeIf { it > 0 } ?: return null
+        return StockEntryEntity(
+            id = id,
+            productId = productId,
+            locationId = locationId,
+            level = m.long("level")?.toInt()?.takeIf { it >= 0 },
+            shelf = m.long("shelf")?.toInt()?.takeIf { it >= 0 },
+            expiryDate = m.str("expiryDate")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            quantity = quantity,
+            quantityTypeId = typeId,
+            note = m.str("note"),
+        )
+    }
+
+    /** Nur einfache Dateinamen (kein Pfad) – Bilder werden unter diesem Namen lokal abgelegt. */
+    fun isSafeFileName(name: String): Boolean = SAFE_NAME.matches(name)
+
+    private val SAFE_NAME = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+    private fun Map<String, Any?>.str(key: String): String? = this[key] as? String
+
+    private fun Map<String, Any?>.long(key: String): Long? = (this[key] as? Number)?.toLong()
+}

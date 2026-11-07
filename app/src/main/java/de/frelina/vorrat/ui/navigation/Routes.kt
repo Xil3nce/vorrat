@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable data object SettingsRoute
 
 // Unterseiten
-@Serializable data class EntryDetailRoute(val entryId: Long)
+@Serializable data class EntryDetailRoute(val entryId: String)
 
 /**
  * Erfassen:
@@ -18,13 +18,9 @@ import kotlinx.serialization.Serializable
  * - nur barcode gesetzt → neues Produkt (Vorbelegung aus Open Food Facts, falls vorhanden)
  * - nichts gesetzt → Produkt manuell anlegen
  */
-@Serializable data class AddStockRoute(val barcode: String? = null, val productId: Long = NONE) {
-    companion object {
-        const val NONE = -1L
-    }
-}
-@Serializable data class EditEntryRoute(val editEntryId: Long)
-@Serializable data class EditProductRoute(val editProductId: Long)
+@Serializable data class AddStockRoute(val barcode: String? = null, val productId: String? = null)
+@Serializable data class EditEntryRoute(val editEntryId: String)
+@Serializable data class EditProductRoute(val editProductId: String)
 @Serializable data class CatalogRoute(val kind: String) {
     companion object {
         const val UNITS = "units"

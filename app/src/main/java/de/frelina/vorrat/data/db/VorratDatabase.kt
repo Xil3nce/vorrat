@@ -28,14 +28,14 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun lookupCacheDao(): LookupCacheDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 2
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = emptyArray()
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -46,12 +46,12 @@ abstract class VorratDatabase : RoomDatabase() {
 
         fun seed(db: SupportSQLiteDatabase) {
             DefaultData.units.forEach { (symbol, name) ->
-                db.execSQL("INSERT INTO units (symbol, name) VALUES (?, ?)", arrayOf(symbol, name))
+                db.execSQL("INSERT INTO units (id, symbol, name) VALUES (?, ?, ?)", arrayOf(newId(), symbol, name))
             }
             DefaultData.quantityTypes.forEach { (symbol, name) ->
                 db.execSQL(
-                    "INSERT INTO quantity_types (symbol, name) VALUES (?, ?)",
-                    arrayOf(symbol, name),
+                    "INSERT INTO quantity_types (id, symbol, name) VALUES (?, ?, ?)",
+                    arrayOf(newId(), symbol, name),
                 )
             }
         }
@@ -69,4 +69,77 @@ object DefaultData {
         "Stck." to "Stück",
         "Pck." to "Packungen",
     )
+}
+
+/**
+ * v1 → v2: IDs werden Text (UUIDs für neue Datensätze; bestehende Zahlen-IDs werden zu "1", "2", …),
+ * UNIQUE-Indizes auf Name/Kürzel/Barcode entfallen (Eindeutigkeit prüfen die Repositories; Room spiegelt
+ * Firestore). Fremdschlüssel bleiben erhalten – die Werte werden identisch umgewandelt.
+ *
+ * Ablauf: alte Tabellen umbenennen, neue Tabellen anlegen (SQL wie in schemas/…/2.json), Daten kopieren,
+ * alte Tabellen (samt Indizes) löschen, Indizes neu anlegen.
+ */
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        val tables = listOf("stock_entries", "products", "locations", "units", "quantity_types")
+        tables.forEach { db.execSQL("ALTER TABLE `$it` RENAME TO `${it}_v1`") }
+
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `locations` (`id` TEXT NOT NULL, `name` TEXT NOT NULL COLLATE NOCASE, " +
+                "PRIMARY KEY(`id`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `units` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL COLLATE NOCASE, " +
+                "`name` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `quantity_types` (`id` TEXT NOT NULL, `symbol` TEXT NOT NULL COLLATE NOCASE, " +
+                "`name` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `barcode` TEXT, `name` TEXT NOT NULL, " +
+                "`brand` TEXT, `category` TEXT, `packageSize` TEXT, `unitId` TEXT, `imagePath` TEXT, " +
+                "`source` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`), " +
+                "FOREIGN KEY(`unitId`) REFERENCES `units`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `stock_entries` (`id` TEXT NOT NULL, `productId` TEXT NOT NULL, " +
+                "`locationId` TEXT NOT NULL, `level` INTEGER, `shelf` INTEGER, `expiryDate` INTEGER, " +
+                "`quantity` INTEGER NOT NULL, `quantityTypeId` TEXT NOT NULL, `note` TEXT, PRIMARY KEY(`id`), " +
+                "FOREIGN KEY(`productId`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , " +
+                "FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , " +
+                "FOREIGN KEY(`quantityTypeId`) REFERENCES `quantity_types`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        )
+
+        db.execSQL("INSERT INTO `units` (id, symbol, name) SELECT CAST(id AS TEXT), symbol, name FROM `units_v1`")
+        db.execSQL(
+            "INSERT INTO `quantity_types` (id, symbol, name) SELECT CAST(id AS TEXT), symbol, name FROM `quantity_types_v1`",
+        )
+        db.execSQL("INSERT INTO `locations` (id, name) SELECT CAST(id AS TEXT), name FROM `locations_v1`")
+        db.execSQL(
+            "INSERT INTO `products` (id, barcode, name, brand, category, packageSize, unitId, imagePath, source, " +
+                "createdAt, updatedAt) SELECT CAST(id AS TEXT), barcode, name, brand, category, packageSize, " +
+                "CAST(unitId AS TEXT), imagePath, source, createdAt, updatedAt FROM `products_v1`",
+        )
+        db.execSQL(
+            "INSERT INTO `stock_entries` (id, productId, locationId, level, shelf, expiryDate, quantity, " +
+                "quantityTypeId, note) SELECT CAST(id AS TEXT), CAST(productId AS TEXT), CAST(locationId AS TEXT), " +
+                "level, shelf, expiryDate, quantity, CAST(quantityTypeId AS TEXT), note FROM `stock_entries_v1`",
+        )
+
+        tables.forEach { db.execSQL("DROP TABLE `${it}_v1`") }
+
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_locations_name` ON `locations` (`name`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_units_symbol` ON `units` (`symbol`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_quantity_types_symbol` ON `quantity_types` (`symbol`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_products_barcode` ON `products` (`barcode`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_products_unitId` ON `products` (`unitId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_products_category` ON `products` (`category`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_productId` ON `stock_entries` (`productId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_locationId` ON `stock_entries` (`locationId`)")
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_stock_entries_quantityTypeId` ON `stock_entries` (`quantityTypeId`)",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_expiryDate` ON `stock_entries` (`expiryDate`)")
+    }
 }

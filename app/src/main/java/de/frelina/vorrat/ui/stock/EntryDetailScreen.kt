@@ -52,8 +52,8 @@ import de.frelina.vorrat.ui.components.StockItemCard
 @Composable
 fun EntryDetailScreen(
     onBack: () -> Unit,
-    onEditEntry: (Long) -> Unit,
-    onEditProduct: (Long) -> Unit,
+    onEditEntry: (String) -> Unit,
+    onEditProduct: (String) -> Unit,
     viewModel: EntryDetailViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()

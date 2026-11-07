@@ -53,7 +53,7 @@ import de.frelina.vorrat.ui.components.StockItemCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockScreen(
-    onOpenEntry: (Long) -> Unit,
+    onOpenEntry: (String) -> Unit,
     onAddManual: () -> Unit,
     viewModel: StockViewModel = hiltViewModel(),
 ) {

@@ -38,38 +38,38 @@ class ExpiryLogicTest {
 
     @Test fun `Filter bald und abgelaufen`() {
         val items = listOf(
-            stockItem(entryId = 1, expiry = today.minusDays(2)),
-            stockItem(entryId = 2, expiry = today),
-            stockItem(entryId = 3, expiry = today.plusDays(2)),
-            stockItem(entryId = 4, expiry = today.plusDays(10)),
-            stockItem(entryId = 5, expiry = null),
+            stockItem(entryId = "1", expiry = today.minusDays(2)),
+            stockItem(entryId = "2", expiry = today),
+            stockItem(entryId = "3", expiry = today.plusDays(2)),
+            stockItem(entryId = "4", expiry = today.plusDays(10)),
+            stockItem(entryId = "5", expiry = null),
         )
-        assertEquals(listOf(2L, 3L), StockQueries.filter(items, StockFilter.SOON, null, today, 3).map { it.entryId })
-        assertEquals(listOf(1L), StockQueries.filter(items, StockFilter.EXPIRED, null, today, 3).map { it.entryId })
+        assertEquals(listOf("2", "3"), StockQueries.filter(items, StockFilter.SOON, null, today, 3).map { it.entryId })
+        assertEquals(listOf("1"), StockQueries.filter(items, StockFilter.EXPIRED, null, today, 3).map { it.entryId })
         assertEquals(5, StockQueries.filter(items, StockFilter.ALL, null, today, 3).size)
     }
 
     @Test fun `Sortierung nach Ablaufdatum, ohne Datum am Ende`() {
         val items = listOf(
-            stockItem(entryId = 1, name = "C", expiry = null),
-            stockItem(entryId = 2, name = "B", expiry = today.plusDays(5)),
-            stockItem(entryId = 3, name = "A", expiry = today.minusDays(1)),
+            stockItem(entryId = "1", name = "C", expiry = null),
+            stockItem(entryId = "2", name = "B", expiry = today.plusDays(5)),
+            stockItem(entryId = "3", name = "A", expiry = today.minusDays(1)),
         )
-        assertEquals(listOf(3L, 2L, 1L), StockQueries.sort(items, StockSort.EXPIRY).map { it.entryId })
+        assertEquals(listOf("3", "2", "1"), StockQueries.sort(items, StockSort.EXPIRY).map { it.entryId })
     }
 
     @Test fun `Sammelbenachrichtigung gruppiert abgelaufen, heute, bald`() {
         val items = listOf(
-            stockItem(entryId = 1, expiry = today.minusDays(1)),
-            stockItem(entryId = 2, expiry = today),
-            stockItem(entryId = 3, expiry = today.plusDays(3)),
-            stockItem(entryId = 4, expiry = today.plusDays(4)),
-            stockItem(entryId = 5, expiry = null),
+            stockItem(entryId = "1", expiry = today.minusDays(1)),
+            stockItem(entryId = "2", expiry = today),
+            stockItem(entryId = "3", expiry = today.plusDays(3)),
+            stockItem(entryId = "4", expiry = today.plusDays(4)),
+            stockItem(entryId = "5", expiry = null),
         )
         val digest = ReminderDigest.from(items, today, 3)
-        assertEquals(listOf(1L), digest.expired.map { it.entryId })
-        assertEquals(listOf(2L), digest.today.map { it.entryId })
-        assertEquals(listOf(3L), digest.soon.map { it.entryId })
+        assertEquals(listOf("1"), digest.expired.map { it.entryId })
+        assertEquals(listOf("2"), digest.today.map { it.entryId })
+        assertEquals(listOf("3"), digest.soon.map { it.entryId })
         assertEquals(3, digest.total)
     }
 

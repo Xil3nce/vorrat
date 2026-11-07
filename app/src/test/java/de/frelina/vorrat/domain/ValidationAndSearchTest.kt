@@ -42,16 +42,16 @@ class ValidationAndSearchTest {
 
     @Test fun `Textsuche ueber Name, Marke, Barcode, Ort, Notiz – ohne Gross-Klein, auch Umlaute`() {
         val items = listOf(
-            stockItem(entryId = 1, name = "Äpfel", brand = "Obsthof"),
-            stockItem(entryId = 2, name = "Milch", barcode = "4001234567890"),
-            stockItem(entryId = 3, name = "Mehl", locationName = "Vorratsschrank"),
-            stockItem(entryId = 4, name = "Reis", note = "Für Risotto"),
+            stockItem(entryId = "1", name = "Äpfel", brand = "Obsthof"),
+            stockItem(entryId = "2", name = "Milch", barcode = "4001234567890"),
+            stockItem(entryId = "3", name = "Mehl", locationName = "Vorratsschrank"),
+            stockItem(entryId = "4", name = "Reis", note = "Für Risotto"),
         )
-        assertEquals(listOf(1L), StockQueries.search(items, "äPF").map { it.entryId })
-        assertEquals(listOf(1L), StockQueries.search(items, "obst").map { it.entryId })
-        assertEquals(listOf(2L), StockQueries.search(items, "12345").map { it.entryId })
-        assertEquals(listOf(3L), StockQueries.search(items, "SCHRANK").map { it.entryId })
-        assertEquals(listOf(4L), StockQueries.search(items, "risotto").map { it.entryId })
+        assertEquals(listOf("1"), StockQueries.search(items, "äPF").map { it.entryId })
+        assertEquals(listOf("1"), StockQueries.search(items, "obst").map { it.entryId })
+        assertEquals(listOf("2"), StockQueries.search(items, "12345").map { it.entryId })
+        assertEquals(listOf("3"), StockQueries.search(items, "SCHRANK").map { it.entryId })
+        assertEquals(listOf("4"), StockQueries.search(items, "risotto").map { it.entryId })
         assertTrue(StockQueries.search(items, "  ").isEmpty())
     }
 

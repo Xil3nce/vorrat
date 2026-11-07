@@ -76,7 +76,7 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun increase(entryId: Long, amount: Int) = viewModelScope.launch {
+    fun increase(entryId: String, amount: Int) = viewModelScope.launch {
         if (amount < 1) return@launch
         if (stockRepository.changeQuantity(entryId, amount) is QuantityChange.Updated) {
             messages.show(UiMessage(R.string.scan_increased))

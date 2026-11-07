@@ -9,6 +9,7 @@ import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.image.ImageStore
+import de.frelina.vorrat.data.sync.RemoteWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -40,11 +41,14 @@ class BackupManager @Inject constructor(
     private val imageStore: ImageStore,
     @Named("appVersion") private val appVersion: String,
     @Named("cacheDir") private val cacheDir: File,
+    private val remote: RemoteWriter,
 ) {
     private val json = Json {
         prettyPrint = true
         ignoreUnknownKeys = true
         encodeDefaults = true
+        // Backups mit schemaVersion 1 haben Zahlen-IDs (ohne Anführungszeichen) → als Text lesen.
+        isLenient = true
     }
 
     // ------------------------------------------------------------------ Export
@@ -157,11 +161,13 @@ class BackupManager @Inject constructor(
     /**
      * Schritt 2 (nach Bestätigung): bestehende Daten in EINER Transaktion ersetzen.
      * Schlägt etwas fehl, rollt Room die Transaktion zurück – die bisherigen Daten bleiben.
-     * Bilder werden erst nach erfolgreichem Commit übernommen.
+     * Bilder werden erst nach erfolgreichem Commit übernommen. Anschließend werden die Haushaltsdaten in
+     * Firestore ersetzt (betrifft beide Handys).
      */
     suspend fun replaceAll(parsed: ParsedBackup) = withContext(Dispatchers.IO) {
         val d = parsed.data
         try {
+            val previousImages = db.productDao().getAllImagePaths().toSet()
             db.withTransaction {
                 db.stockEntryDao().deleteAll()
                 db.productDao().deleteAll()
@@ -214,6 +220,7 @@ class BackupManager @Inject constructor(
             val referenced = db.productDao().getAllImagePaths().toSet() +
                 db.lookupCacheDao().getAllImagePaths().toSet()
             imageStore.deleteUnreferenced(referenced)
+            remote.replaceAll(db, previousImages)
         } finally {
             parsed.stagingDir.deleteRecursively()
         }

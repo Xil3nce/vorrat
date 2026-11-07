@@ -27,7 +27,7 @@ object StockQueries {
     fun filter(
         items: List<StockItem>,
         filter: StockFilter,
-        locationId: Long?,
+        locationId: String?,
         today: LocalDate,
         leadDays: Int,
     ): List<StockItem> = items.filter { item ->

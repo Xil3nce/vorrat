@@ -7,24 +7,32 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
-/** Lagerort, z. B. "Keller" oder "Kühlschrank". Name eindeutig (ohne Groß-/Kleinschreibung). */
+/** Neue, geräteübergreifend eindeutige ID (Sync: beide Handys legen unabhängig Datensätze an). */
+fun newId(): String = UUID.randomUUID().toString()
+
+/**
+ * Lagerort, z. B. "Keller" oder "Kühlschrank". Name eindeutig (ohne Groß-/Kleinschreibung) –
+ * geprüft im CatalogRepository. Seit Schema 2 kein UNIQUE-Index mehr: Room spiegelt den
+ * Firestore-Stand, und zwei Handys können offline denselben Namen anlegen.
+ */
 @Entity(
     tableName = "locations",
-    indices = [Index(value = ["name"], unique = true)],
+    indices = [Index(value = ["name"])],
 )
 data class LocationEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String = newId(),
     @ColumnInfo(collate = ColumnInfo.NOCASE) val name: String,
 )
 
 /** Packungseinheit (g, kg, ml, l, …). */
 @Entity(
     tableName = "units",
-    indices = [Index(value = ["symbol"], unique = true)],
+    indices = [Index(value = ["symbol"])],
 )
 data class UnitEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String = newId(),
     @ColumnInfo(collate = ColumnInfo.NOCASE) val symbol: String,
     val name: String,
 )
@@ -32,10 +40,10 @@ data class UnitEntity(
 /** Menge-Art (Stck., Pck., …). */
 @Entity(
     tableName = "quantity_types",
-    indices = [Index(value = ["symbol"], unique = true)],
+    indices = [Index(value = ["symbol"])],
 )
 data class QuantityTypeEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String = newId(),
     @ColumnInfo(collate = ColumnInfo.NOCASE) val symbol: String,
     val name: String,
 )
@@ -53,20 +61,20 @@ enum class ProductSource { OPEN_FOOD_FACTS, MANUAL }
         ),
     ],
     indices = [
-        // SQLite erlaubt mehrere NULL-Werte in einem UNIQUE-Index → "eindeutig, falls gesetzt".
-        Index(value = ["barcode"], unique = true),
+        // Eindeutigkeit (falls gesetzt) prüft das Formular; kein UNIQUE-Index (siehe LocationEntity).
+        Index(value = ["barcode"]),
         Index(value = ["unitId"]),
         Index(value = ["category"]),
     ],
 )
 data class ProductEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String = newId(),
     val barcode: String?,
     val name: String,
     val brand: String?,
     val category: String?,
     val packageSize: BigDecimal?,
-    val unitId: Long?,
+    val unitId: String?,
     /** Dateiname relativ zum App-internen Bildordner (siehe ImageStore). */
     val imagePath: String?,
     val source: ProductSource,
@@ -104,9 +112,9 @@ data class ProductEntity(
     ],
 )
 data class StockEntryEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val productId: Long,
-    val locationId: Long,
+    @PrimaryKey val id: String = newId(),
+    val productId: String,
+    val locationId: String,
     /** Ebene (optional). */
     val level: Int?,
     /** Fach (optional). */
@@ -114,7 +122,7 @@ data class StockEntryEntity(
     val expiryDate: LocalDate?,
     /** Immer > 0; bei 0 wird der Eintrag gelöscht (siehe StockRepository). */
     val quantity: Int,
-    val quantityTypeId: Long,
+    val quantityTypeId: String,
     val note: String?,
 )
 

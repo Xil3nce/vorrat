@@ -22,7 +22,6 @@ import de.frelina.vorrat.data.repo.ScanRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
-import de.frelina.vorrat.ui.navigation.AddStockRoute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -81,10 +80,9 @@ class StockFormViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Die Routen haben unterschiedliche Argumentnamen → Modus eindeutig bestimmbar.
-    private val entryId: Long? = savedStateHandle.get<Long>("editEntryId")
-    private val editProductId: Long? = savedStateHandle.get<Long>("editProductId")
-    private val addProductId: Long? =
-        savedStateHandle.get<Long>("productId")?.takeIf { it != AddStockRoute.NONE }
+    private val entryId: String? = savedStateHandle.get<String>("editEntryId")
+    private val editProductId: String? = savedStateHandle.get<String>("editProductId")
+    private val addProductId: String? = savedStateHandle.get<String>("productId")?.takeIf { it.isNotBlank() }
     private val barcodeArg: String? = savedStateHandle.get<String>("barcode")?.takeIf { it.isNotBlank() }
 
     /** Neues Produkt aus einem Scan (Barcode als Routen-Argument) – steuert nur den Titel, nicht die Eingabe. */
@@ -148,7 +146,7 @@ class StockFormViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadExisting(productId: Long, entry: EntryForm) {
+    private suspend fun loadExisting(productId: String, entry: EntryForm) {
         val product = productRepository.getById(productId)
         _state.value = StockFormState(FormMode.EXISTING_PRODUCT, loading = false, existingProduct = product, entry = entry)
     }

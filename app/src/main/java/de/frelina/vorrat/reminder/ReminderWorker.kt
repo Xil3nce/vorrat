@@ -8,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
+import de.frelina.vorrat.data.sync.SyncManager
 import java.time.LocalDate
 
 @HiltWorker
@@ -17,6 +18,7 @@ class ReminderWorker @AssistedInject constructor(
     private val stockRepository: StockRepository,
     private val settings: SettingsRepository,
     private val notifications: ReminderNotifications,
+    private val syncManager: SyncManager,
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
@@ -26,11 +28,18 @@ class ReminderWorker @AssistedInject constructor(
         // Höchstens eine Sammelbenachrichtigung pro Tag (z. B. nach Neuplanung am selben Tag).
         if (settings.lastNotifiedDate() == today) return Result.success()
 
+        // Änderungen vom anderen Handy einmal vom Server holen; offline/Zeitüberschreitung → lokaler Stand.
+        syncManager.awaitServerSync(SYNC_TIMEOUT_MS)
+
         val digest = ReminderDigest.from(stockRepository.allItems(), today, s.leadDays)
         if (digest.isEmpty) return Result.success() // nichts steht an → keine Benachrichtigung
         if (notifications.show(digest)) {
             settings.setLastNotifiedDate(today)
         }
         return Result.success()
+    }
+
+    private companion object {
+        const val SYNC_TIMEOUT_MS = 20_000L
     }
 }

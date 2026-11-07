@@ -22,8 +22,8 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class DaoAndRepositoryTest : DbTestBase() {
 
-    private val stockRepo get() = StockRepository(db, db.stockEntryDao(), db.productDao())
-    private val catalogRepo get() = CatalogRepository(db.locationDao(), db.unitDao(), db.quantityTypeDao())
+    private val stockRepo get() = StockRepository(db, db.stockEntryDao(), db.productDao(), writer)
+    private val catalogRepo get() = CatalogRepository(db.locationDao(), db.unitDao(), db.quantityTypeDao(), writer)
 
     @Test fun `Startwerte fuer Einheiten und Menge-Arten`() = runBlocking {
         assertEquals(listOf("g", "kg", "ml", "l"), db.unitDao().getAll().map { it.symbol })
@@ -43,27 +43,24 @@ class DaoAndRepositoryTest : DbTestBase() {
         assertEquals(3, item.shelf)
     }
 
+    // Seit Schema 2 prüft das Repository die Eindeutigkeit (Room spiegelt Firestore, kein UNIQUE-Index mehr).
     @Test fun `Ortsname ist eindeutig ohne Gross-Klein`() = runBlocking {
-        location("Keller")
-        try {
-            db.locationDao().insert(LocationEntity(name = "keller"))
-            fail("Duplikat erwartet")
-        } catch (_: SQLiteConstraintException) {
-        }
+        assertTrue(catalogRepo.addLocation("Keller") is SaveResult.Saved)
         assertEquals(SaveResult.Duplicate, catalogRepo.addLocation(" KELLER "))
+        assertEquals(SaveResult.Duplicate, catalogRepo.addLocation("keller"))
+        assertEquals(1, db.locationDao().getAll().size)
         assertEquals(SaveResult.Blank, catalogRepo.addLocation("   "))
     }
 
-    @Test fun `Barcode eindeutig, aber mehrere Produkte ohne Barcode erlaubt`() = runBlocking {
+    // Eindeutigkeit des Barcodes prüft das Formular; doppelt synchronisierte Produkte (zwei Handys offline)
+    // dürfen Room nicht blockieren – getByBarcode liefert dann das älteste.
+    @Test fun `mehrere Produkte ohne Barcode erlaubt, Barcode-Suche liefert das aelteste`() = runBlocking {
         product(name = "A", barcode = null)
         product(name = "B", barcode = null)
-        product(name = "C", barcode = "123")
-        try {
-            product(name = "D", barcode = "123")
-            fail("Duplikat erwartet")
-        } catch (_: SQLiteConstraintException) {
-        }
-        assertEquals(3, db.productDao().getAll().size)
+        val first = product(name = "C", barcode = "123")
+        db.productDao().insert(db.productDao().getById(first)!!.copy(id = "zweites", name = "D", createdAt = 99))
+        assertEquals(4, db.productDao().getAll().size)
+        assertEquals("C", db.productDao().getByBarcode("123")?.name)
     }
 
     @Test fun `Loeschschutz fuer Orte, Einheiten und Menge-Arten`() = runBlocking {

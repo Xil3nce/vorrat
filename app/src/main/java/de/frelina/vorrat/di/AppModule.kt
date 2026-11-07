@@ -24,6 +24,11 @@ import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.off.OffApi
 import de.frelina.vorrat.data.off.OpenFoodFactsSource
 import de.frelina.vorrat.data.off.ProductLookupSource
+import de.frelina.vorrat.data.sync.FirestoreRemoteStore
+import de.frelina.vorrat.data.sync.RemoteStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -32,6 +37,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 object OffConfig {
@@ -42,9 +48,19 @@ object OffConfig {
     val USER_AGENT = "Vorrat/${BuildConfig.VERSION_NAME} (${BuildConfig.OFF_CONTACT})"
 }
 
+/** App-weiter CoroutineScope (lebt so lange wie der Prozess), z. B. für Sync-Listener. */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScope
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
     @Singleton
@@ -112,4 +128,7 @@ object AppModule {
 abstract class BindingsModule {
     @Binds
     abstract fun lookupSource(impl: OpenFoodFactsSource): ProductLookupSource
+
+    @Binds
+    abstract fun remoteStore(impl: FirestoreRemoteStore): RemoteStore
 }
