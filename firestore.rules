@@ -1,0 +1,71 @@
+rules_version = '2';
+
+// Sicherheitsregeln für Vorrat (Firebase-Projekt frelina-vorrat-app).
+// In der Firebase-Konsole unter Firestore Database → Regeln einfügen und veröffentlichen.
+//
+// Struktur:
+//   invites/{code}                         {householdId, createdBy}
+//   households/{hid}                       {ownerUid, createdAt}
+//   households/{hid}/members/{uid}         {code, joinedAt}
+//   households/{hid}/{locations|units|quantityTypes|products|entries|images}/{id}
+//
+// Grundsatz: Alles, was hier nicht ausdrücklich erlaubt ist, ist verboten. Nur Mitglieder eines Haushalts
+// sehen und ändern dessen Daten; Mitglied wird man als Ersteller oder mit einem gültigen Einladungscode.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(hid) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/households/$(hid)/members/$(request.auth.uid));
+    }
+
+    // Einladungen: nur gezielt per Code lesbar (kein Auflisten → Codes nicht abgreifbar).
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      // Nur ein Mitglied des Haushalts (auch im selben Batch beim Anlegen) darf eine Einladung erstellen.
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['householdId', 'createdBy'])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.householdId is string
+        && existsAfter(/databases/$(database)/documents/households/$(request.resource.data.householdId)/members/$(request.auth.uid));
+      allow update, delete: if false;
+    }
+
+    match /households/{hid} {
+      allow get: if isMember(hid);
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['ownerUid', 'createdAt'])
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if false;
+
+      // Mitgliedschaften: jeder trägt nur sich selbst ein – als Ersteller des Haushalts oder mit einem
+      // Einladungscode, der auf genau diesen Haushalt zeigt.
+      match /members/{uid} {
+        allow read: if isMember(hid);
+        allow create: if signedIn()
+          && uid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['code', 'joinedAt'])
+          && request.resource.data.code is string
+          && (
+            getAfter(/databases/$(database)/documents/households/$(hid)).data.ownerUid == request.auth.uid
+            || get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.householdId == hid
+          );
+        allow update: if false;
+        allow delete: if signedIn() && uid == request.auth.uid;
+      }
+
+      // Haushaltsdaten: lesen und schreiben nur für Mitglieder, nur in den bekannten Sammlungen
+      // ("members" ist hier ausdrücklich ausgeschlossen).
+      match /{collection}/{docId} {
+        allow read, write: if collection in ['locations', 'units', 'quantityTypes', 'products', 'entries', 'images']
+          && isMember(hid);
+      }
+    }
+  }
+}
