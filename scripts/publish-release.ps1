@@ -12,7 +12,7 @@ Set-Location $root
 $gradle = Get-Content 'app\build.gradle.kts' -Raw
 if ($gradle -notmatch 'versionName = "(\d+\.\d+\.\d+)"') { throw 'versionName (x.y.z) fehlt in app\build.gradle.kts' }
 $version = $Matches[1]
-if ($gradle -notmatch '"UPDATE_REPO", "\\"([^"\]+)\\""') { throw 'UPDATE_REPO fehlt in app\build.gradle.kts' }
+if ($gradle -notmatch 'UPDATE_REPO", "\\"([\w.-]+/[\w.-]+)') { throw 'UPDATE_REPO fehlt in app\build.gradle.kts' }
 $repo = $Matches[1]
 if (-not (Test-Path '..\vorrat-signing\keystore.properties')) { throw 'Signatur fehlt: ..\vorrat-signing\keystore.properties' }
 
