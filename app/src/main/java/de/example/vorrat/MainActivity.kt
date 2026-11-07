@@ -13,4 +13,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent { Text(stringResource(R.string.app_name)) }
     }
+
+    companion object {
+        const val EXTRA_OPEN_FILTER = "open_filter"
+        const val FILTER_SOON = "soon"
+    }
 }

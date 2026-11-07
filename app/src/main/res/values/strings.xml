@@ -1,4 +1,268 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vorrat</string>
+
+    <!-- Navigation -->
+    <string name="nav_stock">Bestand</string>
+    <string name="nav_search">Suche</string>
+    <string name="nav_scan">Scannen</string>
+    <string name="nav_locations">Orte</string>
+    <string name="nav_settings">Einstellungen</string>
+
+    <!-- Allgemein -->
+    <string name="action_save">Speichern</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_edit">Bearbeiten</string>
+    <string name="action_add">Hinzufügen</string>
+    <string name="action_rename">Umbenennen</string>
+    <string name="action_undo">Rückgängig</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_ok">OK</string>
+    <string name="action_close">Schließen</string>
+    <string name="action_increase">Anzahl erhöhen</string>
+    <string name="action_decrease">Anzahl verringern</string>
+    <string name="action_more">Weitere Optionen</string>
+    <string name="action_clear">Eingabe löschen</string>
+    <string name="product_image">Produktbild</string>
+    <string name="no_image">Kein Bild</string>
+    <string name="optional">optional</string>
+
+    <!-- Validierung -->
+    <string name="error_required">Pflichtfeld – bitte ausfüllen.</string>
+    <string name="error_quantity_min">Die Anzahl muss mindestens 1 sein.</string>
+    <string name="error_whole_number">Bitte eine ganze Zahl (0 oder größer) eingeben.</string>
+    <string name="error_invalid_date">Ungültiges Datum. Bitte im Format TT.MM.JJJJ eingeben.</string>
+    <string name="error_positive_number">Bitte eine Zahl größer als 0 eingeben.</string>
+    <string name="error_duplicate_name">Dieser Name ist bereits vergeben.</string>
+    <string name="error_duplicate_symbol">Dieses Kürzel ist bereits vergeben.</string>
+    <string name="error_duplicate_barcode">Ein Produkt mit diesem Barcode existiert bereits.</string>
+    <string name="error_location_required">Bitte einen Ort auswählen.</string>
+    <string name="error_generic">Etwas ist schiefgelaufen. Bitte erneut versuchen.</string>
+
+    <!-- Bestand -->
+    <string name="stock_title">Bestand</string>
+    <string name="stock_empty">Noch nichts im Bestand. Scanne ein Produkt oder lege es manuell an.</string>
+    <string name="stock_empty_filtered">Keine Einträge für diesen Filter.</string>
+    <string name="stock_sort">Sortierung</string>
+    <string name="stock_sort_expiry">Nach Ablaufdatum</string>
+    <string name="stock_sort_location">Nach Ort</string>
+    <string name="stock_filter_all">Alle</string>
+    <string name="stock_filter_soon">Läuft bald ab</string>
+    <string name="stock_filter_expired">Abgelaufen</string>
+    <string name="stock_filter_location">Ort</string>
+    <string name="stock_filter_all_locations">Alle Orte</string>
+    <string name="stock_add_manual">Produkt manuell anlegen</string>
+    <plurals name="banner_expired">
+        <item quantity="one">%d Eintrag ist abgelaufen</item>
+        <item quantity="other">%d Einträge sind abgelaufen</item>
+    </plurals>
+    <plurals name="banner_soon">
+        <item quantity="one">%d Eintrag läuft bald ab</item>
+        <item quantity="other">%d Einträge laufen bald ab</item>
+    </plurals>
+    <string name="banner_show">Anzeigen</string>
+    <string name="expiry_label">Ablauf: %1$s</string>
+    <string name="expiry_none">Kein Ablaufdatum</string>
+    <string name="expiry_expired">abgelaufen</string>
+    <string name="expiry_today">läuft heute ab</string>
+    <string name="expiry_soon">läuft bald ab</string>
+    <string name="location_label">%1$s</string>
+    <string name="level_label">Ebene %1$d</string>
+    <string name="shelf_label">Fach %1$d</string>
+    <string name="quantity_label">%1$d %2$s</string>
+    <string name="entry_removed">Eintrag entfernt (Anzahl 0)</string>
+    <string name="entry_deleted">Eintrag gelöscht</string>
+
+    <!-- Details -->
+    <string name="detail_title">Details</string>
+    <string name="detail_quantity">Anzahl</string>
+    <string name="detail_edit_entry">Eintrag bearbeiten</string>
+    <string name="detail_edit_product">Produkt bearbeiten</string>
+    <string name="detail_delete_entry">Eintrag löschen</string>
+    <string name="detail_delete_confirm_title">Eintrag löschen?</string>
+    <string name="detail_delete_confirm_text">Der Bestandseintrag wird entfernt. Das Produkt bleibt gespeichert, damit es beim nächsten Scan wiedererkannt wird.</string>
+    <string name="detail_last_confirm_title">Letztes Exemplar entfernen?</string>
+    <string name="detail_last_confirm_text">Die Anzahl fällt auf 0 – der Bestandseintrag wird gelöscht. Das Produkt bleibt gespeichert.</string>
+    <string name="detail_remove">Entfernen</string>
+    <string name="detail_not_found">Dieser Eintrag existiert nicht mehr.</string>
+    <string name="detail_barcode">Barcode: %1$s</string>
+    <string name="detail_category">Kategorie: %1$s</string>
+    <string name="detail_package">Packung: %1$s %2$s</string>
+    <string name="detail_note">Notiz: %1$s</string>
+
+    <!-- Suche -->
+    <string name="search_hint">Name, Marke, Barcode, Ort oder Notiz</string>
+    <string name="search_empty_query">Suchbegriff eingeben, um den Bestand zu durchsuchen.</string>
+    <string name="search_no_results">Keine Treffer für „%1$s“.</string>
+
+    <!-- Scannen -->
+    <string name="scan_title">Scannen</string>
+    <string name="scan_permission_title">Kamerazugriff benötigt</string>
+    <string name="scan_permission_text">Zum Scannen von Barcodes braucht Vorrat Zugriff auf die Kamera. Die Bilder werden nur auf dem Gerät ausgewertet und nicht gespeichert oder übertragen.</string>
+    <string name="scan_permission_grant">Kamera erlauben</string>
+    <string name="scan_permission_denied">Ohne Kamerazugriff ist kein Scannen möglich. Du kannst den Barcode auch eintippen oder die Berechtigung in den Systemeinstellungen erteilen.</string>
+    <string name="scan_open_settings">Systemeinstellungen öffnen</string>
+    <string name="scan_hint">Barcode in den Rahmen halten – die Erkennung startet automatisch.</string>
+    <string name="scan_again">Neu scannen</string>
+    <string name="scan_torch_on">Taschenlampe einschalten</string>
+    <string name="scan_torch_off">Taschenlampe ausschalten</string>
+    <string name="scan_enter_barcode">Barcode eingeben</string>
+    <string name="scan_barcode_field">Barcode</string>
+    <string name="scan_lookup">Suchen</string>
+    <string name="scan_loading">Suche nach Barcode %1$s …</string>
+    <string name="scan_in_stock">Im Bestand</string>
+    <string name="scan_not_in_stock">Nicht im Bestand</string>
+    <string name="scan_alternatives_title">Alternativprodukte</string>
+    <string name="scan_alternative_badge">Alternativprodukt – nicht das gescannte Produkt</string>
+    <string name="scan_nothing">Davon ist nichts vorrätig – auch keine Alternative aus derselben Kategorie.</string>
+    <string name="scan_no_category">Für dieses Produkt ist keine Kategorie bekannt, daher können keine Alternativen gesucht werden.</string>
+    <string name="scan_offline_no_alternatives">Ohne Internetverbindung ist die Kategorie unbekannter Produkte nicht ermittelbar – Alternativen können nicht angezeigt werden.</string>
+    <string name="scan_unknown_product">Unbekanntes Produkt (%1$s)</string>
+    <string name="scan_off_not_found">Open Food Facts kennt diesen Barcode nicht. Du kannst das Produkt manuell anlegen.</string>
+    <string name="scan_error_network">Keine Internetverbindung. Das Produkt konnte nicht abgefragt werden. Du kannst es manuell anlegen.</string>
+    <string name="scan_error_timeout">Zeitüberschreitung bei der Abfrage. Bitte später erneut versuchen oder manuell anlegen.</string>
+    <string name="scan_error_rate_limited">Zu viele Abfragen in kurzer Zeit. Bitte etwa eine Minute warten oder das Produkt manuell anlegen.</string>
+    <string name="scan_error_server">Open Food Facts ist gerade nicht erreichbar. Bitte später erneut versuchen oder manuell anlegen.</string>
+    <string name="scan_retry">Erneut versuchen</string>
+    <string name="scan_add_to_stock">Zum Bestand hinzufügen</string>
+    <string name="scan_create_manual">Manuell anlegen</string>
+    <string name="scan_existing_title">Produkt ist schon im Bestand</string>
+    <string name="scan_existing_text">Soll die Anzahl eines vorhandenen Eintrags erhöht oder ein neuer Bestandseintrag angelegt werden?</string>
+    <string name="scan_existing_increase">Anzahl erhöhen um</string>
+    <string name="scan_existing_increase_action">Erhöhen</string>
+    <string name="scan_existing_new_entry">Neuer Eintrag</string>
+    <string name="scan_increased">Anzahl erhöht</string>
+    <string name="scan_source_off">Daten von Open Food Facts</string>
+
+    <!-- Erfassen / Produkt -->
+    <string name="add_title">Zum Bestand hinzufügen</string>
+    <string name="add_manual_title">Produkt manuell anlegen</string>
+    <string name="edit_entry_title">Eintrag bearbeiten</string>
+    <string name="edit_product_title">Produkt bearbeiten</string>
+    <string name="section_product">Produkt</string>
+    <string name="section_stock">Bestandsdaten</string>
+    <string name="field_name">Name</string>
+    <string name="field_brand">Marke</string>
+    <string name="field_category">Kategorie</string>
+    <string name="field_category_help">Wird für Alternativvorschläge genutzt. Bereits verwendete Kategorien werden vorgeschlagen.</string>
+    <string name="field_package_size">Packungsgröße</string>
+    <string name="field_unit">Einheit</string>
+    <string name="field_unit_none">Keine</string>
+    <string name="field_barcode">Barcode</string>
+    <string name="field_location">Ort</string>
+    <string name="field_level">Ebene</string>
+    <string name="field_shelf">Fach</string>
+    <string name="field_expiry">Ablaufdatum (TT.MM.JJJJ)</string>
+    <string name="field_pick_date">Datum auswählen</string>
+    <string name="field_clear_date">Datum entfernen</string>
+    <string name="field_quantity">Anzahl</string>
+    <string name="field_quantity_type">Menge-Art</string>
+    <string name="field_note">Notiz</string>
+    <string name="image_take_photo">Foto aufnehmen</string>
+    <string name="image_pick_gallery">Aus Galerie wählen</string>
+    <string name="image_remove">Bild entfernen</string>
+    <string name="image_error">Das Bild konnte nicht übernommen werden.</string>
+    <string name="add_loading_off">Produktdaten werden geladen …</string>
+    <string name="add_prefilled_hint">Vorbelegt mit Daten von Open Food Facts – bitte prüfen und ergänzen.</string>
+    <string name="add_package_unparsed">Die Packungsgröße konnte nicht eindeutig erkannt werden – bitte bei Bedarf ergänzen.</string>
+    <string name="add_new_location">Neuen Ort anlegen</string>
+    <string name="add_no_locations">Noch keine Orte vorhanden – bitte zuerst einen Ort anlegen.</string>
+    <string name="saved">Gespeichert</string>
+
+    <!-- Orte -->
+    <string name="locations_title">Orte</string>
+    <string name="locations_empty">Noch keine Orte. Lege z. B. „Keller“, „Kühlschrank“ oder „Vorratsschrank“ an.</string>
+    <string name="locations_add">Ort hinzufügen</string>
+    <string name="locations_new">Neuer Ort</string>
+    <string name="locations_rename">Ort umbenennen</string>
+    <string name="locations_name">Name des Orts</string>
+    <string name="locations_delete_title">Ort löschen?</string>
+    <string name="locations_delete_text">„%1$s“ wird gelöscht.</string>
+    <plurals name="locations_in_use">
+        <item quantity="one">„%2$s“ kann nicht gelöscht werden: %1$d Bestandseintrag liegt noch dort. Verschiebe oder entferne ihn zuerst.</item>
+        <item quantity="other">„%2$s“ kann nicht gelöscht werden: %1$d Bestandseinträge liegen noch dort. Verschiebe oder entferne sie zuerst.</item>
+    </plurals>
+
+    <!-- Einstellungen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_catalogs">Stammdaten</string>
+    <string name="settings_units">Packungseinheiten</string>
+    <string name="settings_units_summary">g, kg, ml, l …</string>
+    <string name="settings_quantity_types">Menge-Arten</string>
+    <string name="settings_quantity_types_summary">Stck., Pck. …</string>
+    <string name="settings_reminders">Erinnerungen</string>
+    <string name="settings_reminders_enabled">Tägliche Erinnerung an ablaufende Produkte</string>
+    <string name="settings_reminders_time">Uhrzeit</string>
+    <string name="settings_reminders_lead">Vorlaufzeit</string>
+    <plurals name="settings_reminders_lead_days">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
+    <string name="settings_reminders_inexact">Android führt die Erinnerung ungefähr zur eingestellten Uhrzeit aus; durch Energiesparfunktionen kann sie sich verzögern.</string>
+    <string name="settings_notifications_denied">Benachrichtigungen sind nicht erlaubt. Ohne diese Berechtigung können keine Erinnerungen angezeigt werden.</string>
+    <string name="settings_notifications_request">Benachrichtigungen erlauben</string>
+    <string name="settings_notifications_open_settings">In den Systemeinstellungen erlauben</string>
+    <string name="settings_notifications_rationale_title">Benachrichtigungen erlauben?</string>
+    <string name="settings_notifications_rationale_text">Vorrat schickt dir höchstens einmal täglich eine Sammelbenachrichtigung, wenn Produkte bald ablaufen oder abgelaufen sind.</string>
+    <string name="settings_backup">Backup</string>
+    <string name="settings_backup_export">Daten exportieren</string>
+    <string name="settings_backup_export_summary">ZIP-Datei mit allen Daten und Bildern speichern</string>
+    <string name="settings_backup_import">Daten importieren</string>
+    <string name="settings_backup_import_summary">ZIP-Datei aus einem früheren Export laden</string>
+    <string name="settings_backup_export_done">Export abgeschlossen.</string>
+    <string name="settings_backup_export_failed">Export fehlgeschlagen. Bitte erneut versuchen.</string>
+    <string name="settings_backup_import_confirm_title">Bestehende Daten ersetzen?</string>
+    <string name="settings_backup_import_confirm_text">Das Backup enthält %1$d Produkte, %2$d Bestandseinträge und %3$d Orte. Alle aktuellen Daten in der App werden dadurch ersetzt. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_backup_import_replace">Ersetzen</string>
+    <string name="settings_backup_import_done">Import abgeschlossen.</string>
+    <string name="settings_backup_import_failed">Import fehlgeschlagen. Deine bisherigen Daten sind unverändert.</string>
+    <string name="settings_backup_error_not_backup">Die Datei ist kein Vorrat-Backup.</string>
+    <string name="settings_backup_error_unreadable">Die Datei konnte nicht gelesen werden.</string>
+    <string name="settings_backup_error_newer">Das Backup stammt aus einer neueren App-Version und kann nicht importiert werden.</string>
+    <string name="settings_backup_error_format">Das Backup-Format wird nicht unterstützt.</string>
+    <string name="settings_backup_error_invalid">Das Backup ist unvollständig oder fehlerhaft (%1$s). Es wurde nichts verändert.</string>
+    <string name="settings_backup_working">Bitte warten …</string>
+    <string name="settings_about">Über</string>
+    <string name="settings_about_summary">Version, Datenquelle und Lizenz</string>
+
+    <!-- Stammdaten-Verwaltung -->
+    <string name="catalog_units_title">Packungseinheiten</string>
+    <string name="catalog_types_title">Menge-Arten</string>
+    <string name="catalog_add">Neu anlegen</string>
+    <string name="catalog_edit">Bearbeiten</string>
+    <string name="catalog_symbol">Kürzel</string>
+    <string name="catalog_name">Name</string>
+    <string name="catalog_delete_title">„%1$s“ löschen?</string>
+    <plurals name="catalog_unit_in_use">
+        <item quantity="one">„%2$s“ kann nicht gelöscht werden: %1$d Produkt verwendet diese Einheit.</item>
+        <item quantity="other">„%2$s“ kann nicht gelöscht werden: %1$d Produkte verwenden diese Einheit.</item>
+    </plurals>
+    <plurals name="catalog_type_in_use">
+        <item quantity="one">„%2$s“ kann nicht gelöscht werden: %1$d Bestandseintrag verwendet diese Menge-Art.</item>
+        <item quantity="other">„%2$s“ kann nicht gelöscht werden: %1$d Bestandseinträge verwenden diese Menge-Art.</item>
+    </plurals>
+
+    <!-- Über -->
+    <string name="about_title">Über Vorrat</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_description">Vorrat hilft dir, den Überblick über deine Lebensmittelvorräte zu behalten. Alle Daten bleiben lokal auf deinem Gerät; das Internet wird nur für Produktabfragen per Barcode genutzt.</string>
+    <string name="about_off_title">Datenquelle: Open Food Facts</string>
+    <string name="about_off_text">Produktdaten (Name, Marke, Menge, Kategorien, Bilder) stammen von Open Food Facts (openfoodfacts.org), einer freien, gemeinschaftlich gepflegten Lebensmitteldatenbank. Die Datenbank steht unter der Open Database License (ODbL) v1.0, die einzelnen Inhalte unter der Database Contents License (DbCL) v1.0. Produktbilder stehen unter Creative Commons Attribution ShareAlike (CC BY-SA) 3.0.</string>
+    <string name="about_off_link">openfoodfacts.org öffnen</string>
+    <string name="about_license_link">ODbL-Lizenztext öffnen</string>
+    <string name="about_privacy">Beim Scannen eines unbekannten Barcodes wird nur der Barcode an Open Food Facts übertragen.</string>
+
+    <!-- Benachrichtigungen -->
+    <string name="notification_channel_name">Ablauf-Erinnerungen</string>
+    <string name="notification_channel_description">Tägliche Sammelbenachrichtigung über bald ablaufende und abgelaufene Produkte</string>
+    <plurals name="notification_title">
+        <item quantity="one">%d Produkt läuft ab</item>
+        <item quantity="other">%d Produkte laufen ab</item>
+    </plurals>
+    <string name="notification_summary">Abgelaufen: %1$d · Heute: %2$d · In %4$d Tagen: %3$d</string>
+    <string name="notification_line_expired">Abgelaufen: %1$s</string>
+    <string name="notification_line_today">Heute: %1$s</string>
+    <string name="notification_line_soon">Bald: %1$s</string>
+    <string name="notification_more">+ %1$d weitere</string>
 </resources>
