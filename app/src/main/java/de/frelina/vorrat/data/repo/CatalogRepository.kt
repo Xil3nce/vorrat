@@ -37,23 +37,27 @@ class CatalogRepository @Inject constructor(
     // ---------- Orte ----------
     fun observeLocations(): Flow<List<LocationEntity>> = locationDao.observeAll()
 
-    suspend fun addLocation(name: String): SaveResult {
+    suspend fun addLocation(name: String, levels: Int? = null, shelves: Int? = null): SaveResult {
         val n = name.trim()
         if (n.isEmpty()) return SaveResult.Blank
         if (locationDao.findByName(n) != null) return SaveResult.Duplicate
-        val location = LocationEntity(name = n)
+        val location = LocationEntity(name = n, levels = levels.slotCount(), shelves = shelves.slotCount())
         return guardUnique {
             locationDao.insert(location)
             SaveResult.Saved(location.id)
         }.also { if (it is SaveResult.Saved) remote.putLocation(location) }
     }
 
-    suspend fun renameLocation(location: LocationEntity, newName: String): SaveResult {
+    suspend fun renameLocation(location: LocationEntity, newName: String): SaveResult =
+        updateLocation(location, newName, location.levels, location.shelves)
+
+    /** Name sowie Anzahl Ebenen/Fächer ändern (null bzw. ≤ 0 = nicht festgelegt). */
+    suspend fun updateLocation(location: LocationEntity, newName: String, levels: Int?, shelves: Int?): SaveResult {
         val n = newName.trim()
         if (n.isEmpty()) return SaveResult.Blank
         val existing = locationDao.findByName(n)
         if (existing != null && existing.id != location.id) return SaveResult.Duplicate
-        val renamed = location.copy(name = n)
+        val renamed = location.copy(name = n, levels = levels.slotCount(), shelves = shelves.slotCount())
         return guardUnique {
             locationDao.update(renamed)
             SaveResult.Saved(location.id)
@@ -126,3 +130,5 @@ class CatalogRepository @Inject constructor(
         SaveResult.Duplicate
     }
 }
+
+private fun Int?.slotCount(): Int? = this?.takeIf { it > 0 }?.coerceAtMost(LocationEntity.MAX_SLOTS)

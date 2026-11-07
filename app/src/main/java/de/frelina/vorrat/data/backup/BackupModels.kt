@@ -22,7 +22,7 @@ data class BackupData(
 )
 
 @Serializable
-data class LocationDto(val id: String, val name: String)
+data class LocationDto(val id: String, val name: String, val levels: Int? = null, val shelves: Int? = null)
 
 @Serializable
 data class UnitDto(val id: String, val symbol: String, val name: String)

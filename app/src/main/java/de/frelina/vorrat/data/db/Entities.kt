@@ -24,7 +24,16 @@ fun newId(): String = UUID.randomUUID().toString()
 data class LocationEntity(
     @PrimaryKey val id: String = newId(),
     @ColumnInfo(collate = ColumnInfo.NOCASE) val name: String,
-)
+    /** Anzahl Ebenen (optional); Bestandseinträge wählen dann Ebene 1 … [levels] per Auswahlliste. */
+    val levels: Int? = null,
+    /** Anzahl Fächer (optional); Auswahl Fach 1 … [shelves]. */
+    val shelves: Int? = null,
+) {
+    companion object {
+        /** Obergrenze für Ebenen/Fächer je Ort (Auswahlliste bleibt handhabbar). */
+        const val MAX_SLOTS = 50
+    }
+}
 
 /** Packungseinheit (g, kg, ml, l, …). */
 @Entity(

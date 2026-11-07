@@ -9,6 +9,7 @@ import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.domain.StockMerge
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,6 +39,32 @@ class StockRepository @Inject constructor(
     suspend fun itemsForProduct(productId: String): List<StockItem> = stockDao.getItemsForProduct(productId)
 
     suspend fun getEntry(id: String): StockEntryEntity? = stockDao.getById(id)
+
+    /** Anderer Bestandseintrag mit exakt denselben Daten wie [entry] (für die Frage "Zusammenführen?"). */
+    suspend fun findTwin(entry: StockEntryEntity): StockEntryEntity? =
+        StockMerge.findTwin(entry, stockDao.getEntriesForProduct(entry.productId))
+
+    /**
+     * Führt [entry] mit dem gleichen Eintrag [targetId] zusammen: dessen Anzahl erhöht sich um die Anzahl von
+     * [entry]. Existiert [entry] bereits (Bearbeiten/Verschieben), wird er danach gelöscht.
+     * Liefert false, wenn das Ziel inzwischen nicht mehr existiert (z. B. auf dem anderen Handy gelöscht).
+     */
+    suspend fun mergeInto(targetId: String, entry: StockEntryEntity): Boolean {
+        require(entry.quantity > 0) { "Anzahl muss mindestens 1 sein" }
+        require(targetId != entry.id) { "Eintrag kann nicht mit sich selbst zusammengeführt werden" }
+        // null = Ziel fehlt; sonst: ob [entry] schon gespeichert war (dann auch dessen Dokument löschen).
+        val sourceExisted: Boolean? = db.withTransaction {
+            val target = stockDao.getById(targetId) ?: return@withTransaction null
+            stockDao.update(target.copy(quantity = target.quantity + entry.quantity))
+            val existed = stockDao.getById(entry.id) != null
+            if (existed) stockDao.deleteById(entry.id)
+            existed
+        }
+        if (sourceExisted == null) return false
+        remote.incrementQuantity(targetId, entry.quantity)
+        if (sourceExisted) remote.delete(RemoteCollection.ENTRIES, entry.id)
+        return true
+    }
 
     suspend fun addEntry(entry: StockEntryEntity): String {
         require(entry.quantity > 0) { "Anzahl muss mindestens 1 sein" }

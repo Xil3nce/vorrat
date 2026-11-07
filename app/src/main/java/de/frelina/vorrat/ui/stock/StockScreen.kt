@@ -197,6 +197,58 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
                 }
             }
         }
+        if (state.levelOptions.isNotEmpty() || state.level != null) {
+            SlotFilterChip(
+                selected = state.level,
+                options = state.levelOptions,
+                chipLabel = R.string.stock_filter_level,
+                allLabel = R.string.stock_filter_all_levels,
+                valueLabel = R.string.level_label,
+                onSelect = viewModel::setLevel,
+            )
+        }
+        if (state.shelfOptions.isNotEmpty() || state.shelf != null) {
+            SlotFilterChip(
+                selected = state.shelf,
+                options = state.shelfOptions,
+                chipLabel = R.string.stock_filter_shelf,
+                allLabel = R.string.stock_filter_all_shelves,
+                valueLabel = R.string.shelf_label,
+                onSelect = viewModel::setShelf,
+            )
+        }
+    }
+}
+
+/** Filter-Chip mit Auswahlmenü für Ebene bzw. Fach. */
+@Composable
+private fun SlotFilterChip(
+    selected: Int?,
+    options: List<Int>,
+    chipLabel: Int,
+    allLabel: Int,
+    valueLabel: Int,
+    onSelect: (Int?) -> Unit,
+) {
+    var menu by remember { mutableStateOf(false) }
+    Box {
+        FilterChip(
+            selected = selected != null,
+            onClick = { menu = true },
+            label = { Text(if (selected != null) stringResource(valueLabel, selected) else stringResource(chipLabel)) },
+        )
+        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(allLabel)) },
+                onClick = { onSelect(null); menu = false },
+            )
+            options.forEach { n ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(valueLabel, n)) },
+                    onClick = { onSelect(n); menu = false },
+                )
+            }
+        }
     }
 }
 

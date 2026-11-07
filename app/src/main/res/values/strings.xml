@@ -14,7 +14,6 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_delete">Löschen</string>
     <string name="action_edit">Bearbeiten</string>
-    <string name="action_rename">Umbenennen</string>
     <string name="action_undo">Rückgängig</string>
     <string name="action_back">Zurück</string>
     <string name="action_ok">OK</string>
@@ -48,6 +47,10 @@
     <string name="stock_filter_expired">Abgelaufen</string>
     <string name="stock_filter_location">Ort</string>
     <string name="stock_filter_all_locations">Alle Orte</string>
+    <string name="stock_filter_level">Ebene</string>
+    <string name="stock_filter_all_levels">Alle Ebenen</string>
+    <string name="stock_filter_shelf">Fach</string>
+    <string name="stock_filter_all_shelves">Alle Fächer</string>
     <string name="stock_add_manual">Produkt manuell anlegen</string>
     <plurals name="banner_expired">
         <item quantity="one">%d Eintrag ist abgelaufen</item>
@@ -150,6 +153,7 @@
     <string name="field_location">Ort</string>
     <string name="field_level">Ebene</string>
     <string name="field_shelf">Fach</string>
+    <string name="field_slot_none">Keine Angabe</string>
     <string name="field_expiry">Ablaufdatum (TT.MM.JJJJ)</string>
     <string name="field_pick_date">Datum auswählen</string>
     <string name="field_clear_date">Datum entfernen</string>
@@ -166,13 +170,31 @@
     <string name="add_new_location">Neuen Ort anlegen</string>
     <string name="add_no_locations">Noch keine Orte vorhanden – bitte zuerst einen Ort anlegen.</string>
     <string name="saved">Gespeichert</string>
+    <string name="merge_title">Einträge zusammenführen?</string>
+    <string name="merge_text">Diesen Artikel gibt es dort bereits mit genau denselben Daten (Anzahl %1$d). Sollen die beiden Einträge zu einem zusammengeführt werden?
+
+Neue Anzahl: %1$d + %2$d = %3$d</string>
+    <string name="merge_confirm">Zusammenführen</string>
+    <string name="merge_keep_separate">Getrennt speichern</string>
 
     <!-- Orte -->
     <string name="locations_title">Orte</string>
     <string name="locations_empty">Noch keine Orte. Lege z. B. „Keller“, „Kühlschrank“ oder „Vorratsschrank“ an.</string>
     <string name="locations_add">Ort hinzufügen</string>
     <string name="locations_new">Neuer Ort</string>
-    <string name="locations_rename">Ort umbenennen</string>
+    <string name="locations_edit">Ort bearbeiten</string>
+    <string name="locations_levels">Anzahl Ebenen</string>
+    <string name="locations_shelves">Anzahl Fächer</string>
+    <string name="locations_slots_help">Optional. Ebene und Fach werden beim Erfassen dann aus einer Liste gewählt.</string>
+    <string name="locations_slots_error">Bitte eine Zahl von 1 bis 50.</string>
+    <plurals name="locations_levels_count">
+        <item quantity="one">%d Ebene</item>
+        <item quantity="other">%d Ebenen</item>
+    </plurals>
+    <plurals name="locations_shelves_count">
+        <item quantity="one">%d Fach</item>
+        <item quantity="other">%d Fächer</item>
+    </plurals>
     <string name="locations_name">Name des Orts</string>
     <string name="locations_delete_title">Ort löschen?</string>
     <string name="locations_delete_text">„%1$s“ wird gelöscht.</string>

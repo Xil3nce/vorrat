@@ -28,14 +28,14 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun lookupCacheDao(): LookupCacheDao
 
     companion object {
-        const val VERSION = 2
+        const val VERSION = 3
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -141,5 +141,13 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
             "CREATE INDEX IF NOT EXISTS `index_stock_entries_quantityTypeId` ON `stock_entries` (`quantityTypeId`)",
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_expiryDate` ON `stock_entries` (`expiryDate`)")
+    }
+}
+
+/** v2 → v3: Orte bekommen optional die Anzahl ihrer Ebenen und Fächer (Auswahllisten im Formular). */
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `locations` ADD COLUMN `levels` INTEGER")
+        db.execSQL("ALTER TABLE `locations` ADD COLUMN `shelves` INTEGER")
     }
 }

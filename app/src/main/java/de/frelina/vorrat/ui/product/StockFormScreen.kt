@@ -171,6 +171,25 @@ fun StockFormScreen(
             ) { Text(stringResource(R.string.action_save)) }
         }
     }
+
+    state.mergeOffer?.let { offer ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissMerge,
+            title = { Text(stringResource(R.string.merge_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.merge_text,
+                        offer.target.quantity,
+                        offer.entry.quantity,
+                        offer.target.quantity + offer.entry.quantity,
+                    ),
+                )
+            },
+            confirmButton = { TextButton(onClick = viewModel::confirmMerge) { Text(stringResource(R.string.merge_confirm)) } },
+            dismissButton = { TextButton(onClick = viewModel::keepSeparate) { Text(stringResource(R.string.merge_keep_separate)) } },
+        )
+    }
 }
 
 @Composable
@@ -351,16 +370,19 @@ fun EntryFormSection(
             Icon(Icons.Outlined.AddLocationAlt, contentDescription = stringResource(R.string.add_new_location))
         }
     }
+    val location = locations.firstOrNull { it.id == form.locationId }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        NumberField(
+        SlotField(
             value = form.level,
+            count = location?.levels,
             onValueChange = { v -> onChange { it.copy(level = v, levelError = null) } },
             label = stringResource(R.string.field_level) + " (" + stringResource(R.string.optional) + ")",
             error = form.levelError,
             modifier = Modifier.weight(1f),
         )
-        NumberField(
+        SlotField(
             value = form.shelf,
+            count = location?.shelves,
             onValueChange = { v -> onChange { it.copy(shelf = v, shelfError = null) } },
             label = stringResource(R.string.field_shelf) + " (" + stringResource(R.string.optional) + ")",
             error = form.shelfError,
@@ -431,6 +453,38 @@ fun EntryFormSection(
             onConfirm = onCreateLocation,
         )
     }
+}
+
+/**
+ * Ebene bzw. Fach: Hat der Ort eine Anzahl festgelegt ([count]), Auswahlliste 1 … count (plus "keine Angabe"
+ * und ggf. ein bisher gespeicherter Wert außerhalb des Bereichs); sonst freie Zahleneingabe.
+ */
+@Composable
+private fun SlotField(
+    value: String,
+    count: Int?,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: de.frelina.vorrat.domain.ValidationError?,
+    modifier: Modifier = Modifier,
+) {
+    if (count == null || count <= 0) {
+        NumberField(value = value, onValueChange = onValueChange, label = label, error = error, modifier = modifier)
+        return
+    }
+    val current = value.trim().toIntOrNull()
+    val options: List<Int?> = remember(count, current) {
+        listOf<Int?>(null) + ((1..count).toSet() + listOfNotNull(current)).sorted()
+    }
+    val none = stringResource(R.string.field_slot_none)
+    SelectField(
+        label = label,
+        options = options,
+        selected = current,
+        optionLabel = { it?.toString() ?: none },
+        onSelect = { onValueChange(it?.toString().orEmpty()) },
+        modifier = modifier,
+    )
 }
 
 /**

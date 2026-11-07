@@ -30,14 +30,26 @@ object StockQueries {
         locationId: String?,
         today: LocalDate,
         leadDays: Int,
+        level: Int? = null,
+        shelf: Int? = null,
     ): List<StockItem> = items.filter { item ->
         val statusOk = when (filter) {
             StockFilter.ALL -> true
             StockFilter.SOON -> ExpiryLogic.status(item.expiryDate, today, leadDays) == ExpiryStatus.SOON
             StockFilter.EXPIRED -> ExpiryLogic.status(item.expiryDate, today, leadDays) == ExpiryStatus.EXPIRED
         }
-        statusOk && (locationId == null || item.locationId == locationId)
+        statusOk &&
+            (locationId == null || item.locationId == locationId) &&
+            (level == null || item.level == level) &&
+            (shelf == null || item.shelf == shelf)
     }
+
+    /**
+     * Auswahl für den Ebenen-/Fach-Filter: alle im Bestand (ggf. am gewählten Ort) vorkommenden Werte
+     * plus 1 … [definedCount] des gewählten Orts, aufsteigend.
+     */
+    fun slotOptions(values: List<Int?>, definedCount: Int?): List<Int> =
+        (values.filterNotNull() + (1..(definedCount ?: 0))).distinct().sorted()
 
     /**
      * Textsuche: Teilstring, Groß-/Kleinschreibung egal (auch Umlaute), über

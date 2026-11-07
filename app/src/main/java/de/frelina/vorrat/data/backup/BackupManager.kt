@@ -73,7 +73,7 @@ class BackupManager @Inject constructor(
         schemaVersion = VorratDatabase.VERSION,
         exportedAt = System.currentTimeMillis(),
         appVersion = appVersion,
-        locations = db.locationDao().getAll().map { LocationDto(it.id, it.name) },
+        locations = db.locationDao().getAll().map { LocationDto(it.id, it.name, it.levels, it.shelves) },
         units = db.unitDao().getAll().map { UnitDto(it.id, it.symbol, it.name) },
         quantityTypes = db.quantityTypeDao().getAll().map { QuantityTypeDto(it.id, it.symbol, it.name) },
         products = db.productDao().getAll().map {
@@ -175,7 +175,12 @@ class BackupManager @Inject constructor(
                 db.unitDao().deleteAll()
                 db.quantityTypeDao().deleteAll()
 
-                db.locationDao().insertAll(d.locations.map { LocationEntity(it.id, it.name.trim()) })
+                db.locationDao().insertAll(d.locations.map { LocationEntity(
+                            id = it.id,
+                            name = it.name.trim(),
+                            levels = it.levels?.takeIf { n -> n in 1..LocationEntity.MAX_SLOTS },
+                            shelves = it.shelves?.takeIf { n -> n in 1..LocationEntity.MAX_SLOTS },
+                        ) })
                 db.unitDao().insertAll(d.units.map { UnitEntity(it.id, it.symbol.trim(), it.name.trim()) })
                 db.quantityTypeDao().insertAll(
                     d.quantityTypes.map { QuantityTypeEntity(it.id, it.symbol.trim(), it.name.trim()) },

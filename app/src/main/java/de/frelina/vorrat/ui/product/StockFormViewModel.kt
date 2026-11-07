@@ -11,6 +11,7 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
+import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.image.ImageStore
@@ -61,7 +62,12 @@ data class StockFormState(
     val lookupNotFound: Boolean = false,
     val saving: Boolean = false,
     val imageError: Boolean = false,
+    /** Gleicher Eintrag existiert schon → Nutzer fragen, ob zusammengeführt werden soll. */
+    val mergeOffer: MergeOffer? = null,
 )
+
+/** [entry] (validiert, noch nicht gespeichert) hat dieselben Daten wie der bestehende Eintrag [target]. */
+data class MergeOffer(val entry: StockEntryEntity, val target: StockEntryEntity)
 
 /**
  * Gemeinsames ViewModel für "Zum Bestand hinzufügen", "Produkt manuell anlegen",
@@ -277,6 +283,7 @@ class StockFormViewModel @Inject constructor(
         val (entryForm, entry) = s.entry.validate(productId = product.id)
         _state.update { it.copy(entry = entryForm) }
         if (entry == null) return
+        if (offerMerge(entry)) return
         stockRepository.addEntry(entry)
         finish()
     }
@@ -287,8 +294,43 @@ class StockFormViewModel @Inject constructor(
         val (entryForm, entry) = s.entry.validate(entryId = id, productId = original.productId)
         _state.update { it.copy(entry = entryForm) }
         if (entry == null) return
+        if (offerMerge(entry)) return
         stockRepository.updateEntry(entry)
         finish()
+    }
+
+    /** Gibt es schon einen Eintrag mit denselben Daten, wird nachgefragt (true = Speichern wartet auf Antwort). */
+    private suspend fun offerMerge(entry: StockEntryEntity): Boolean {
+        val twin = stockRepository.findTwin(entry) ?: return false
+        _state.update { it.copy(mergeOffer = MergeOffer(entry, twin)) }
+        return true
+    }
+
+    /** Antwort "Zusammenführen": Anzahl auf den bestehenden Eintrag addieren. */
+    fun confirmMerge() = resolveMerge { offer ->
+        if (!stockRepository.mergeInto(offer.target.id, offer.entry)) persist(offer.entry)
+    }
+
+    /** Antwort "Getrennt speichern": wie ohne Nachfrage speichern. */
+    fun keepSeparate() = resolveMerge { offer -> persist(offer.entry) }
+
+    /** Dialog abgebrochen: nichts speichern, Formular bleibt offen. */
+    fun dismissMerge() = _state.update { it.copy(mergeOffer = null) }
+
+    private fun resolveMerge(action: suspend (MergeOffer) -> Unit) = viewModelScope.launch {
+        val offer = _state.value.mergeOffer ?: return@launch
+        if (_state.value.saving) return@launch
+        _state.update { it.copy(mergeOffer = null, saving = true) }
+        try {
+            action(offer)
+            finish()
+        } finally {
+            _state.update { it.copy(saving = false) }
+        }
+    }
+
+    private suspend fun persist(entry: StockEntryEntity) {
+        if (_state.value.mode == FormMode.EDIT_ENTRY) stockRepository.updateEntry(entry) else stockRepository.addEntry(entry)
     }
 
     private suspend fun saveEditProduct(s: StockFormState) {

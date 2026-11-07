@@ -202,6 +202,9 @@ interface StockEntryDao {
     @Query("SELECT * FROM stock_entries ORDER BY id")
     suspend fun getAll(): List<StockEntryEntity>
 
+    @Query("SELECT * FROM stock_entries WHERE productId = :productId ORDER BY id")
+    suspend fun getEntriesForProduct(productId: String): List<StockEntryEntity>
+
     @Insert
     suspend fun insert(entry: StockEntryEntity)
 

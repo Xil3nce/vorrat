@@ -1,6 +1,7 @@
 package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.FakeRemoteStore.Call
+import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.household.HouseholdRepository
 import de.frelina.vorrat.data.household.HouseholdResult
 import de.frelina.vorrat.data.repo.CatalogRepository
@@ -8,6 +9,7 @@ import de.frelina.vorrat.data.repo.QuantityChange
 import de.frelina.vorrat.data.repo.SaveResult
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.sync.RemoteCollection
+import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteOp
 import de.frelina.vorrat.data.sync.RemoteWriter
 import kotlinx.coroutines.runBlocking
@@ -78,6 +80,61 @@ class RemoteWriteTest : DbTestBase() {
         assertNull(remote.doc(RemoteCollection.ENTRIES, e))
         stockRepo.restoreEntry(removed)
         assertEquals(3L, remote.doc(RemoteCollection.ENTRIES, e)!!["quantity"])
+    }
+
+    @Test fun `Zusammenfuehren beim Verschieben erhoeht Ziel und loescht Quelle`() = runBlocking {
+        val p = product()
+        val keller = location("Keller")
+        val garage = location("Garage")
+        val target = entry(p, garage, quantity = 2)
+        val source = entry(p, keller, quantity = 3)
+        writer.putEntry(db.stockEntryDao().getById(target)!!)
+        writer.putEntry(db.stockEntryDao().getById(source)!!)
+
+        // Verschieben in die Garage: gleiche Daten wie dort vorhandener Eintrag.
+        val moved = db.stockEntryDao().getById(source)!!.copy(locationId = garage)
+        assertEquals(target, stockRepo.findTwin(moved)?.id)
+        assertTrue(stockRepo.mergeInto(target, moved))
+
+        assertEquals(5, db.stockEntryDao().getById(target)!!.quantity)
+        assertNull(db.stockEntryDao().getById(source))
+        assertEquals(5L, remote.doc(RemoteCollection.ENTRIES, target)!!["quantity"])
+        assertNull(remote.doc(RemoteCollection.ENTRIES, source))
+    }
+
+    @Test fun `Zusammenfuehren eines neuen Eintrags loescht kein Dokument`() = runBlocking {
+        val p = product()
+        val keller = location()
+        val target = entry(p, keller, quantity = 1)
+        writer.putEntry(db.stockEntryDao().getById(target)!!)
+        remote.calls.clear()
+
+        val fresh = db.stockEntryDao().getById(target)!!.copy(id = "neu", quantity = 4)
+        assertEquals(target, stockRepo.findTwin(fresh)?.id)
+        assertTrue(stockRepo.mergeInto(target, fresh))
+        assertEquals(5, db.stockEntryDao().getById(target)!!.quantity)
+        assertEquals(listOf(Call.Increment(RemoteCollection.ENTRIES, target, "quantity", 4)), remote.calls)
+
+        // Ziel inzwischen weg → false, nichts geschrieben.
+        stockRepo.deleteEntry(target)
+        remote.calls.clear()
+        assertTrue(!stockRepo.mergeInto(target, fresh))
+        assertTrue(remote.calls.isEmpty())
+    }
+
+    @Test fun `Ebenen und Faecher eines Orts werden synchronisiert`() = runBlocking {
+        val saved = catalogRepo.addLocation("Regal", levels = 4, shelves = 0) as SaveResult.Saved
+        val doc = remote.doc(RemoteCollection.LOCATIONS, saved.id)!!
+        assertEquals(4L, doc["levels"])
+        assertNull(doc["shelves"])
+        catalogRepo.updateLocation(db.locationDao().getById(saved.id)!!, "Regal", 4, 999)
+        assertEquals(LocationEntity.MAX_SLOTS, db.locationDao().getById(saved.id)!!.shelves)
+        val back = RemoteMapper.location(saved.id, remote.doc(RemoteCollection.LOCATIONS, saved.id)!!)!!
+        assertEquals(4, back.levels)
+        assertEquals(LocationEntity.MAX_SLOTS, back.shelves)
+        // Umbenennen behält die Angaben.
+        catalogRepo.renameLocation(back, "Hochregal")
+        assertEquals(4, db.locationDao().getById(saved.id)!!.levels)
     }
 
     @Test fun `Stammdaten werden geschrieben und geloescht`() = runBlocking {

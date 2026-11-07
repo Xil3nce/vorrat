@@ -16,7 +16,11 @@ import java.time.LocalDate
 object RemoteMapper {
     const val FIELD_QUANTITY = "quantity"
 
-    fun toMap(e: LocationEntity): Map<String, Any?> = mapOf("name" to e.name)
+    fun toMap(e: LocationEntity): Map<String, Any?> = mapOf(
+        "name" to e.name,
+        "levels" to e.levels?.toLong(),
+        "shelves" to e.shelves?.toLong(),
+    )
 
     fun toMap(e: UnitEntity): Map<String, Any?> = mapOf("symbol" to e.symbol, "name" to e.name)
 
@@ -48,7 +52,12 @@ object RemoteMapper {
 
     fun location(id: String, m: Map<String, Any?>): LocationEntity? {
         val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
-        return LocationEntity(id, name)
+        return LocationEntity(
+            id = id,
+            name = name,
+            levels = m.long("levels")?.toInt()?.takeIf { it in 1..LocationEntity.MAX_SLOTS },
+            shelves = m.long("shelves")?.toInt()?.takeIf { it in 1..LocationEntity.MAX_SLOTS },
+        )
     }
 
     fun unit(id: String, m: Map<String, Any?>): UnitEntity? {
