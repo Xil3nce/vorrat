@@ -84,6 +84,10 @@ class StockFormViewModel @Inject constructor(
     private val editProductId: String? = savedStateHandle.get<String>("editProductId")
     private val addProductId: String? = savedStateHandle.get<String>("productId")?.takeIf { it.isNotBlank() }
     private val barcodeArg: String? = savedStateHandle.get<String>("barcode")?.takeIf { it.isNotBlank() }
+    private val copyFromEntryId: String? = savedStateHandle.get<String>("copyFromEntryId")
+
+    /** Duplizieren: Formular mit den Werten eines bestehenden Eintrags; gespeichert wird ein neuer Eintrag. */
+    val duplicating: Boolean = copyFromEntryId != null
 
     /** Neues Produkt aus einem Scan (Barcode als Routen-Argument) – steuert nur den Titel, nicht die Eingabe. */
     val fromScan: Boolean = barcodeArg != null
@@ -139,6 +143,14 @@ class StockFormViewModel @Inject constructor(
                     existingProduct = product,
                     product = product?.let(ProductForm::from) ?: ProductForm(),
                 )
+            }
+            copyFromEntryId != null -> {
+                val source = stockRepository.getEntry(copyFromEntryId)
+                if (source == null) {
+                    _state.value = StockFormState(FormMode.NEW_PRODUCT, loading = false, entry = defaultEntry)
+                } else {
+                    loadExisting(source.productId, EntryForm.from(source))
+                }
             }
             addProductId != null -> loadExisting(addProductId, defaultEntry)
             barcodeArg != null -> loadForBarcode(barcodeArg, defaultEntry)

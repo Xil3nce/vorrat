@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,16 +34,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -49,12 +63,14 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.domain.StockFilter
 import de.frelina.vorrat.domain.StockSort
 import de.frelina.vorrat.ui.components.StockItemCard
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StockScreen(
     onOpenEntry: (String) -> Unit,
     onAddManual: () -> Unit,
+    onDuplicateEntry: (String) -> Unit,
     viewModel: StockViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -116,7 +132,13 @@ fun StockScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(state.items, key = { it.entryId }) { item ->
-                        StockItemCard(item, state.today, state.leadDays, onClick = { onOpenEntry(item.entryId) })
+                        SwipeableStockItem(
+                            onDelete = { viewModel.delete(item.entryId) },
+                            onDuplicate = { onDuplicateEntry(item.entryId) },
+                            modifier = Modifier.animateItem(),
+                        ) {
+                            StockItemCard(item, state.today, state.leadDays, onClick = { onOpenEntry(item.entryId) })
+                        }
                     }
                 }
             }
@@ -199,6 +221,79 @@ private fun ExpiryBanner(expired: Int, soon: Int, onShow: () -> Unit) {
                 if (soon > 0) Text(pluralStringResource(R.plurals.banner_soon, soon, soon))
             }
             TextButton(onClick = onShow) { Text(stringResource(R.string.banner_show)) }
+        }
+    }
+}
+
+/**
+ * Eintrag mit Wischgesten: nach links (Ende → Anfang) löschen, nach rechts (Anfang → Ende) duplizieren.
+ * Duplizieren öffnet das vorbelegte Formular; die Kopie entsteht erst beim Speichern, der Eintrag springt zurück. Für Screenreader gibt es dieselben Aktionen als
+ * Bedienungshilfen-Aktionen.
+ */
+@Composable
+private fun SwipeableStockItem(
+    onDelete: () -> Unit,
+    onDuplicate: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    // Erst ab 40 % der Breite auslösen (Standard sind 56 dp – zu empfindlich, kurze Wischer beim Scrollen würden löschen/duplizieren).
+    val swipeState = rememberSwipeToDismissBoxState(positionalThreshold = { totalDistance -> totalDistance * 0.4f })
+    val scope = rememberCoroutineScope()
+    val deleteLabel = stringResource(R.string.stock_swipe_delete)
+    val duplicateLabel = stringResource(R.string.stock_swipe_duplicate)
+    SwipeToDismissBox(
+        state = swipeState,
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .semantics {
+                customActions = listOf(
+                    CustomAccessibilityAction(deleteLabel) { onDelete(); true },
+                    CustomAccessibilityAction(duplicateLabel) { onDuplicate(); true },
+                )
+            },
+        backgroundContent = { SwipeBackground(swipeState.dismissDirection, deleteLabel, duplicateLabel) },
+        onDismiss = { direction ->
+            when (direction) {
+                SwipeToDismissBoxValue.EndToStart -> onDelete()
+                SwipeToDismissBoxValue.StartToEnd -> {
+                    onDuplicate()
+                    scope.launch { swipeState.reset() }
+                }
+                SwipeToDismissBoxValue.Settled -> Unit
+            }
+        },
+    ) { content() }
+}
+
+@Composable
+private fun SwipeBackground(direction: SwipeToDismissBoxValue, deleteLabel: String, duplicateLabel: String) {
+    val colors = MaterialTheme.colorScheme
+    val (container, content) = when (direction) {
+        SwipeToDismissBoxValue.EndToStart -> colors.errorContainer to colors.onErrorContainer
+        SwipeToDismissBoxValue.StartToEnd -> colors.secondaryContainer to colors.onSecondaryContainer
+        SwipeToDismissBoxValue.Settled -> Color.Transparent to colors.onSurface
+    }
+    Row(
+        Modifier
+            .fillMaxSize()
+            .background(container)
+            .padding(horizontal = 24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = if (direction == SwipeToDismissBoxValue.EndToStart) Arrangement.End else Arrangement.Start,
+    ) {
+        when (direction) {
+            SwipeToDismissBoxValue.StartToEnd -> {
+                Icon(Icons.Outlined.ContentCopy, contentDescription = null, tint = content)
+                Spacer(Modifier.width(12.dp))
+                Text(duplicateLabel, color = content, style = MaterialTheme.typography.titleSmall)
+            }
+            SwipeToDismissBoxValue.EndToStart -> {
+                Text(deleteLabel, color = content, style = MaterialTheme.typography.titleSmall)
+                Spacer(Modifier.width(12.dp))
+                Icon(Icons.Outlined.Delete, contentDescription = null, tint = content)
+            }
+            SwipeToDismissBoxValue.Settled -> Unit
         }
     }
 }

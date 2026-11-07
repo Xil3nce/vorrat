@@ -90,7 +90,7 @@ fun StockFormScreen(
 
     val title = when (state.mode) {
         FormMode.NEW_PRODUCT -> if (viewModel.fromScan) R.string.add_title else R.string.add_manual_title
-        FormMode.EXISTING_PRODUCT -> R.string.add_title
+        FormMode.EXISTING_PRODUCT -> if (viewModel.duplicating) R.string.duplicate_entry_title else R.string.add_title
         FormMode.EDIT_ENTRY -> R.string.edit_entry_title
         FormMode.EDIT_PRODUCT -> R.string.edit_product_title
     }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.frelina.vorrat.MainActivity
+import de.frelina.vorrat.R
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.data.repo.CatalogRepository
@@ -16,12 +17,15 @@ import de.frelina.vorrat.domain.ExpiryStatus
 import de.frelina.vorrat.domain.StockFilter
 import de.frelina.vorrat.domain.StockQueries
 import de.frelina.vorrat.domain.StockSort
+import de.frelina.vorrat.ui.components.UiMessage
+import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.navigation.StockRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -44,9 +48,10 @@ private data class Controls(val sort: StockSort, val filter: StockFilter, val lo
 @HiltViewModel
 class StockViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    stockRepository: StockRepository,
+    private val stockRepository: StockRepository,
     catalogRepository: CatalogRepository,
     settingsRepository: SettingsRepository,
+    private val messages: UiMessages,
 ) : ViewModel() {
 
     private val initialFilter = when (savedStateHandle.toRoute<StockRoute>().filter) {
@@ -83,4 +88,17 @@ class StockViewModel @Inject constructor(
     fun setSort(sort: StockSort) = controls.value.let { controls.value = it.copy(sort = sort) }
     fun setFilter(filter: StockFilter) = controls.value.let { controls.value = it.copy(filter = filter) }
     fun setLocation(id: String?) = controls.value.let { controls.value = it.copy(locationId = id) }
+
+    /** Wischen nach links: Eintrag löschen, mit Rückgängig. */
+    fun delete(entryId: String) = viewModelScope.launch {
+        val removed = stockRepository.deleteEntry(entryId) ?: return@launch
+        messages.show(
+            UiMessage(
+                text = R.string.entry_deleted,
+                actionLabel = R.string.action_undo,
+                onAction = { stockRepository.restoreEntry(removed) },
+            ),
+        )
+    }
+
 }

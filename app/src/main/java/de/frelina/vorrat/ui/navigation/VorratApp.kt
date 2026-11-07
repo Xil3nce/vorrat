@@ -122,6 +122,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
                 StockScreen(
                     onOpenEntry = { navController.navigate(EntryDetailRoute(it)) },
                     onAddManual = { navController.navigate(AddStockRoute()) },
+                    onDuplicateEntry = { navController.navigate(DuplicateEntryRoute(it)) },
                 )
             }
             composable<SearchRoute> {
@@ -152,6 +153,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>) {
             }
             composable<AddStockRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
             composable<EditEntryRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
+            composable<DuplicateEntryRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
             composable<EditProductRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
             composable<CatalogRoute> { CatalogScreen(onBack = { navController.popBackStack() }) }
             composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }) }

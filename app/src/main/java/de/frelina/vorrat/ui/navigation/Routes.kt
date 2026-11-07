@@ -20,6 +20,9 @@ import kotlinx.serialization.Serializable
  */
 @Serializable data class AddStockRoute(val barcode: String? = null, val productId: String? = null)
 @Serializable data class EditEntryRoute(val editEntryId: String)
+
+/** Formular vorbelegt mit den Werten eines Eintrags; neuer Eintrag entsteht erst beim Speichern. */
+@Serializable data class DuplicateEntryRoute(val copyFromEntryId: String)
 @Serializable data class EditProductRoute(val editProductId: String)
 @Serializable data class CatalogRoute(val kind: String) {
     companion object {
