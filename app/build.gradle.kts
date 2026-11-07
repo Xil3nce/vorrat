@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -6,6 +8,15 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
     alias(libs.plugins.google.services)
+}
+
+// Release-Signatur: Schlüssel liegt außerhalb des Repos (Standard: ../vorrat-signing/keystore.properties,
+// überschreibbar mit -PvorratKeystoreProps=<Pfad>). Fehlt die Datei, bleibt der Release-Build unsigniert.
+val keystorePropsFile = rootProject.file(
+    (findProperty("vorratKeystoreProps") as String?) ?: "../vorrat-signing/keystore.properties",
+)
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.isFile) keystorePropsFile.inputStream().use(::load)
 }
 
 android {
@@ -26,8 +37,20 @@ android {
         buildConfigField("String", "OFF_CONTACT", "\"kontakt@example.com\"")
     }
 
+    signingConfigs {
+        if (keystoreProps.isNotEmpty()) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
