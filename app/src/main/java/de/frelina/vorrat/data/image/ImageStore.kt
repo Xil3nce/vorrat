@@ -8,6 +8,9 @@ import android.net.Uri
 import androidx.core.graphics.scale
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -51,6 +54,8 @@ class ImageStore(private val dir: File) {
             tmp.delete()
             throw java.io.IOException("Umbenennen fehlgeschlagen")
         }
+        // Bereits angezeigte Platzhalter neu prüfen lassen (Bild kam nachträglich per Sync).
+        _changes.value++
     }
 
     /**
@@ -136,5 +141,10 @@ class ImageStore(private val dir: File) {
         /** Base64 (×4/3) muss sicher unter 1 MiB pro Dokument bleiben. */
         const val SYNC_HARD_LIMIT_BYTES = 700 * 1024
         private val SAFE_NAME = Regex("^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+
+        private val _changes = MutableStateFlow(0)
+
+        /** Zählt hoch, sobald ein synchronisiertes Bild abgelegt wurde (siehe ProductImage). */
+        val changes: StateFlow<Int> = _changes.asStateFlow()
     }
 }

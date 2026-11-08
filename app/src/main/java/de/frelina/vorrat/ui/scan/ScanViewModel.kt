@@ -137,6 +137,7 @@ class ScanViewModel @Inject constructor(
         val outcome = (_state.value as? ScanUiState.Result)?.outcome ?: return@launch
         val added = when {
             outcome.localProduct != null -> shoppingRepository.addProduct(outcome.localProduct)
+            outcome.remote != null -> shoppingRepository.addScanned(outcome.remote)
             else -> outcome.displayName?.let { shoppingRepository.addText(it) }
         }
         if (added != null) messages.show(UiMessage(R.string.shopping_added))

@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +34,9 @@ import java.io.File
 @Composable
 fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val file = remember(imagePath) {
+    // Fehlt die Datei noch (Sync lädt sie im Hintergrund), nach jedem abgelegten Bild erneut prüfen.
+    val imagesVersion by ImageStore.changes.collectAsState()
+    val file = remember(imagePath, imagesVersion) {
         imagePath?.let { File(File(context.filesDir, ImageStore.DIR_NAME), it) }?.takeIf { it.exists() }
     }
     val shape = RoundedCornerShape(12.dp)

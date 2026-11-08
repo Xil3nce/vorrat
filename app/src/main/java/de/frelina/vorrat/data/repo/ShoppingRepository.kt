@@ -2,6 +2,8 @@ package de.frelina.vorrat.data.repo
 
 import de.frelina.vorrat.data.db.ProductDao
 import de.frelina.vorrat.data.db.ProductEntity
+import de.frelina.vorrat.data.db.ProductSource
+import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.db.ShoppingDao
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryDao
@@ -30,6 +32,7 @@ class ShoppingRepository @Inject constructor(
     private val productDao: ProductDao,
     private val stockDao: StockEntryDao,
     private val remote: RemoteWriter,
+    private val imageStore: ImageStore,
 ) {
     fun observe(): Flow<ShoppingList> = combine(
         shoppingDao.observeAll(),
@@ -54,6 +57,33 @@ class ShoppingRepository @Inject constructor(
         val trimmed = name.trim().takeIf { it.isNotEmpty() } ?: return null
         val product = ShoppingLogic.matchProduct(trimmed, productDao.getAll())
         return if (product != null) addProduct(product, quantity) else insert(null, trimmed, quantity)
+    }
+
+    /**
+     * Gescanntes, lokal unbekanntes Produkt (Daten aus Open Food Facts) auf die Liste setzen: Es wird als Produkt
+     * angelegt (mit Barcode und einer Kopie des OFF-Bilds), damit die Liste das Bild zeigt, es auf das andere
+     * Handy synchronisiert wird und "Gekauft" später alles vorbelegt.
+     */
+    suspend fun addScanned(prefill: ProductPrefill): ShoppingItemEntity? {
+        productDao.getByBarcode(prefill.barcode)?.let { return addProduct(it) }
+        val name = prefill.name?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        ShoppingLogic.matchProduct(name, productDao.getAll())?.let { return addProduct(it) }
+        val now = System.currentTimeMillis()
+        val product = ProductEntity(
+            barcode = prefill.barcode,
+            name = name,
+            brand = prefill.brand?.trim()?.takeIf { it.isNotEmpty() },
+            category = prefill.category?.trim()?.takeIf { it.isNotEmpty() },
+            packageSize = null,
+            unitId = null,
+            imagePath = prefill.imagePath?.let { imageStore.copy(it) },
+            source = ProductSource.OPEN_FOOD_FACTS,
+            createdAt = now,
+            updatedAt = now,
+        )
+        productDao.insert(product)
+        remote.putProduct(product)
+        return addProduct(product)
     }
 
     /** Produkt hinzufügen; steht es schon (manuell) auf der Liste, wird die Menge erhöht. */

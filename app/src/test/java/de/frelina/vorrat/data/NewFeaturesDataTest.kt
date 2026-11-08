@@ -1,6 +1,7 @@
 package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.db.StockEntryEntity
+import de.frelina.vorrat.data.repo.ProductPrefill
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.sync.RemoteChange
@@ -23,7 +24,7 @@ import java.time.LocalDate
 class NewFeaturesDataTest : DbTestBase() {
 
     private val stockRepo get() = StockRepository(db, db.stockEntryDao(), db.productDao(), writer)
-    private val shopping get() = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), writer)
+    private val shopping get() = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), writer, images)
 
     private suspend fun typeId() = db.quantityTypeDao().findBySymbol("Stck.")!!.id
 
@@ -53,6 +54,29 @@ class NewFeaturesDataTest : DbTestBase() {
     }
 
     // ---------------------------------------------------------------- Einkaufsliste
+
+    @Test fun `Gescanntes unbekanntes Produkt kommt mit Bild auf die Liste`() = runBlocking {
+        val offImage = images.saveBytes(byteArrayOf(1, 2, 3))
+        val prefill = ProductPrefill("4000000000001", "Haferflocken", "Kölln", null, null, null, offImage)
+        val added = shopping.addScanned(prefill)!!
+        val product = db.productDao().getByBarcode("4000000000001")!!
+        assertEquals(product.id, added.productId)
+        assertNotEquals(offImage, product.imagePath) // Kopie, der OFF-Cache behält sein Bild
+        assertTrue(images.fileOrNull(product.imagePath) != null)
+        assertEquals(product.imagePath, shopping.observe().first().items.single().product!!.imagePath)
+        // Nochmal scannen → nur Menge erhöht, kein zweites Produkt
+        shopping.addScanned(prefill)
+        assertEquals(2, db.shoppingDao().getAll().single().quantity)
+        assertEquals(1, db.productDao().getAll().count { it.barcode == "4000000000001" })
+    }
+
+    @Test fun `Freitext mit Produktnamen zeigt das Produktbild`() = runBlocking {
+        product(name = "Milch")
+        db.shoppingDao().upsert(
+            de.frelina.vorrat.data.db.ShoppingItemEntity(productId = null, name = "milch", quantity = 1, note = null, createdAt = 0),
+        )
+        assertEquals("Milch", shopping.observe().first().items.single().product!!.name)
+    }
     @Test fun `Mindestbestand bringt Produkt auf die Liste und wieder runter`() = runBlocking {
         val loc = location()
         val p = product()
