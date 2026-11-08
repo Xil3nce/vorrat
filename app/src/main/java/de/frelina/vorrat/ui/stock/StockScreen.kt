@@ -18,7 +18,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.outlined.AcUnit
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Nfc
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
@@ -72,6 +75,9 @@ fun StockScreen(
     onOpenEntry: (String) -> Unit,
     onAddManual: () -> Unit,
     onDuplicateEntry: (String) -> Unit,
+    onAddFrozen: () -> Unit,
+    onReadNfc: () -> Unit,
+    onOpenHistory: () -> Unit,
     viewModel: StockViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -82,6 +88,12 @@ fun StockScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.stock_title)) },
                 actions = {
+                    IconButton(onClick = onReadNfc) {
+                        Icon(Icons.Outlined.Nfc, contentDescription = stringResource(R.string.nfc_read_title))
+                    }
+                    IconButton(onClick = onOpenHistory) {
+                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.history_title))
+                    }
                     Box {
                         IconButton(onClick = { sortMenu = true }) {
                             Icon(Icons.AutoMirrored.Outlined.Sort, contentDescription = stringResource(R.string.stock_sort))
@@ -99,11 +111,16 @@ fun StockScreen(
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = onAddManual,
-                icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.stock_add_manual)) },
-            )
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                androidx.compose.material3.SmallFloatingActionButton(onClick = onAddFrozen) {
+                    Icon(Icons.Outlined.AcUnit, contentDescription = stringResource(R.string.frozen_add))
+                }
+                ExtendedFloatingActionButton(
+                    onClick = onAddManual,
+                    icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
+                    text = { Text(stringResource(R.string.stock_add_manual)) },
+                )
+            }
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
@@ -173,6 +190,7 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
             StockFilter.ALL to R.string.stock_filter_all,
             StockFilter.SOON to R.string.stock_filter_soon,
             StockFilter.EXPIRED to R.string.stock_filter_expired,
+            StockFilter.FROZEN to R.string.stock_filter_frozen,
         ).forEach { (filter, label) ->
             FilterChip(
                 selected = state.filter == filter,

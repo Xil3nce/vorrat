@@ -21,6 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,8 +72,26 @@ private val TOP_LEVEL = listOf(
  * [openSoonFilter] liefert Ereignisse, wenn die App über die Erinnerung geöffnet wird.
  */
 @Composable
-fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: UpdateViewModel = hiltViewModel()) {
+fun VorratRoot(
+    messages: UiMessages,
+    openSoonFilter: Flow<Unit>,
+    openHistory: Flow<Unit>,
+    nfcTags: Flow<de.frelina.vorrat.nfc.NfcTagRead>,
+    updates: UpdateViewModel = hiltViewModel(),
+    nfc: NfcViewModel = hiltViewModel(),
+) {
     val navController = rememberNavController()
+    var nfcReadDialog by remember { mutableStateOf(false) }
+    var unknownChip by remember { mutableStateOf<NfcTarget.Unknown?>(null) }
+    val scope = rememberCoroutineScope()
+    val onChip: (de.frelina.vorrat.nfc.NfcTagRead) -> Unit = { read ->
+        scope.launch {
+            when (val target = nfc.resolve(read)) {
+                is NfcTarget.Entry -> navController.navigate(EntryDetailRoute(target.entryId)) { launchSingleTop = true }
+                is NfcTarget.Unknown -> unknownChip = target
+            }
+        }
+    }
     val snackbar = remember { SnackbarHostState() }
     val resources = LocalResources.current
     val backStack by navController.currentBackStackEntryAsState()
@@ -101,6 +123,36 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
         }
     }
 
+    LaunchedEffect(Unit) {
+        openHistory.collect { navController.navigate(HistoryRoute) { launchSingleTop = true } }
+    }
+    LaunchedEffect(Unit) { nfcTags.collect { onChip(it) } }
+    if (nfcReadDialog) {
+        de.frelina.vorrat.nfc.NfcDialog(
+            mode = de.frelina.vorrat.nfc.NfcMode.Read,
+            onDismiss = { nfcReadDialog = false },
+            onRead = { nfcReadDialog = false; onChip(it) },
+        )
+    }
+    unknownChip?.let { chip ->
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { unknownChip = null },
+            title = { Text(stringResource(R.string.nfc_unknown_title)) },
+            text = { Text(stringResource(R.string.nfc_unknown_text)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    unknownChip = null
+                    navController.navigate(AddStockRoute(frozen = true, nfcTagId = chip.tagId))
+                }) { Text(stringResource(R.string.frozen_add)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { unknownChip = null }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) 72.dp else 0.dp)) },
         bottomBar = {
@@ -129,6 +181,9 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
                     onOpenEntry = { navController.navigate(EntryDetailRoute(it)) },
                     onAddManual = { navController.navigate(AddStockRoute()) },
                     onDuplicateEntry = { navController.navigate(DuplicateEntryRoute(it)) },
+                    onAddFrozen = { navController.navigate(AddStockRoute(frozen = true)) },
+                    onReadNfc = { nfcReadDialog = true },
+                    onOpenHistory = { navController.navigate(HistoryRoute) },
                 )
             }
             composable<SearchRoute> {
@@ -156,6 +211,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
                     onOpenUnits = { navController.navigate(CatalogRoute(CatalogRoute.UNITS)) },
                     onOpenQuantityTypes = { navController.navigate(CatalogRoute(CatalogRoute.QUANTITY_TYPES)) },
                     onOpenAbout = { navController.navigate(AboutRoute) },
+                    onOpenHistory = { navController.navigate(HistoryRoute) },
                 )
             }
             composable<EntryDetailRoute> {
@@ -176,6 +232,9 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
             composable<EditProductRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
             composable<CatalogRoute> { CatalogScreen(onBack = { navController.popBackStack() }) }
             composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }) }
+            composable<HistoryRoute> {
+                de.frelina.vorrat.ui.history.HistoryScreen(onBack = { navController.popBackStack() })
+            }
         }
     }
 }

@@ -26,7 +26,11 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
   `RemoteMapper`. Neue Sammlung → `RemoteCollection`, `RemoteMapper`, `SyncApplier` und `firestore.rules`.
 - IDs sind String-UUIDs (`newId()`); keine UNIQUE-Indizes in Room (Eindeutigkeit im Repository/Formular).
 - Anzahl ± nur über `StockRepository.changeQuantity` (FieldValue.increment; 0 → Dokument löschen).
-- Pro Gerät: OFF-Cache, Erinnerungs-Einstellungen, Haushaltszuordnung (`HouseholdStore`).
+- Pro Gerät: OFF-Cache, Erinnerungs-Einstellungen, Haushaltszuordnung (`HouseholdStore`), eigener Name im Verlauf.
+- Verlauf (`history`): `StockRepository` protokolliert über `HistoryRecorder` (Tests ohne Verlauf: `HistoryRecorder.NONE`).
+  Hinweise ans andere Handy ohne Server: `SyncManager` → `HouseholdNotices`; im Hintergrund `HouseholdSyncWorker` (15 min).
+  Der Verlauf ist nicht in `RemoteCollection.BULK` (kein Upload beim Anlegen, kein Ersetzen beim Backup-Import).
+- NFC: Chips enthalten `vorrat://entry/{id}` (`NfcLink`); maßgeblich ist die Chip-Kennung `nfcTagId` am Eintrag.
 
 ## Konventionen
 - UI-Texte ausschließlich Deutsch in `res/values/strings.xml` (Plurals für Zahlen + Wörter); keine Hardcodes.

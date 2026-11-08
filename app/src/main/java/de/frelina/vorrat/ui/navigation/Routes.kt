@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 
 // Unterseiten
 @Serializable data class EntryDetailRoute(val entryId: String)
+@Serializable data object HistoryRoute
 
 /**
  * Erfassen:
@@ -21,11 +22,14 @@ import kotlinx.serialization.Serializable
  * - nur barcode gesetzt → neues Produkt (Vorbelegung aus Open Food Facts, falls vorhanden)
  * - nichts gesetzt → Produkt manuell anlegen
  * - shoppingItemId: Kauf von der Einkaufsliste – Name vorbelegen, Listeneintrag nach dem Speichern entfernen
+ * - frozen: selbst Eingefrorenes (ohne Barcode, mit Einfrierdatum); nfcTagId: bereits gelesener Chip
  */
 @Serializable data class AddStockRoute(
     val barcode: String? = null,
     val productId: String? = null,
     val shoppingItemId: String? = null,
+    val frozen: Boolean = false,
+    val nfcTagId: String? = null,
 )
 @Serializable data class EditEntryRoute(val editEntryId: String)
 

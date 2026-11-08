@@ -122,6 +122,7 @@ data class ProductEntity(
         Index(value = ["locationId"]),
         Index(value = ["quantityTypeId"]),
         Index(value = ["expiryDate"]),
+        Index(value = ["nfcTagId"]),
     ],
 )
 data class StockEntryEntity(
@@ -142,6 +143,58 @@ data class StockEntryEntity(
     val openedAt: LocalDate? = null,
     /** Haltbarkeit nach dem Öffnen in Tagen (zusammen mit [openedAt]). */
     val openedDays: Int? = null,
+    /** Selbst eingefroren am (z. B. Bolognese-Portionen); null = gekaufte Ware. Seit Schema 6. */
+    val frozenAt: LocalDate? = null,
+    /** Kennung (UID, Hex) des verknüpften NFC-Chips; ein Chip gehört höchstens zu einem Eintrag. Seit Schema 6. */
+    val nfcTagId: String? = null,
+)
+
+enum class HistoryAction {
+    /** Hinzugefügt (neuer Eintrag oder Anzahl erhöht). */
+    ADDED,
+
+    /** Entnommen (Anzahl verringert, bei 0 Eintrag entfernt). */
+    REMOVED,
+
+    /** Eintrag gelöscht (Korrektur, nicht verbraucht). */
+    DELETED,
+
+    /** Packung geöffnet. */
+    OPENED,
+
+    /** Nachricht an den Haushalt, z. B. "Milch ist alle". */
+    MESSAGE,
+}
+
+/**
+ * Verlauf im Haushalt: wer hat wann was entnommen oder hinzugefügt (synchronisiert, ohne Fremdschlüssel –
+ * Produkte/Einträge können längst gelöscht sein; Name und Menge-Art werden deshalb mitgespeichert).
+ * Seit Schema 6.
+ */
+@Entity(
+    tableName = "history_events",
+    indices = [Index(value = ["createdAt"])],
+)
+data class HistoryEventEntity(
+    @PrimaryKey val id: String = newId(),
+    val createdAt: Long,
+    val action: HistoryAction,
+    /** UID der Mitgliedschaft (Firebase) des Geräts, das den Eintrag erzeugt hat; null ohne Haushalt. */
+    val authorUid: String?,
+    /** Angezeigter Name der Person (Einstellungen → Dein Name), optional. */
+    val authorName: String?,
+    val productId: String?,
+    val productName: String,
+    /** Geänderte Anzahl (immer positiv), bei MESSAGE null. */
+    val quantity: Int?,
+    val quantityTypeSymbol: String?,
+    val entryId: String?,
+    /** Nach dieser Änderung ist vom Produkt nichts mehr da ("ist alle"). */
+    val outOfStock: Boolean = false,
+    /** Freitext (MESSAGE). */
+    val message: String? = null,
+    /** Andere Person per Benachrichtigung informieren. */
+    val notify: Boolean = false,
 )
 
 /**

@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AcUnit
 import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Nfc
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -91,6 +94,22 @@ fun StockItemCard(
                     Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 Text(locationText(item), style = MaterialTheme.typography.bodyMedium)
+                item.frozenAt?.let { frozen ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.AcUnit, contentDescription = null, modifier = Modifier.padding(end = 4.dp).size(16.dp))
+                        Text(
+                            stringResource(R.string.frozen_at_label, Validation.formatDate(frozen)),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                        if (item.nfcTagId != null) {
+                            Icon(
+                                Icons.Outlined.Nfc,
+                                contentDescription = stringResource(R.string.nfc_linked),
+                                modifier = Modifier.padding(start = 6.dp).size(16.dp),
+                            )
+                        }
+                    }
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) {
                         Icon(

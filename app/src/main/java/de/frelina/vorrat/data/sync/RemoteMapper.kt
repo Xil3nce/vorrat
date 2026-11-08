@@ -1,5 +1,7 @@
 package de.frelina.vorrat.data.sync
 
+import de.frelina.vorrat.data.db.HistoryAction
+import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
@@ -54,6 +56,23 @@ object RemoteMapper {
         "note" to e.note,
         "openedAt" to e.openedAt?.toString(),
         "openedDays" to e.openedDays?.toLong(),
+        "frozenAt" to e.frozenAt?.toString(),
+        "nfcTagId" to e.nfcTagId,
+    )
+
+    fun toMap(h: HistoryEventEntity): Map<String, Any?> = mapOf(
+        "createdAt" to h.createdAt,
+        "action" to h.action.name,
+        "authorUid" to h.authorUid,
+        "authorName" to h.authorName,
+        "productId" to h.productId,
+        "productName" to h.productName,
+        "quantity" to h.quantity?.toLong(),
+        "quantityTypeSymbol" to h.quantityTypeSymbol,
+        "entryId" to h.entryId,
+        "outOfStock" to h.outOfStock,
+        "message" to h.message,
+        "notify" to h.notify,
     )
 
     fun toMap(s: ShoppingItemEntity): Map<String, Any?> = mapOf(
@@ -124,8 +143,34 @@ object RemoteMapper {
             note = m.str("note"),
             openedAt = m.str("openedAt")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
             openedDays = m.long("openedDays")?.toInt()?.takeIf { it in 0..OpenedLogic.MAX_DAYS },
+            frozenAt = m.str("frozenAt")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            nfcTagId = m.str("nfcTagId")?.takeIf(String::isNotBlank),
         )
     }
+
+    fun history(id: String, m: Map<String, Any?>): HistoryEventEntity? {
+        val createdAt = m.long("createdAt") ?: return null
+        val action = m.str("action")?.let { a -> HistoryAction.entries.firstOrNull { it.name == a } } ?: return null
+        return HistoryEventEntity(
+            id = id,
+            createdAt = createdAt,
+            action = action,
+            authorUid = m.str("authorUid"),
+            authorName = m.str("authorName")?.trim()?.take(MAX_NAME)?.takeIf(String::isNotBlank),
+            productId = m.str("productId"),
+            productName = m.str("productName")?.take(MAX_TEXT).orEmpty(),
+            quantity = m.long("quantity")?.toInt()?.takeIf { it > 0 },
+            quantityTypeSymbol = m.str("quantityTypeSymbol"),
+            entryId = m.str("entryId"),
+            outOfStock = m["outOfStock"] as? Boolean ?: false,
+            message = m.str("message")?.trim()?.take(MAX_TEXT)?.takeIf(String::isNotBlank),
+            notify = m["notify"] as? Boolean ?: false,
+        )
+    }
+
+    /** Längen-Obergrenzen für Texte im Verlauf (Benachrichtigungen bleiben lesbar). */
+    const val MAX_NAME = 40
+    const val MAX_TEXT = 200
 
     fun shopping(id: String, m: Map<String, Any?>): ShoppingItemEntity? {
         val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null

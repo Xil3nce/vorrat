@@ -19,7 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.AcUnit
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Nfc
 import androidx.compose.material.icons.outlined.AddLocationAlt
 import androidx.compose.material.icons.outlined.WrongLocation
 import androidx.compose.material.icons.outlined.Delete
@@ -41,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -86,11 +89,16 @@ fun StockFormScreen(
     val units by viewModel.units.collectAsStateWithLifecycle()
     val types by viewModel.quantityTypes.collectAsStateWithLifecycle()
     val categories by viewModel.categories.collectAsStateWithLifecycle()
+    val manualNames by viewModel.manualProductNames.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { viewModel.saved.collect { onDone() } }
 
     val title = when (state.mode) {
-        FormMode.NEW_PRODUCT -> if (viewModel.fromScan) R.string.add_title else R.string.add_manual_title
+        FormMode.NEW_PRODUCT -> when {
+            state.frozenMode -> R.string.frozen_add_title
+            viewModel.fromScan -> R.string.add_title
+            else -> R.string.add_manual_title
+        }
         FormMode.EXISTING_PRODUCT -> if (viewModel.duplicating) R.string.duplicate_entry_title else R.string.add_title
         FormMode.EDIT_ENTRY -> R.string.edit_entry_title
         FormMode.EDIT_PRODUCT -> R.string.edit_product_title
@@ -130,7 +138,20 @@ fun StockFormScreen(
             LookupHints(state)
 
             val editableProduct = state.mode == FormMode.NEW_PRODUCT || state.mode == FormMode.EDIT_PRODUCT
-            if (editableProduct) {
+            if (editableProduct && state.frozenMode) {
+                SectionTitle(R.string.section_product)
+                AutocompleteField(
+                    value = state.product.name,
+                    onValueChange = { v -> viewModel.updateProduct { it.copy(name = v, nameError = null) } },
+                    label = stringResource(R.string.frozen_name_label),
+                    suggestions = manualNames,
+                    supportingText = {
+                        if (state.product.nameError != null) ErrorSupportingText(state.product.nameError!!)
+                        else Text(stringResource(R.string.frozen_name_hint))
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else if (editableProduct) {
                 SectionTitle(R.string.section_product)
                 ProductFormSection(
                     form = state.product,
@@ -162,6 +183,10 @@ fun StockFormScreen(
                     types = types,
                     onChange = viewModel::updateEntry,
                     onCreateLocation = viewModel::createLocation,
+                    onSetFrozen = viewModel::setFrozen,
+                    nfcEntryId = viewModel.nfcEntryId,
+                    onNfcWritten = viewModel::onNfcWritten,
+                    onClearNfc = viewModel::clearNfcTag,
                 )
             }
 
@@ -353,8 +378,13 @@ fun EntryFormSection(
     types: List<QuantityTypeEntity>,
     onChange: ((EntryForm) -> EntryForm) -> Unit,
     onCreateLocation: suspend (String) -> SaveResult,
+    onSetFrozen: (Boolean) -> Unit,
+    nfcEntryId: String,
+    onNfcWritten: (String) -> Unit,
+    onClearNfc: () -> Unit,
 ) {
     var newLocationDialog by remember { mutableStateOf(false) }
+    var nfcDialog by remember { mutableStateOf(false) }
 
     if (locations.isEmpty()) {
         Text(stringResource(R.string.add_no_locations), style = MaterialTheme.typography.bodyMedium)
@@ -407,6 +437,48 @@ fun EntryFormSection(
             label = stringResource(R.string.field_shelf) + " (" + stringResource(R.string.optional) + ")",
             error = form.shelfError,
             modifier = Modifier.weight(1f),
+        )
+    }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Icon(Icons.Outlined.AcUnit, contentDescription = null)
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.frozen_switch), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(R.string.frozen_switch_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Switch(checked = form.frozen, onCheckedChange = onSetFrozen)
+    }
+    if (form.frozen) {
+        DateField(
+            value = form.frozenAt,
+            onValueChange = { v -> onChange { it.copy(frozenAt = v, frozenAtError = null) } },
+            label = stringResource(R.string.frozen_at_field),
+            error = form.frozenAtError,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(Icons.Outlined.Nfc, contentDescription = null)
+            Text(
+                stringResource(if (form.nfcTagId != null) R.string.nfc_linked else R.string.nfc_not_linked),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f),
+            )
+            if (form.nfcTagId != null) {
+                TextButton(onClick = onClearNfc) { Text(stringResource(R.string.nfc_unlink)) }
+            }
+            OutlinedButton(onClick = { nfcDialog = true }) {
+                Text(stringResource(if (form.nfcTagId != null) R.string.nfc_rewrite else R.string.nfc_write))
+            }
+        }
+    }
+    if (nfcDialog) {
+        de.frelina.vorrat.nfc.NfcDialog(
+            mode = de.frelina.vorrat.nfc.NfcMode.Write(nfcEntryId),
+            onDismiss = { nfcDialog = false },
+            onWritten = { tagId -> nfcDialog = false; onNfcWritten(tagId) },
         )
     }
     DateField(

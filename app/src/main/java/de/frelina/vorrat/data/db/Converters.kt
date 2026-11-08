@@ -23,4 +23,11 @@ class Converters {
 
     @TypeConverter
     fun stringToSource(value: String): ProductSource = ProductSource.valueOf(value)
+
+    @TypeConverter
+    fun historyActionToString(value: HistoryAction): String = value.name
+
+    @TypeConverter
+    fun stringToHistoryAction(value: String): HistoryAction =
+        HistoryAction.entries.firstOrNull { it.name == value } ?: HistoryAction.MESSAGE
 }

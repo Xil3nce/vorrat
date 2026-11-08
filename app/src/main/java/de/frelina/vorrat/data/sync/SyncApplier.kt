@@ -1,6 +1,7 @@
 package de.frelina.vorrat.data.sync
 
 import androidx.room.withTransaction
+import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
@@ -24,6 +25,12 @@ import kotlinx.coroutines.sync.withLock
  */
 class SyncApplier(private val db: VorratDatabase) {
 
+    /** In Room übernommene Produkte (fehlende Bilder nachladen) und Verlaufseinträge (Benachrichtigungen). */
+    data class Applied(
+        val products: List<ProductEntity> = emptyList(),
+        val history: List<HistoryEventEntity> = emptyList(),
+    )
+
     private sealed interface Pending {
         data class Upsert(val entity: Any) : Pending
         data object Delete : Pending
@@ -39,13 +46,13 @@ class SyncApplier(private val db: VorratDatabase) {
     /**
      * Übernimmt Änderungen einer Sammlung.
      * @param fullIds alle IDs laut Server → lokale Datensätze ohne Gegenstück werden gelöscht.
-     * @return in Room übernommene Produkte (für das Nachladen fehlender Bilder).
+     * @return in Room übernommene Produkte und Verlaufseinträge.
      */
     suspend fun apply(
         collection: RemoteCollection,
         changes: List<RemoteChange>,
         fullIds: Set<String>? = null,
-    ): List<ProductEntity> = mutex.withLock {
+    ): Applied = mutex.withLock {
         require(collection in RemoteCollection.DATA) { "keine Datensammlung: $collection" }
         val queue = pending.getValue(collection)
         changes.forEach { change ->
@@ -73,6 +80,7 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.PRODUCTS -> RemoteMapper.product(id, data)
         RemoteCollection.ENTRIES -> RemoteMapper.entry(id, data)
         RemoteCollection.SHOPPING -> RemoteMapper.shopping(id, data)
+        RemoteCollection.HISTORY -> RemoteMapper.history(id, data)
         RemoteCollection.IMAGES -> null
     }
 
@@ -83,12 +91,14 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.PRODUCTS -> db.productDao().getIds()
         RemoteCollection.ENTRIES -> db.stockEntryDao().getIds()
         RemoteCollection.SHOPPING -> db.shoppingDao().getIds()
+        RemoteCollection.HISTORY -> db.historyDao().getIds()
         RemoteCollection.IMAGES -> emptyList()
     }
 
     /** Alle zurückgestellten Änderungen versuchen: Upserts Eltern → Kinder, Löschungen Kinder → Eltern. */
-    private suspend fun flush(): List<ProductEntity> {
+    private suspend fun flush(): Applied {
         val products = mutableListOf<ProductEntity>()
+        val history = mutableListOf<HistoryEventEntity>()
         for (collection in RemoteCollection.DATA) {
             val queue = pending.getValue(collection)
             val it = queue.entries.iterator()
@@ -96,6 +106,7 @@ class SyncApplier(private val db: VorratDatabase) {
                 val op = it.next().value as? Pending.Upsert ?: continue
                 if (tryUpsert(op.entity)) {
                     if (op.entity is ProductEntity) products += op.entity
+                    if (op.entity is HistoryEventEntity) history += op.entity
                     it.remove()
                 }
             }
@@ -108,7 +119,7 @@ class SyncApplier(private val db: VorratDatabase) {
                 if (op == Pending.Delete && tryDelete(collection, id)) it.remove()
             }
         }
-        return products
+        return Applied(products, history)
     }
 
     private suspend fun tryUpsert(entity: Any): Boolean = when (entity) {
@@ -128,12 +139,14 @@ class SyncApplier(private val db: VorratDatabase) {
             ok
         }
         is ShoppingItemEntity -> db.shoppingDao().upsert(entity).let { true }
+        is HistoryEventEntity -> db.historyDao().upsert(entity).let { true }
         else -> true
     }
 
     private suspend fun tryDelete(collection: RemoteCollection, id: String): Boolean = when (collection) {
         RemoteCollection.ENTRIES -> db.stockEntryDao().deleteById(id).let { true }
         RemoteCollection.SHOPPING -> db.shoppingDao().deleteById(id).let { true }
+        RemoteCollection.HISTORY -> db.historyDao().deleteById(id).let { true }
         // Bestandseinträge des Produkts entfernt der Fremdschlüssel (CASCADE).
         RemoteCollection.PRODUCTS -> db.productDao().deleteById(id).let { true }
         RemoteCollection.LOCATIONS ->

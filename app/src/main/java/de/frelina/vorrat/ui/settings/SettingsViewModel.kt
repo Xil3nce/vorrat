@@ -34,6 +34,7 @@ class SettingsViewModel @Inject constructor(
     private val backupManager: BackupManager,
     private val messages: UiMessages,
     householdRepository: HouseholdRepository,
+    private val workManager: androidx.work.WorkManager,
 ) : ViewModel() {
 
     val household: StateFlow<Household?> =
@@ -45,6 +46,18 @@ class SettingsViewModel @Inject constructor(
 
     val reminder: StateFlow<ReminderSettings> =
         settings.reminderSettings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ReminderSettings())
+
+    val householdSettings: StateFlow<de.frelina.vorrat.data.settings.HouseholdSettings> = settings.householdSettings
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), de.frelina.vorrat.data.settings.HouseholdSettings())
+
+    fun setMyName(name: String) = viewModelScope.launch { settings.setMyName(name) }
+
+    fun setNotifyWhenEmpty(enabled: Boolean) = viewModelScope.launch { settings.setNotifyWhenEmpty(enabled) }
+
+    fun setReceiveNotices(enabled: Boolean) = viewModelScope.launch {
+        settings.setReceiveNotices(enabled)
+        de.frelina.vorrat.reminder.HouseholdSyncWorker.schedule(workManager, enabled)
+    }
 
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()

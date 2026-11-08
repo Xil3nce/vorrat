@@ -205,6 +205,39 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 5 nach 6 ergaenzt Einfrierdatum, NFC-Chip und Verlauf`() {
+        createAt(5) {
+            execSQL("INSERT INTO quantity_types (id, symbol, name) VALUES ('q1', 'Stck.', 'Stück')")
+            execSQL(
+                "INSERT INTO products (id, barcode, name, brand, category, packageSize, unitId, imagePath, source, " +
+                    "createdAt, updatedAt, minStock, openedDays) VALUES " +
+                    "('p1', NULL, 'Bolognese', NULL, NULL, NULL, NULL, NULL, 'MANUAL', 1, 2, NULL, NULL)",
+            )
+            execSQL(
+                "INSERT INTO stock_entries (id, productId, locationId, level, shelf, expiryDate, quantity, " +
+                    "quantityTypeId, note, openedAt, openedDays) VALUES ('e1', 'p1', NULL, 2, 1, NULL, 3, 'q1', NULL, NULL, NULL)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val e = db.stockEntryDao().getById("e1")!!
+                assertEquals(3, e.quantity)
+                assertNull(e.frozenAt)
+                assertNull(e.nfcTagId)
+                db.stockEntryDao().update(e.copy(frozenAt = LocalDate.of(2026, 11, 1), nfcTagId = "AB"))
+                assertEquals(listOf("e1"), db.stockEntryDao().getByNfcTag("AB").map { it.id })
+                assertEquals(LocalDate.of(2026, 11, 1), db.stockEntryDao().getAllItems().single().frozenAt)
+                assertTrue(db.historyDao().getAll().isEmpty())
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

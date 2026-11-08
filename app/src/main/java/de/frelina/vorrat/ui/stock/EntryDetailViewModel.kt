@@ -106,6 +106,16 @@ class EntryDetailViewModel @Inject constructor(
 
     fun clearOpened() = viewModelScope.launch { stockRepository.clearOpened(entryId) }
 
+    /** Chip wurde mit der URI dieses Eintrags beschrieben → Kennung merken. */
+    fun onNfcWritten(tagId: String) = viewModelScope.launch {
+        if (stockRepository.assignNfcTag(entryId, tagId)) messages.show(UiMessage(R.string.nfc_write_done))
+    }
+
+    fun clearNfcTag() = viewModelScope.launch { stockRepository.clearNfcTag(entryId) }
+
+    /** ID für das Beschreiben eines Chips. */
+    val nfcEntryId: String get() = entryId
+
     fun addToShoppingList() = viewModelScope.launch {
         val product = state.value.product ?: return@launch
         shoppingRepository.addProduct(product)

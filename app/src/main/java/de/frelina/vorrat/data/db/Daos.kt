@@ -151,6 +151,10 @@ interface ProductDao {
     @Query("SELECT * FROM products ORDER BY name COLLATE NOCASE")
     fun observeAll(): Flow<List<ProductEntity>>
 
+    /** Produkt ohne Barcode mit diesem Namen (selbst Eingefrorenes wiederverwenden). */
+    @Query("SELECT * FROM products WHERE barcode IS NULL AND name = :name COLLATE NOCASE ORDER BY createdAt LIMIT 1")
+    suspend fun findWithoutBarcodeByName(name: String): ProductEntity?
+
     @Query(
         "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' " +
             "ORDER BY category COLLATE NOCASE",
@@ -229,10 +233,16 @@ interface StockEntryDao {
     @Query("DELETE FROM stock_entries")
     suspend fun deleteAll()
 
+    @Query("SELECT * FROM stock_entries WHERE nfcTagId = :tagId ORDER BY id")
+    suspend fun getByNfcTag(tagId: String): List<StockEntryEntity>
+
+    @Query("SELECT COALESCE(SUM(quantity), 0) FROM stock_entries WHERE productId = :productId")
+    suspend fun totalQuantity(productId: String): Int
+
     companion object {
         const val STOCK_ITEM_SELECT = """
             SELECT e.id AS entryId, e.productId, e.locationId, e.level, e.shelf, e.expiryDate,
-                   e.quantity, e.quantityTypeId, e.note, e.openedAt, e.openedDays,
+                   e.quantity, e.quantityTypeId, e.note, e.openedAt, e.openedDays, e.frozenAt, e.nfcTagId,
                    p.name AS productName, p.brand, p.barcode, p.imagePath, p.category,
                    l.name AS locationName, q.symbol AS quantityTypeSymbol
             FROM stock_entries e
@@ -285,5 +295,35 @@ interface ShoppingDao {
     suspend fun getIds(): List<String>
 
     @Query("DELETE FROM shopping_items")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface HistoryDao {
+    @Query("SELECT * FROM history_events ORDER BY createdAt DESC, id LIMIT :limit")
+    fun observeRecent(limit: Int): Flow<List<HistoryEventEntity>>
+
+    @Query("SELECT * FROM history_events WHERE id = :id")
+    suspend fun getById(id: String): HistoryEventEntity?
+
+    @Query("SELECT * FROM history_events ORDER BY createdAt, id")
+    suspend fun getAll(): List<HistoryEventEntity>
+
+    @Upsert
+    suspend fun upsert(event: HistoryEventEntity)
+
+    @Query("DELETE FROM history_events WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT id FROM history_events")
+    suspend fun getIds(): List<String>
+
+    @Query("SELECT id FROM history_events WHERE createdAt < :before")
+    suspend fun getIdsOlderThan(before: Long): List<String>
+
+    @Query("DELETE FROM history_events WHERE createdAt < :before")
+    suspend fun deleteOlderThan(before: Long)
+
+    @Query("DELETE FROM history_events")
     suspend fun deleteAll()
 }

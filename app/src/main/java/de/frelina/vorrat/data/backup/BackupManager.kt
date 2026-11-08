@@ -107,6 +107,8 @@ class BackupManager @Inject constructor(
                 note = it.note,
                 openedAt = it.openedAt?.toString(),
                 openedDays = it.openedDays,
+                frozenAt = it.frozenAt?.toString(),
+                nfcTagId = it.nfcTagId,
             )
         },
         shoppingItems = db.shoppingDao().getAll().map {
@@ -227,6 +229,8 @@ class BackupManager @Inject constructor(
                             note = it.note,
                             openedAt = it.openedAt?.let(LocalDate::parse),
                             openedDays = it.openedDays?.takeIf { n -> n >= 0 },
+                            frozenAt = it.frozenAt?.let(LocalDate::parse),
+                            nfcTagId = it.nfcTagId?.takeIf(String::isNotBlank),
                         )
                     },
                 )
@@ -311,7 +315,7 @@ class BackupManager @Inject constructor(
             if (e.quantityTypeId !in typeIds) invalid("Eintrag ${e.id}: unbekannte Menge-Art")
             if (e.quantity < 1) invalid("Eintrag ${e.id}: Anzahl < 1")
             if ((e.level ?: 0) < 0 || (e.shelf ?: 0) < 0) invalid("Eintrag ${e.id}: Ebene/Fach")
-            listOfNotNull(e.expiryDate, e.openedAt).forEach {
+            listOfNotNull(e.expiryDate, e.openedAt, e.frozenAt).forEach {
                 try {
                     LocalDate.parse(it)
                 } catch (_: DateTimeParseException) {

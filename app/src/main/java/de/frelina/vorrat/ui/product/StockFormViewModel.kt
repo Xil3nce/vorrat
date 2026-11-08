@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -65,6 +66,8 @@ data class StockFormState(
     val imageError: Boolean = false,
     /** Gleicher Eintrag existiert schon → Nutzer fragen, ob zusammengeführt werden soll. */
     val mergeOffer: MergeOffer? = null,
+    /** Selbst Eingefrorenes erfassen: vereinfachter Produktteil (nur Name, Bild). */
+    val frozenMode: Boolean = false,
 )
 
 /** [entry] (validiert, noch nicht gespeichert) hat dieselben Daten wie der bestehende Eintrag [target]. */
@@ -93,6 +96,15 @@ class StockFormViewModel @Inject constructor(
     private val addProductId: String? = savedStateHandle.get<String>("productId")?.takeIf { it.isNotBlank() }
     private val barcodeArg: String? = savedStateHandle.get<String>("barcode")?.takeIf { it.isNotBlank() }
     private val copyFromEntryId: String? = savedStateHandle.get<String>("copyFromEntryId")
+    private val frozenArg: Boolean = savedStateHandle.get<Boolean>("frozen") == true
+    private val nfcTagArg: String? = savedStateHandle.get<String>("nfcTagId")?.takeIf { it.isNotBlank() }
+
+    /**
+     * ID des neuen Eintrags – steht schon vor dem Speichern fest, damit ein NFC-Chip bereits im Formular
+     * beschrieben werden kann. Beim Bearbeiten die ID des bestehenden Eintrags.
+     */
+    val nfcEntryId: String = entryId ?: savedStateHandle.get<String>(KEY_NEW_ENTRY_ID)
+        ?: de.frelina.vorrat.data.db.newId().also { savedStateHandle[KEY_NEW_ENTRY_ID] = it }
 
     /** Kauf von der Einkaufsliste: dieser Eintrag wird nach dem Speichern entfernt. */
     private val shoppingItemId: String? = savedStateHandle.get<String>("shoppingItemId")?.takeIf { it.isNotBlank() }
@@ -114,6 +126,11 @@ class StockFormViewModel @Inject constructor(
         catalogRepository.observeQuantityTypes().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
     val categories: StateFlow<List<String>> =
         productRepository.observeCategories().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /** Namen bisheriger Produkte ohne Barcode (Vorschläge beim Einfrieren, z. B. "Bolognese"). */
+    val manualProductNames: StateFlow<List<String>> = productRepository.observeAll()
+        .map { list -> list.filter { it.barcode == null }.map { it.name }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val _saved = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val saved: SharedFlow<Unit> = _saved
@@ -165,6 +182,23 @@ class StockFormViewModel @Inject constructor(
             }
             addProductId != null -> loadExisting(addProductId, defaultEntry)
             barcodeArg != null -> loadForBarcode(barcodeArg, defaultEntry)
+            frozenArg -> {
+                val portionType = catalogRepository.ensureQuantityType(
+                    context.getString(R.string.frozen_portion_symbol),
+                    context.getString(R.string.frozen_portion_name),
+                )
+                _state.value = StockFormState(
+                    FormMode.NEW_PRODUCT,
+                    loading = false,
+                    frozenMode = true,
+                    entry = defaultEntry.copy(
+                        quantityTypeId = portionType ?: defaultEntry.quantityTypeId,
+                        frozen = true,
+                        frozenAt = de.frelina.vorrat.domain.Validation.formatDate(java.time.LocalDate.now()),
+                        nfcTagId = nfcTagArg,
+                    ),
+                )
+            }
             else -> {
                 // Freitext von der Einkaufsliste: Namen vorbelegen.
                 val name = shoppingItemId?.let { shoppingRepository.getById(it)?.name }.orEmpty()
@@ -227,6 +261,20 @@ class StockFormViewModel @Inject constructor(
 
     fun updateEntry(transform: (EntryForm) -> EntryForm) = _state.update { it.copy(entry = transform(it.entry)) }
 
+    /** "Eingefroren" an/aus; beim Einschalten ist das Einfrierdatum heute. */
+    fun setFrozen(on: Boolean) = updateEntry {
+        val date = it.frozenAt.ifBlank { de.frelina.vorrat.domain.Validation.formatDate(java.time.LocalDate.now()) }
+        it.copy(frozen = on, frozenAt = if (on) date else it.frozenAt, frozenAtError = null)
+    }
+
+    /** NFC-Chip wurde mit der URI dieses Eintrags beschrieben. */
+    fun onNfcWritten(tagId: String) {
+        updateEntry { it.copy(nfcTagId = tagId) }
+        messages.show(UiMessage(R.string.nfc_write_done))
+    }
+
+    fun clearNfcTag() = updateEntry { it.copy(nfcTagId = null) }
+
     fun onImagePicked(uri: Uri) = viewModelScope.launch {
         try {
             val name = imageStore.importFromUri(context, uri)
@@ -278,9 +326,21 @@ class StockFormViewModel @Inject constructor(
 
     private suspend fun saveNewProduct(s: StockFormState) {
         val (productForm, fields) = s.product.validate()
-        val (entryForm, entry) = s.entry.validate()
+        val (entryForm, entry) = s.entry.validate(entryId = nfcEntryId)
         _state.update { it.copy(product = productForm, entry = entryForm) }
         if (fields == null || entry == null) return
+        // Eingefrorenes ohne Barcode: gleichnamiges Produkt wiederverwenden (keine Dubletten wie "Bolognese" ×5).
+        if (s.frozenMode && fields.barcode == null) {
+            productRepository.findWithoutBarcodeByName(fields.name)?.let { existing ->
+                val forExisting = entry.copy(productId = existing.id)
+                if (offerMerge(forExisting)) return
+                stockRepository.addEntry(forExisting)
+                pendingImage?.let { imageStore.delete(it) }
+                pendingImage = null
+                finish(purchasedProductId = existing.id)
+                return
+            }
+        }
         if (fields.barcode != null && productRepository.getByBarcode(fields.barcode) != null) {
             _state.update { it.copy(product = it.product.copy(barcodeDuplicate = true)) }
             return
@@ -295,7 +355,7 @@ class StockFormViewModel @Inject constructor(
 
     private suspend fun saveExistingProductEntry(s: StockFormState) {
         val product = s.existingProduct ?: return
-        val (entryForm, entry) = s.entry.validate(productId = product.id)
+        val (entryForm, entry) = s.entry.validate(entryId = nfcEntryId, productId = product.id)
         _state.update { it.copy(entry = entryForm) }
         if (entry == null) return
         if (offerMerge(entry)) return
@@ -376,6 +436,10 @@ class StockFormViewModel @Inject constructor(
         }
         messages.show(UiMessage(if (removed.isEmpty()) R.string.saved else R.string.shopping_removed_after_purchase))
         _saved.tryEmit(Unit)
+    }
+
+    private companion object {
+        const val KEY_NEW_ENTRY_ID = "new_entry_id"
     }
 
     override fun onCleared() {

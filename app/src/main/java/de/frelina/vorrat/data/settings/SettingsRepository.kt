@@ -21,6 +21,16 @@ data class ReminderSettings(
     val leadDays: Int = ExpiryLogic.DEFAULT_LEAD_DAYS,
 )
 
+/** Verlauf/Benachrichtigungen im Haushalt (pro Gerät). */
+data class HouseholdSettings(
+    /** Name, unter dem dieses Handy im Verlauf erscheint (z. B. "Frank"); leer = ohne Namen. */
+    val myName: String = "",
+    /** Wird etwas aufgebraucht, die andere Person automatisch benachrichtigen ("Milch ist alle"). */
+    val notifyWhenEmpty: Boolean = true,
+    /** Hinweise der anderen Person als Benachrichtigung anzeigen. */
+    val receiveNotices: Boolean = true,
+)
+
 @Singleton
 class SettingsRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
@@ -35,6 +45,27 @@ class SettingsRepository @Inject constructor(
     }
 
     suspend fun current(): ReminderSettings = reminderSettings.first()
+
+    val householdSettings: Flow<HouseholdSettings> = dataStore.data.map { p ->
+        HouseholdSettings(
+            myName = p[MY_NAME].orEmpty(),
+            notifyWhenEmpty = p[NOTIFY_EMPTY] ?: true,
+            receiveNotices = p[RECEIVE_NOTICES] ?: true,
+        )
+    }
+
+    suspend fun currentHousehold(): HouseholdSettings = householdSettings.first()
+
+    suspend fun setMyName(name: String) = dataStore.edit { it[MY_NAME] = name.trim().take(40) }
+
+    suspend fun setNotifyWhenEmpty(enabled: Boolean) = dataStore.edit { it[NOTIFY_EMPTY] = enabled }
+
+    suspend fun setReceiveNotices(enabled: Boolean) = dataStore.edit { it[RECEIVE_NOTICES] = enabled }
+
+    /** Zeitpunkt (ms) des neuesten bereits gezeigten Hinweises; null = noch nie geprüft. */
+    suspend fun noticesSeenUntil(): Long? = dataStore.data.first()[NOTICES_SEEN_UNTIL]
+
+    suspend fun setNoticesSeenUntil(value: Long) = dataStore.edit { it[NOTICES_SEEN_UNTIL] = value }
 
     suspend fun setEnabled(enabled: Boolean) = dataStore.edit { it[ENABLED] = enabled }
 
@@ -57,5 +88,9 @@ class SettingsRepository @Inject constructor(
         val MINUTE = intPreferencesKey("reminder_minute")
         val LEAD_DAYS = intPreferencesKey("reminder_lead_days")
         val LAST_NOTIFIED = longPreferencesKey("reminder_last_notified")
+        val MY_NAME = androidx.datastore.preferences.core.stringPreferencesKey("household_my_name")
+        val NOTIFY_EMPTY = booleanPreferencesKey("household_notify_empty")
+        val RECEIVE_NOTICES = booleanPreferencesKey("household_receive_notices")
+        val NOTICES_SEEN_UNTIL = longPreferencesKey("household_notices_seen_until")
     }
 }

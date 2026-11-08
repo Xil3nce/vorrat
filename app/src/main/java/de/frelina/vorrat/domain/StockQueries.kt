@@ -6,7 +6,7 @@ import java.util.Locale
 
 enum class StockSort { EXPIRY, LOCATION }
 
-enum class StockFilter { ALL, SOON, EXPIRED }
+enum class StockFilter { ALL, SOON, EXPIRED, FROZEN }
 
 object StockQueries {
 
@@ -41,6 +41,7 @@ object StockQueries {
             StockFilter.ALL -> true
             StockFilter.SOON -> ExpiryLogic.status(item.effectiveExpiry, today, leadDays) == ExpiryStatus.SOON
             StockFilter.EXPIRED -> ExpiryLogic.status(item.effectiveExpiry, today, leadDays) == ExpiryStatus.EXPIRED
+            StockFilter.FROZEN -> item.frozenAt != null
         }
         statusOk &&
             (locationId == null || item.locationId == locationId || (locationId == NO_LOCATION && item.locationId == null)) &&

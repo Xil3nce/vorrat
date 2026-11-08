@@ -7,6 +7,7 @@ import de.frelina.vorrat.data.household.Household
 import de.frelina.vorrat.data.household.HouseholdStore
 import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.di.ApplicationScope
+import de.frelina.vorrat.reminder.HouseholdNotices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
@@ -31,6 +32,7 @@ class SyncManager @Inject constructor(
     private val db: VorratDatabase,
     private val writer: RemoteWriter,
     private val imageStore: ImageStore,
+    private val notices: HouseholdNotices,
     @param:ApplicationScope private val scope: CoroutineScope,
 ) {
     private val applier = SyncApplier(db)
@@ -55,11 +57,14 @@ class SyncManager @Inject constructor(
      * Wartet höchstens [timeoutMs], bis alle Sammlungen einmal vom Server gelesen und in Room übernommen
      * wurden (für den ReminderWorker). Ohne Haushalt oder offline: false, Room bleibt wie es ist.
      */
-    suspend fun awaitServerSync(timeoutMs: Long): Boolean {
+    suspend fun awaitServerSync(
+        timeoutMs: Long,
+        collections: List<RemoteCollection> = RemoteCollection.STOCK,
+    ): Boolean {
         if (household.currentId() == null) return false
         start()
         return withTimeoutOrNull(timeoutMs) {
-            serverSynced.first { it.containsAll(RemoteCollection.STOCK) }
+            serverSynced.first { it.containsAll(collections) }
             true
         } ?: false
     }
@@ -87,12 +92,13 @@ class SyncManager @Inject constructor(
 
     private suspend fun process(e: Event) {
         try {
-            val products = applier.apply(
+            val applied = applier.apply(
                 e.collection,
                 e.snapshot.changes,
                 if (e.full) e.snapshot.allIds else null,
             )
-            fetchMissingImages(e.hid, products)
+            fetchMissingImages(e.hid, applied.products)
+            notices.onIncoming(applied.history)
             if (e.full) serverSynced.value = serverSynced.value + e.collection
         } catch (ex: Exception) {
             Log.w(TAG, "Übernahme von ${e.collection.path} fehlgeschlagen", ex)

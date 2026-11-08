@@ -9,6 +9,7 @@ import de.frelina.vorrat.domain.Validated
 import de.frelina.vorrat.domain.OpenedLogic
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.LockOpen
+import androidx.compose.material.icons.outlined.Nfc
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +81,7 @@ fun EntryDetailScreen(
     LaunchedEffect(Unit) { viewModel.closed.collect { onBack() } }
     LaunchedEffect(Unit) { viewModel.replaced.collect { onReplace(it) } }
     var openedDialog by remember { mutableStateOf(false) }
+    var nfcDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -165,6 +167,29 @@ fun EntryDetailScreen(
                 }
                 item.note?.takeIf { it.isNotBlank() }?.let {
                     Text(stringResource(R.string.detail_note, it), style = MaterialTheme.typography.bodyMedium)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Icons.Outlined.Nfc, contentDescription = null)
+                    Text(
+                        stringResource(if (item.nfcTagId != null) R.string.nfc_linked else R.string.nfc_not_linked),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (item.nfcTagId != null) {
+                        androidx.compose.material3.TextButton(onClick = viewModel::clearNfcTag) {
+                            Text(stringResource(R.string.nfc_unlink))
+                        }
+                    }
+                    OutlinedButton(onClick = { nfcDialog = true }) {
+                        Text(stringResource(if (item.nfcTagId != null) R.string.nfc_rewrite else R.string.nfc_write))
+                    }
+                }
+                if (nfcDialog) {
+                    de.frelina.vorrat.nfc.NfcDialog(
+                        mode = de.frelina.vorrat.nfc.NfcMode.Write(viewModel.nfcEntryId),
+                        onDismiss = { nfcDialog = false },
+                        onWritten = { tagId -> nfcDialog = false; viewModel.onNfcWritten(tagId) },
+                    )
                 }
 
                 // Anzahl +/- (große Touch-Ziele)

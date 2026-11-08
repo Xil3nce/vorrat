@@ -14,6 +14,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import de.frelina.vorrat.BuildConfig
+import de.frelina.vorrat.data.db.HistoryDao
 import de.frelina.vorrat.data.db.LocationDao
 import de.frelina.vorrat.data.db.LookupCacheDao
 import de.frelina.vorrat.data.db.ShoppingDao
@@ -78,6 +79,7 @@ object AppModule {
     @Provides fun stockEntryDao(db: VorratDatabase): StockEntryDao = db.stockEntryDao()
     @Provides fun lookupCacheDao(db: VorratDatabase): LookupCacheDao = db.lookupCacheDao()
     @Provides fun shoppingDao(db: VorratDatabase): ShoppingDao = db.shoppingDao()
+    @Provides fun historyDao(db: VorratDatabase): HistoryDao = db.historyDao()
 
     @Provides
     @Singleton
@@ -133,4 +135,7 @@ abstract class BindingsModule {
 
     @Binds
     abstract fun remoteStore(impl: FirestoreRemoteStore): RemoteStore
+
+    @Binds
+    abstract fun historyRecorder(impl: de.frelina.vorrat.data.repo.HistoryRepository): de.frelina.vorrat.data.repo.HistoryRecorder
 }

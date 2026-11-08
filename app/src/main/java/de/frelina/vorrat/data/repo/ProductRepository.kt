@@ -24,6 +24,9 @@ class ProductRepository @Inject constructor(
 
     fun observeAll(): Flow<List<ProductEntity>> = productDao.observeAll()
 
+    /** Produkt ohne Barcode mit diesem Namen (z. B. "Bolognese" beim nächsten Einfrieren wiederverwenden). */
+    suspend fun findWithoutBarcodeByName(name: String): ProductEntity? = productDao.findWithoutBarcodeByName(name.trim())
+
     /** Speichert Änderungen; ein ersetztes Bild wird aus dem Speicher entfernt. */
     suspend fun update(product: ProductEntity) {
         val old = productDao.getById(product.id)

@@ -4,7 +4,8 @@ import de.frelina.vorrat.data.db.StockEntryEntity
 
 /**
  * Zusammenführen von Bestandseinträgen: Zwei Einträge gelten als gleich, wenn alles außer ID und Anzahl
- * übereinstimmt (Produkt, Ort, Ebene, Fach, Ablaufdatum, Menge-Art, Notiz).
+ * übereinstimmt (Produkt, Ort, Ebene, Fach, Ablaufdatum, Menge-Art, Notiz, Einfrierdatum).
+ * Einträge mit NFC-Chip werden nie zusammengeführt – der Chip kennzeichnet genau einen Behälter.
  */
 object StockMerge {
 
@@ -17,6 +18,8 @@ object StockMerge {
             a.quantityTypeId == b.quantityTypeId &&
             a.openedAt == b.openedAt &&
             a.openedDays == b.openedDays &&
+            a.frozenAt == b.frozenAt &&
+            a.nfcTagId == null && b.nfcTagId == null &&
             normalizeNote(a.note) == normalizeNote(b.note)
 
     /** Erster anderer Eintrag mit denselben Daten wie [entry] (der Eintrag selbst zählt nicht). */

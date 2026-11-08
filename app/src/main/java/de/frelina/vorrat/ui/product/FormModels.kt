@@ -106,6 +106,12 @@ data class EntryForm(
     /** Beim Bearbeiten unverändert übernommen ("Geöffnet am" wird in den Details gesetzt). */
     val openedAt: java.time.LocalDate? = null,
     val openedDays: Int? = null,
+    /** Eingefroren (selbst eingefroren) – mit Datum [frozenAt] (leer = heute). */
+    val frozen: Boolean = false,
+    val frozenAt: String = "",
+    /** Verknüpfter NFC-Chip (Kennung); wird im Formular beschrieben bzw. vom Lesen übernommen. */
+    val nfcTagId: String? = null,
+    val frozenAtError: ValidationError? = null,
     val levelError: ValidationError? = null,
     val shelfError: ValidationError? = null,
     val expiryError: ValidationError? = null,
@@ -117,7 +123,10 @@ data class EntryForm(
         val shelfV = Validation.optionalWholeNumber(shelf)
         val expiryV = Validation.optionalDate(expiry)
         val qtyV = Validation.quantity(quantity)
+        val frozenV: Validated<java.time.LocalDate?> =
+            if (frozen) Validation.optionalDate(frozenAt) else Validated.Ok(null)
         val checked = copy(
+            frozenAtError = (frozenV as? Validated.Error)?.error,
             levelError = (levelV as? Validated.Error)?.error,
             shelfError = (shelfV as? Validated.Error)?.error,
             expiryError = (expiryV as? Validated.Error)?.error,
@@ -125,7 +134,7 @@ data class EntryForm(
             quantityTypeMissing = quantityTypeId == null,
         )
         if (quantityTypeId == null || levelV !is Validated.Ok || shelfV !is Validated.Ok ||
-            expiryV !is Validated.Ok || qtyV !is Validated.Ok
+            expiryV !is Validated.Ok || qtyV !is Validated.Ok || frozenV !is Validated.Ok
         ) {
             return checked to null
         }
@@ -141,11 +150,19 @@ data class EntryForm(
             note = note.trim().ifEmpty { null },
             openedAt = openedAt,
             openedDays = openedDays,
+            frozenAt = if (frozen) frozenV.value ?: today() else null,
+            nfcTagId = nfcTagId,
         )
     }
 
     companion object {
+        /** Heute (austauschbar für Tests nicht nötig: leeres Datum = Speichertag). */
+        private fun today(): java.time.LocalDate = java.time.LocalDate.now()
+
         fun from(e: StockEntryEntity) = EntryForm(
+            frozen = e.frozenAt != null,
+            frozenAt = Validation.formatDate(e.frozenAt),
+            nfcTagId = e.nfcTagId,
             locationId = e.locationId,
             level = e.level?.toString().orEmpty(),
             shelf = e.shelf?.toString().orEmpty(),

@@ -1,6 +1,7 @@
 package de.frelina.vorrat.data.sync
 
 import android.util.Log
+import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
@@ -35,6 +36,8 @@ class RemoteWriter @Inject constructor(
     suspend fun putEntry(e: StockEntryEntity) = set(RemoteCollection.ENTRIES, e.id, RemoteMapper.toMap(e))
 
     suspend fun putShopping(s: ShoppingItemEntity) = set(RemoteCollection.SHOPPING, s.id, RemoteMapper.toMap(s))
+
+    suspend fun putHistory(e: HistoryEventEntity) = set(RemoteCollection.HISTORY, e.id, RemoteMapper.toMap(e))
 
     /**
      * Produkt schreiben; ein neues Bild wird VOR dem Produkt hochgeladen (Firestore überträgt die Schreibvorgänge
@@ -76,7 +79,7 @@ class RemoteWriter @Inject constructor(
         val hid = household.currentId() ?: return
         val sets = dataOps(db)
         val newIds = sets.groupBy({ it.collection }, { it.id }).mapValues { it.value.toSet() }
-        val deletes = RemoteCollection.DATA.flatMap { c ->
+        val deletes = RemoteCollection.BULK.flatMap { c ->
             val existing = runCatching { remote.listIds(hid, c) }.getOrDefault(emptySet())
             (existing - newIds[c].orEmpty()).map { RemoteOp.Delete(c, it) }
         }

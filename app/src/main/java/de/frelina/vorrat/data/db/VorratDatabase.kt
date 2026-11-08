@@ -15,6 +15,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         StockEntryEntity::class,
         LookupCacheEntity::class,
         ShoppingItemEntity::class,
+        HistoryEventEntity::class,
     ],
     version = VorratDatabase.VERSION,
     exportSchema = true,
@@ -28,16 +29,17 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun stockEntryDao(): StockEntryDao
     abstract fun lookupCacheDao(): LookupCacheDao
     abstract fun shoppingDao(): ShoppingDao
+    abstract fun historyDao(): HistoryDao
 
     companion object {
-        const val VERSION = 5
+        const val VERSION = 6
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -202,5 +204,25 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
             "CREATE TABLE IF NOT EXISTS `shopping_items` (`id` TEXT NOT NULL, `productId` TEXT, `name` TEXT NOT NULL, " +
                 "`quantity` INTEGER NOT NULL, `note` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         )
+    }
+}
+
+/**
+ * v5 → v6:
+ * - Bestandseinträge: "Eingefroren am" (selbst Eingefrorenes) und verknüpfter NFC-Chip
+ * - neue Tabelle für den Verlauf im Haushalt
+ */
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `stock_entries` ADD COLUMN `frozenAt` INTEGER")
+        db.execSQL("ALTER TABLE `stock_entries` ADD COLUMN `nfcTagId` TEXT")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_nfcTagId` ON `stock_entries` (`nfcTagId`)")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `history_events` (`id` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, " +
+                "`action` TEXT NOT NULL, `authorUid` TEXT, `authorName` TEXT, `productId` TEXT, " +
+                "`productName` TEXT NOT NULL, `quantity` INTEGER, `quantityTypeSymbol` TEXT, `entryId` TEXT, " +
+                "`outOfStock` INTEGER NOT NULL, `message` TEXT, `notify` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_history_events_createdAt` ON `history_events` (`createdAt`)")
     }
 }

@@ -26,6 +26,10 @@ class VorratApp : Application(), Configuration.Provider {
     @Inject lateinit var productDao: ProductDao
     @Inject lateinit var lookupCacheDao: LookupCacheDao
     @Inject lateinit var syncManager: SyncManager
+    @Inject lateinit var householdNotices: de.frelina.vorrat.reminder.HouseholdNotices
+    @Inject lateinit var historyRepository: de.frelina.vorrat.data.repo.HistoryRepository
+    @Inject lateinit var settingsRepository: de.frelina.vorrat.data.settings.SettingsRepository
+    @Inject lateinit var workManager: androidx.work.WorkManager
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -35,6 +39,16 @@ class VorratApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         notifications.createChannel()
+        householdNotices.createChannel()
+        appScope.launch {
+            householdNotices.initialize()
+            de.frelina.vorrat.reminder.HouseholdSyncWorker.schedule(
+                workManager,
+                settingsRepository.currentHousehold().receiveNotices,
+            )
+            // Alten Verlauf aufräumen (auf beiden Handys, doppelt löschen schadet nicht).
+            runCatching { historyRepository.prune() }
+        }
         // Sobald ein Haushalt bekannt ist: Firestore-Listener → Room.
         syncManager.start()
         appScope.launch { reminderScheduler.ensureScheduled() }

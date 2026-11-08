@@ -77,6 +77,10 @@ data class StockEntryDto(
     /** ISO-8601 (seit Schema 5). */
     val openedAt: String? = null,
     val openedDays: Int? = null,
+    /** ISO-8601 (seit Schema 6). */
+    val frozenAt: String? = null,
+    /** UID des NFC-Chips (seit Schema 6). */
+    val nfcTagId: String? = null,
 )
 
 /** Validierungs-/Lesefehler beim Import; [reason] wird in der UI übersetzt. */

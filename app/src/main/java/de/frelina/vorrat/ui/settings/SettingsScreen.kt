@@ -22,7 +22,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.RemoveShoppingCart
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Share
@@ -49,12 +52,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -86,6 +91,7 @@ fun SettingsScreen(
     onOpenUnits: () -> Unit,
     onOpenQuantityTypes: () -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenHistory: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     updates: UpdateViewModel = hiltViewModel(),
 ) {
@@ -95,6 +101,8 @@ fun SettingsScreen(
     val pendingImport by viewModel.pendingImport.collectAsStateWithLifecycle()
     val household by viewModel.household.collectAsStateWithLifecycle()
     val memberCount by viewModel.memberCount.collectAsStateWithLifecycle()
+    val householdSettings by viewModel.householdSettings.collectAsStateWithLifecycle()
+    var nameDialog by remember { mutableStateOf(false) }
 
     var allowed by remember { mutableStateOf(notificationsAllowed(context)) }
     var requestedOnce by remember { mutableStateOf(false) }
@@ -155,7 +163,58 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
+                ListItem(
+                    leadingContent = { Icon(Icons.Outlined.Badge, contentDescription = null) },
+                    headlineContent = { Text(stringResource(R.string.settings_my_name)) },
+                    supportingContent = {
+                        Text(householdSettings.myName.ifBlank { stringResource(R.string.settings_my_name_empty) })
+                    },
+                    modifier = Modifier.clickable { nameDialog = true },
+                )
+                ListItem(
+                    leadingContent = { Icon(Icons.Outlined.RemoveShoppingCart, contentDescription = null) },
+                    headlineContent = { Text(stringResource(R.string.settings_notify_empty)) },
+                    supportingContent = { Text(stringResource(R.string.settings_notify_empty_summary)) },
+                    trailingContent = {
+                        Switch(checked = householdSettings.notifyWhenEmpty, onCheckedChange = viewModel::setNotifyWhenEmpty)
+                    },
+                )
+                ListItem(
+                    leadingContent = { Icon(Icons.Outlined.NotificationsActive, contentDescription = null) },
+                    headlineContent = { Text(stringResource(R.string.settings_receive_notices)) },
+                    supportingContent = { Text(stringResource(R.string.settings_receive_notices_summary)) },
+                    trailingContent = {
+                        Switch(checked = householdSettings.receiveNotices, onCheckedChange = viewModel::setReceiveNotices)
+                    },
+                )
+                NavItem(Icons.Outlined.History, R.string.history_title, R.string.settings_history_summary, onOpenHistory)
                 HorizontalDivider()
+            }
+            if (nameDialog) {
+                var name by rememberSaveable { mutableStateOf(householdSettings.myName) }
+                AlertDialog(
+                    onDismissRequest = { nameDialog = false },
+                    title = { Text(stringResource(R.string.settings_my_name)) },
+                    text = {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(stringResource(R.string.settings_my_name_hint), style = MaterialTheme.typography.bodyMedium)
+                            OutlinedTextField(
+                                value = name,
+                                onValueChange = { name = it.take(40) },
+                                singleLine = true,
+                                label = { Text(stringResource(R.string.settings_my_name)) },
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { viewModel.setMyName(name); nameDialog = false }) {
+                            Text(stringResource(R.string.action_save))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { nameDialog = false }) { Text(stringResource(R.string.action_cancel)) }
+                    },
+                )
             }
 
             // ---------------- Stammdaten

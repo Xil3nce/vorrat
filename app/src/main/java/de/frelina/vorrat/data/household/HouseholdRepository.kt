@@ -76,6 +76,8 @@ class HouseholdRepository @Inject constructor(
         db.locationDao().deleteAll()
         db.unitDao().deleteAll()
         db.quantityTypeDao().deleteAll()
+        db.shoppingDao().deleteAll()
+        db.historyDao().deleteAll()
     }
 
     private inline fun guarded(block: () -> Unit): HouseholdResult = try {

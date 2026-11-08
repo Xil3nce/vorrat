@@ -24,6 +24,8 @@ data class StockItem(
     val quantityTypeSymbol: String,
     val openedAt: LocalDate? = null,
     val openedDays: Int? = null,
+    val frozenAt: LocalDate? = null,
+    val nfcTagId: String? = null,
 ) {
     /** Maßgebliches Datum: Ablaufdatum oder – bei geöffneten Packungen – das frühere "verbrauchen bis". */
     val effectiveExpiry: LocalDate?

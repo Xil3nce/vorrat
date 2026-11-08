@@ -27,6 +27,12 @@ class MainActivity : ComponentActivity() {
     /** Tippen auf die Erinnerung → Bestand mit Filter "läuft bald ab". */
     private val openSoonFilter = Channel<Unit>(Channel.CONFLATED)
 
+    /** Tippen auf einen Hinweis aus dem Haushalt → Verlauf. */
+    private val openHistory = Channel<Unit>(Channel.CONFLATED)
+
+    /** NFC-Chip (vorrat://entry/…) gescannt, während die App nicht im Lese-Dialog war. */
+    private val nfcTags = Channel<de.frelina.vorrat.nfc.NfcTagRead>(Channel.CONFLATED)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -38,7 +44,12 @@ class MainActivity : ComponentActivity() {
                 when (root) {
                     RootState.LOADING -> Unit
                     RootState.NEEDS_HOUSEHOLD -> OnboardingScreen(household)
-                    RootState.READY -> VorratRoot(messages = messages, openSoonFilter = openSoonFilter.receiveAsFlow())
+                    RootState.READY -> VorratRoot(
+                        messages = messages,
+                        openSoonFilter = openSoonFilter.receiveAsFlow(),
+                        openHistory = openHistory.receiveAsFlow(),
+                        nfcTags = nfcTags.receiveAsFlow(),
+                    )
                 }
             }
         }
@@ -50,14 +61,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        if (intent?.getStringExtra(EXTRA_OPEN_FILTER) == FILTER_SOON) {
-            openSoonFilter.trySend(Unit)
-            intent.removeExtra(EXTRA_OPEN_FILTER)
+        when (intent?.getStringExtra(EXTRA_OPEN_FILTER)) {
+            FILTER_SOON -> {
+                openSoonFilter.trySend(Unit)
+                intent.removeExtra(EXTRA_OPEN_FILTER)
+            }
+            OPEN_HISTORY -> {
+                openHistory.trySend(Unit)
+                intent.removeExtra(EXTRA_OPEN_FILTER)
+            }
         }
+        de.frelina.vorrat.nfc.NfcTags.fromIntent(intent)?.let { nfcTags.trySend(it) }
     }
 
     companion object {
         const val EXTRA_OPEN_FILTER = "open_filter"
         const val FILTER_SOON = "soon"
+        const val OPEN_HISTORY = "history"
     }
 }

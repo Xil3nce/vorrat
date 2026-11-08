@@ -99,6 +99,11 @@ class CatalogRepository @Inject constructor(
     // ---------- Menge-Arten ----------
     fun observeQuantityTypes(): Flow<List<QuantityTypeEntity>> = quantityTypeDao.observeAll()
 
+    /** ID der Menge-Art [symbol]; fehlt sie, wird sie angelegt (z. B. "Port." für Eingefrorenes). */
+    suspend fun ensureQuantityType(symbol: String, name: String): String? =
+        quantityTypeDao.findBySymbol(symbol.trim())?.id
+            ?: (saveQuantityType(null, symbol, name) as? SaveResult.Saved)?.id
+
     suspend fun saveQuantityType(id: String?, symbol: String, name: String): SaveResult {
         val s = symbol.trim()
         val n = name.trim()
