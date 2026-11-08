@@ -28,14 +28,14 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun lookupCacheDao(): LookupCacheDao
 
     companion object {
-        const val VERSION = 3
+        const val VERSION = 4
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -149,5 +149,13 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE `locations` ADD COLUMN `levels` INTEGER")
         db.execSQL("ALTER TABLE `locations` ADD COLUMN `shelves` INTEGER")
+    }
+}
+
+/** v3 → v4: OFF-Cache speichert Nährwerte (JSON) und ob sie schon abgefragt wurden. */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `lookup_cache` ADD COLUMN `nutrition` TEXT")
+        db.execSQL("ALTER TABLE `lookup_cache` ADD COLUMN `nutritionLoaded` INTEGER NOT NULL DEFAULT 0")
     }
 }

@@ -12,9 +12,11 @@ import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.repo.CatalogRepository
 import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.QuantityChange
+import de.frelina.vorrat.data.repo.ScanRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.domain.ExpiryLogic
+import de.frelina.vorrat.domain.Nutrition
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.navigation.EntryDetailRoute
@@ -22,6 +24,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -48,6 +53,7 @@ class EntryDetailViewModel @Inject constructor(
     productRepository: ProductRepository,
     catalogRepository: CatalogRepository,
     settingsRepository: SettingsRepository,
+    scanRepository: ScanRepository,
     private val messages: UiMessages,
 ) : ViewModel() {
 
@@ -55,9 +61,19 @@ class EntryDetailViewModel @Inject constructor(
 
     private val itemFlow = stockRepository.observeItem(entryId)
 
+    private val productFlow =
+        itemFlow.flatMapLatest { item -> item?.let { productRepository.observeById(it.productId) } ?: flowOf(null) }
+
+    /** Nährwerte aus Open Food Facts (Cache bzw. einmalige Nachfrage); null = keine vorhanden. */
+    val nutrition: StateFlow<Nutrition?> = productFlow
+        .map { it?.barcode?.takeIf { code -> code.isNotBlank() } }
+        .distinctUntilChanged()
+        .mapLatest { barcode -> barcode?.let { scanRepository.nutritionFor(it) } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     val state: StateFlow<EntryDetailState> = combine(
         itemFlow,
-        itemFlow.flatMapLatest { item -> item?.let { productRepository.observeById(it.productId) } ?: flowOf(null) },
+        productFlow,
         catalogRepository.observeUnits(),
         settingsRepository.reminderSettings,
     ) { item, product, units, settings ->

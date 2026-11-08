@@ -151,4 +151,11 @@ data class LookupCacheEntity(
     /** Lokal heruntergeladenes Bild (Dateiname im Bildordner). */
     val imagePath: String?,
     val fetchedAt: Long,
+    /** Nährwerte als JSON (siehe NutritionParser), null wenn keine vorhanden. Seit Schema 4. */
+    val nutrition: String? = null,
+    /**
+     * true, sobald für diesen Eintrag Nährwerte abgefragt wurden (auch wenn OFF keine hat).
+     * Einträge von vor Schema 4 haben false → die Detailansicht fragt einmal nach.
+     */
+    @ColumnInfo(defaultValue = "0") val nutritionLoaded: Boolean = false,
 )

@@ -11,6 +11,8 @@ import de.frelina.vorrat.data.off.LookupErrorKind
 import de.frelina.vorrat.data.off.LookupResult
 import de.frelina.vorrat.data.off.ProductLookupSource
 import de.frelina.vorrat.domain.AlternativeMatcher
+import de.frelina.vorrat.domain.Nutrition
+import de.frelina.vorrat.domain.NutritionParser
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -89,12 +91,14 @@ class ScanRepository @Inject constructor(
                         unitSymbol = p.unitSymbol,
                         imagePath = image,
                         fetchedAt = now,
+                        nutrition = NutritionParser.encode(p.nutrition),
+                        nutritionLoaded = true,
                     )
                     cacheDao.get(barcode)?.imagePath?.let { imageStore.delete(it) }
                     cacheDao.upsert(cached)
                 }
                 LookupResult.NotFound -> {
-                    cached = LookupCacheEntity(barcode, false, null, null, null, null, null, null, now)
+                    cached = LookupCacheEntity(barcode, false, null, null, null, null, null, null, now, null, true)
                     cacheDao.upsert(cached)
                 }
                 is LookupResult.Failed -> error = result.kind
@@ -117,6 +121,58 @@ class ScanRepository @Inject constructor(
     /** Für das Erfassen: Vorbelegung aus dem Cache (ohne erneute Netzabfrage). */
     suspend fun cachedPrefill(barcode: String): ProductPrefill? =
         cacheDao.get(barcode.trim())?.takeIf { it.found }?.toPrefill()
+
+    /**
+     * Nährwerte zu einem Barcode für die Produktdetails. Aus dem OFF-Cache, sonst einmalig bei OFF
+     * nachgefragt (z. B. Produkte, die vor Version 1.3.0 erfasst wurden oder vom anderen Handy stammen).
+     * Liefert null, wenn OFF keine Nährwerte hat oder die Abfrage fehlschlägt (dann beim nächsten Mal erneut).
+     */
+    suspend fun nutritionFor(rawBarcode: String, now: Long = System.currentTimeMillis()): Nutrition? {
+        val barcode = rawBarcode.trim()
+        if (barcode.isEmpty()) return null
+        val row = cacheDao.get(barcode)
+        if (row != null && row.nutritionLoaded && (row.found || now - row.fetchedAt < NOT_FOUND_TTL_MS)) {
+            return NutritionParser.decode(row.nutrition)
+        }
+        return when (val result = source.lookup(barcode)) {
+            is LookupResult.Found -> {
+                val p = result.product
+                val encoded = NutritionParser.encode(p.nutrition)
+                cacheDao.upsert(
+                    if (row != null && row.found) {
+                        // Vorhandene Daten (inkl. Bild) behalten, nur Nährwerte ergänzen.
+                        row.copy(nutrition = encoded, nutritionLoaded = true)
+                    } else {
+                        LookupCacheEntity(
+                            barcode = barcode,
+                            found = true,
+                            name = p.name,
+                            brand = p.brand,
+                            category = p.category,
+                            packageSize = p.packageSize,
+                            unitSymbol = p.unitSymbol,
+                            imagePath = null, // Produkt ist lokal bekannt und hat sein eigenes Bild.
+                            fetchedAt = now,
+                            nutrition = encoded,
+                            nutritionLoaded = true,
+                        )
+                    },
+                )
+                p.nutrition
+            }
+            LookupResult.NotFound -> {
+                cacheDao.upsert(
+                    if (row != null && row.found) {
+                        row.copy(nutrition = null, nutritionLoaded = true)
+                    } else {
+                        LookupCacheEntity(barcode, false, null, null, null, null, null, null, now, null, true)
+                    },
+                )
+                null
+            }
+            is LookupResult.Failed -> null
+        }
+    }
 
     private fun LookupCacheEntity.toPrefill() =
         ProductPrefill(barcode, name, brand, category, packageSize, unitSymbol, imagePath)

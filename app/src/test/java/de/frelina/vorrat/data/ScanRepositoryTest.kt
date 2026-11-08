@@ -6,6 +6,8 @@ import de.frelina.vorrat.data.off.LookupErrorKind
 import de.frelina.vorrat.data.off.LookupResult
 import de.frelina.vorrat.data.off.ProductLookupSource
 import de.frelina.vorrat.data.repo.ScanRepository
+import de.frelina.vorrat.data.db.LookupCacheEntity
+import de.frelina.vorrat.domain.Nutrition
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -89,5 +91,55 @@ class ScanRepositoryTest : DbTestBase() {
         assertTrue(repo.resolve("555").remoteNotFound)
         assertTrue(repo.resolve("555").remoteNotFound)
         assertEquals(1, source.calls)
+    }
+
+    private val nutella = Nutrition(energyKj = 2252.0, energyKcal = 539.0, fat = 30.9, sugars = 56.3)
+
+    private fun found(code: String, nutrition: Nutrition?) = LookupResult.Found(
+        LookedUpProduct(code, "Nutella", "Ferrero", "en:hazelnut-spreads", null, null, null, nutrition),
+    )
+
+    @Test fun `Scan speichert Naehrwerte im Cache, Detailansicht fragt nicht erneut`() = runBlocking {
+        source.result = found("999", nutella)
+        repo.resolve("999")
+        assertEquals(nutella, repo.nutritionFor("999"))
+        assertEquals(1, source.calls)
+    }
+
+    @Test fun `alter Cache-Eintrag ohne Naehrwerte wird einmal nachgefragt, Bild bleibt erhalten`() = runBlocking {
+        db.lookupCacheDao().upsert(
+            LookupCacheEntity("999", true, "Nutella", null, null, null, null, "bild.jpg", 1L),
+        )
+        source.result = found("999", nutella)
+        assertEquals(nutella, repo.nutritionFor("999"))
+        assertEquals(nutella, repo.nutritionFor("999"))
+        assertEquals(1, source.calls)
+        assertEquals("bild.jpg", db.lookupCacheDao().get("999")!!.imagePath)
+    }
+
+    @Test fun `lokales Produkt ohne Cache – Naehrwerte werden geholt und gemerkt, auch wenn OFF keine hat`() = runBlocking {
+        source.result = found("777", null)
+        assertNull(repo.nutritionFor("777"))
+        assertNull(repo.nutritionFor("777"))
+        assertEquals(1, source.calls)
+        assertTrue(db.lookupCacheDao().get("777")!!.found)
+    }
+
+    @Test fun `offline – keine Naehrwerte, beim naechsten Mal neuer Versuch`() = runBlocking {
+        assertNull(repo.nutritionFor("888"))
+        assertNull(db.lookupCacheDao().get("888"))
+        source.result = found("888", nutella)
+        assertEquals(nutella, repo.nutritionFor("888"))
+        assertEquals(2, source.calls)
+    }
+
+    @Test fun `nicht bei OFF – gemerkt fuer 24 h`() = runBlocking {
+        source.result = LookupResult.NotFound
+        assertNull(repo.nutritionFor("555", now = 1_000L))
+        assertNull(repo.nutritionFor("555", now = 2_000L))
+        assertEquals(1, source.calls)
+        source.result = found("555", nutella)
+        assertEquals(nutella, repo.nutritionFor("555", now = 1_000L + ScanRepository.NOT_FOUND_TTL_MS + 1))
+        assertEquals(2, source.calls)
     }
 }

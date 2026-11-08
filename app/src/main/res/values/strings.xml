@@ -17,6 +17,7 @@
     <string name="action_undo">Rückgängig</string>
     <string name="action_back">Zurück</string>
     <string name="action_ok">OK</string>
+    <string name="action_close">Schließen</string>
     <string name="action_increase">Anzahl erhöhen</string>
     <string name="action_decrease">Anzahl verringern</string>
     <string name="action_clear">Eingabe löschen</string>
@@ -91,6 +92,21 @@
     <string name="detail_category">Kategorie: %1$s</string>
     <string name="detail_package">Packung: %1$s %2$s</string>
     <string name="detail_note">Notiz: %1$s</string>
+    <string name="nutrition_show">Nährwerte anzeigen</string>
+    <string name="nutrition_title">Nährwerte</string>
+    <string name="nutrition_per_100g">je 100 g</string>
+    <string name="nutrition_per_100ml">je 100 ml</string>
+    <string name="nutrition_energy">Energie</string>
+    <string name="nutrition_energy_value">%1$s kJ / %2$s kcal</string>
+    <string name="nutrition_fat">Fett</string>
+    <string name="nutrition_saturated_fat">davon gesättigte Fettsäuren</string>
+    <string name="nutrition_carbohydrates">Kohlenhydrate</string>
+    <string name="nutrition_sugars">davon Zucker</string>
+    <string name="nutrition_fiber">Ballaststoffe</string>
+    <string name="nutrition_proteins">Eiweiß</string>
+    <string name="nutrition_salt">Salz</string>
+    <string name="nutrition_unit_g">g</string>
+    <string name="nutrition_source">Quelle: Open Food Facts (Angaben ohne Gewähr)</string>
 
     <!-- Suche -->
     <string name="search_hint">Name, Marke, Barcode, Ort oder Notiz</string>

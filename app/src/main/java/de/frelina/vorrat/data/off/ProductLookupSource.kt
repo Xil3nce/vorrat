@@ -1,5 +1,6 @@
 package de.frelina.vorrat.data.off
 
+import de.frelina.vorrat.domain.Nutrition
 import java.math.BigDecimal
 
 /** Produktdaten aus einer externen Quelle (derzeit nur Open Food Facts). */
@@ -11,6 +12,8 @@ data class LookedUpProduct(
     val packageSize: BigDecimal?,
     val unitSymbol: String?,
     val imageUrl: String?,
+    /** Nährwerte je 100 g/ml, null wenn OFF keine hat. */
+    val nutrition: Nutrition? = null,
 )
 
 enum class LookupErrorKind { NO_NETWORK, TIMEOUT, RATE_LIMITED, SERVER }

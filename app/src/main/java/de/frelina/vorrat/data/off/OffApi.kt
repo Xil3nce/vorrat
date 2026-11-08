@@ -3,6 +3,7 @@ package de.frelina.vorrat.data.off
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import retrofit2.Response
@@ -28,7 +29,7 @@ interface OffApi {
         /** Nur die benötigten, in der OFF-Doku beschriebenen Felder abfragen. */
         const val FIELDS =
             "code,product_name,product_name_de,brands,quantity,product_quantity," +
-                "product_quantity_unit,image_front_url,image_url,categories_tags"
+                "product_quantity_unit,image_front_url,image_url,categories_tags,nutriments"
     }
 }
 
@@ -53,6 +54,8 @@ data class OffProduct(
     @SerialName("image_front_url") val imageFrontUrl: String? = null,
     @SerialName("image_url") val imageUrl: String? = null,
     @SerialName("categories_tags") val categoriesTags: List<String>? = null,
+    /** Nährwerte; ausgewertet werden nur die `_100g`-Werte (siehe NutritionParser). */
+    val nutriments: JsonObject? = null,
 ) {
     val productQuantityText: String?
         get() = (productQuantity as? JsonPrimitive)?.contentOrNull

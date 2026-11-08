@@ -44,9 +44,12 @@ class MigrationTest {
         context.deleteDatabase(DB)
     }
 
-    private fun createV1(fill: SupportSQLiteDatabase.() -> Unit) {
-        val schema = JSONObject(File(SCHEMA_DIR, "1.json").readText()).getJSONObject("database")
-        val callback = object : SupportSQLiteOpenHelper.Callback(1) {
+    private fun createV1(fill: SupportSQLiteDatabase.() -> Unit) = createAt(1, fill)
+
+    /** Legt die Datenbank exakt nach `schemas/…/<version>.json` an. */
+    private fun createAt(version: Int, fill: SupportSQLiteDatabase.() -> Unit) {
+        val schema = JSONObject(File(SCHEMA_DIR, "$version.json").readText()).getJSONObject("database")
+        val callback = object : SupportSQLiteOpenHelper.Callback(version) {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 val entities = schema.getJSONArray("entities")
                 for (i in 0 until entities.length()) {
@@ -133,6 +136,30 @@ class MigrationTest {
                 val loc = LocationEntity(name = "Dachboden")
                 db.locationDao().insert(loc)
                 assertEquals(36, loc.id.length)
+            }
+        } finally {
+            db.close()
+        }
+    }
+
+    @Test fun `Migration 3 nach 4 ergaenzt Naehrwert-Spalten im OFF-Cache`() {
+        createAt(3) {
+            execSQL(
+                "INSERT INTO lookup_cache (barcode, found, name, brand, category, packageSize, unitSymbol, " +
+                    "imagePath, fetchedAt) VALUES ('3017624010701', 1, 'Nutella', NULL, NULL, '400', 'g', 'b.jpg', 5)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val row = db.lookupCacheDao().get("3017624010701")!!
+                assertEquals("Nutella", row.name)
+                assertEquals("b.jpg", row.imagePath)
+                assertNull(row.nutrition)
+                assertEquals(false, row.nutritionLoaded)
             }
         } finally {
             db.close()
