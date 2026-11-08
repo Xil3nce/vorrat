@@ -48,4 +48,14 @@ class AppUpdateTest {
         assertNull(AppUpdate.pick(GitHubRelease("latest", assets = apk)))
         assertNull(AppUpdate.pick(null))
     }
+
+    @Test fun `API-Adresse des Assets wird als Ausweichweg uebernommen`() {
+        val release = Json { ignoreUnknownKeys = true }.decodeFromString(
+            GitHubRelease.serializer(),
+            """{"tag_name":"v1.3.1","assets":[{"name":"vorrat-1.3.1.apk","size":5,
+               "browser_download_url":"https://github.com/x/y/releases/download/v1.3.1/vorrat-1.3.1.apk",
+               "url":"https://api.github.com/repos/x/y/releases/assets/1"}]}""",
+        )
+        assertEquals("https://api.github.com/repos/x/y/releases/assets/1", AppUpdate.pick(release)!!.apiUrl)
+    }
 }

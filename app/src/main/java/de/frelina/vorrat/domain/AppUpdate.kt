@@ -19,10 +19,21 @@ data class GitHubAsset(
     val name: String? = null,
     val size: Long = 0,
     @SerialName("browser_download_url") val downloadUrl: String? = null,
+    /** API-Adresse des Assets; mit "Accept: application/octet-stream" liefert sie die Datei (Ausweichweg). */
+    val url: String? = null,
 )
 
-/** Installierbares Update: Version ohne "v", direkter APK-Link, erwartete Größe (0 = unbekannt). */
-data class AppRelease(val version: String, val apkUrl: String, val apkSize: Long, val notes: String)
+/**
+ * Installierbares Update: Version ohne "v", direkter APK-Link, erwartete Größe (0 = unbekannt) und
+ * optional die API-Adresse des Assets als zweiter Download-Weg.
+ */
+data class AppRelease(
+    val version: String,
+    val apkUrl: String,
+    val apkSize: Long,
+    val notes: String,
+    val apiUrl: String? = null,
+)
 
 object AppUpdate {
 
@@ -50,6 +61,7 @@ object AppUpdate {
             apkUrl = apk.downloadUrl!!,
             apkSize = apk.size,
             notes = release.body.orEmpty().trim(),
+            apiUrl = apk.url?.takeIf { it.startsWith("https://api.github.com/") },
         )
     }
 }

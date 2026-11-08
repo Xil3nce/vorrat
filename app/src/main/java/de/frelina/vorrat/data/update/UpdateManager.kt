@@ -143,13 +143,19 @@ class UpdateManager @Inject constructor(
         }
         job = scope.launch {
             _state.update { it.copy(needsPermission = false, error = null, progress = if (release.apkSize > 0) 0f else -1f) }
-            try {
-                val apk = download(release)
-                _state.update { it.copy(progress = null, installing = true) }
-                withContext(Dispatchers.IO) { commitSession(apk) }
+            val apk = try {
+                download(release)
             } catch (e: IOException) {
                 Log.w(TAG, "Update-Download fehlgeschlagen", e)
                 _state.update { it.copy(progress = null, installing = false, error = R.string.update_error_download) }
+                return@launch
+            }
+            _state.update { it.copy(progress = null, installing = true) }
+            try {
+                withContext(Dispatchers.IO) { commitSession(apk) }
+            } catch (e: IOException) {
+                Log.w(TAG, "Installation konnte nicht gestartet werden", e)
+                _state.update { it.copy(installing = false, error = R.string.update_error_install) }
             }
         }
     }
@@ -161,11 +167,33 @@ class UpdateManager @Inject constructor(
         }
     }
 
+    /**
+     * Lädt die APK. Zuerst über die normale Download-Adresse; antwortet github.com dort mit einem Fehler
+     * (z. B. 504 bei Störungen), wird die API-Adresse des Assets versucht.
+     */
     private suspend fun download(release: AppRelease): File = withContext(Dispatchers.IO) {
         val dir = File(context.cacheDir, "updates").apply { mkdirs() }
         dir.listFiles()?.forEach { it.delete() }
         val target = File(dir, "vorrat-${release.version}.apk")
-        val request = Request.Builder().url(release.apkUrl).build()
+        val requests = listOfNotNull(
+            Request.Builder().url(release.apkUrl).build(),
+            release.apiUrl?.let { Request.Builder().url(it).header("Accept", "application/octet-stream").build() },
+        )
+        var lastError: IOException? = null
+        for (request in requests) {
+            try {
+                downloadTo(request, release, target)
+                return@withContext target
+            } catch (e: IOException) {
+                Log.w(TAG, "Download über ${request.url.host} fehlgeschlagen", e)
+                target.delete()
+                lastError = e
+            }
+        }
+        throw lastError ?: IOException("Keine Download-Adresse")
+    }
+
+    private fun downloadTo(request: Request, release: AppRelease, target: File) {
         downloadClient.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Download ${response.code}")
             val body = response.body
@@ -195,7 +223,6 @@ class UpdateManager @Inject constructor(
                 throw IOException("Unvollständig: $done von ${release.apkSize} Bytes")
             }
         }
-        target
     }
 
     private fun commitSession(apk: File) {
