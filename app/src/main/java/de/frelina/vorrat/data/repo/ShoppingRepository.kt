@@ -43,7 +43,9 @@ class ShoppingRepository @Inject constructor(
             shortages = shortages,
             // Manuelle Einträge zu einem Produkt, das ohnehin unter Mindestbestand ist, nur einmal zeigen.
             items = items.filter { it.productId == null || it.productId !in shortIds }
-                .map { ShoppingEntry(it, it.productId?.let(byId::get)) },
+                // Freitext-Einträge, deren Name exakt zu einem Produkt passt, zeigen dessen Bild/Marke.
+                .map { ShoppingEntry(it, it.productId?.let(byId::get) ?: ShoppingLogic.matchProduct(it.name, products)) }
+                .filter { it.item.productId != null || it.product == null || it.product.id !in shortIds },
         )
     }
 

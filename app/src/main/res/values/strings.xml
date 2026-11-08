@@ -19,6 +19,9 @@
     <string name="shopping_bought">Gekauft</string>
     <string name="shopping_bought_to_stock">Gekauft – zum Bestand hinzufügen</string>
     <string name="shopping_quantity">%1$d×</string>
+    <string name="shopping_free_text">Freitext – noch kein Produkt</string>
+    <string name="shopping_swipe_check">Abhaken</string>
+    <string name="shopping_missing">fehlt %1$d</string>
     <string name="shopping_checked">„%1$s“ abgehakt</string>
     <string name="shopping_removed_after_purchase">Gespeichert – von der Einkaufsliste genommen</string>
     <string name="shopping_add_product">Auf die Einkaufsliste</string>
