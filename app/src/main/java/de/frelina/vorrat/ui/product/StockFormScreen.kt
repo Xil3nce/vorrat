@@ -369,6 +369,22 @@ fun ProductFormSection(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+    val detected = remember(form.name, form.category) {
+        de.frelina.vorrat.domain.IngredientMatcher.match(form.name, form.category.ifBlank { null })
+            ?.let(de.frelina.vorrat.domain.IngredientGroups::label)
+    }
+    de.frelina.vorrat.ui.components.IngredientGroupField(
+        label = stringResource(R.string.field_ingredient_group),
+        selected = form.ingredientGroup,
+        nullOptionLabel = if (detected != null) {
+            stringResource(R.string.ingredient_group_auto_detected, detected)
+        } else {
+            stringResource(R.string.ingredient_group_auto_none)
+        },
+        onSelect = { g -> onChange { it.copy(ingredientGroup = g) } },
+        supportingText = { Text(stringResource(R.string.field_ingredient_group_help)) },
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
 @Composable

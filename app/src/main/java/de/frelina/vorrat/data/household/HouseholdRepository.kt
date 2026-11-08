@@ -77,6 +77,7 @@ class HouseholdRepository @Inject constructor(
         db.unitDao().deleteAll()
         db.quantityTypeDao().deleteAll()
         db.shoppingDao().deleteAll()
+        db.recipeDao().deleteAll()
         db.historyDao().deleteAll()
     }
 

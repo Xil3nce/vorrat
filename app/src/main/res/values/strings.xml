@@ -481,4 +481,82 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="notice_message_title">Nachricht von %1$s</string>
     <string name="notice_out_of_stock_title">%1$s ist alle</string>
     <string name="notice_out_of_stock_text">%1$s hat das Letzte entnommen.</string>
+
+    <!-- Rezepte: Was koche ich heute? -->
+    <string name="recipes_title">Was koche ich heute?</string>
+    <string name="settings_recipes_summary">Rezeptvorschläge aus bald ablaufenden Produkten, eigene Rezepte</string>
+    <plurals name="recipes_banner">
+        <item quantity="one">%d Produkt läuft bald ab – Was koche ich heute?</item>
+        <item quantity="other">%d Produkte laufen bald ab – Was koche ich heute?</item>
+    </plurals>
+    <string name="recipes_banner_show">Rezepte</string>
+    <string name="recipes_expiring_title">Läuft bald ab – antippen zum Filtern</string>
+    <string name="recipes_no_expiring">Aktuell läuft nichts bald ab. Die Vorschläge richten sich nach dem, was du vorrätig hast.</string>
+    <string name="recipes_search">Rezept oder Zutat suchen</string>
+    <string name="recipes_filter_all">Alle</string>
+    <string name="recipes_filter_own">Eigene</string>
+    <string name="recipes_filter_vegetarian">Vegetarisch</string>
+    <string name="recipes_show_all">Alle Rezepte anzeigen</string>
+    <string name="recipes_empty">Keine passenden Vorschläge. Tippe auf „Alle Rezepte anzeigen“, um das ganze Rezeptbuch zu durchsuchen.</string>
+    <string name="recipes_empty_all">Keine Rezepte gefunden.</string>
+    <string name="recipe_add">Rezept hinzufügen</string>
+    <string name="recipe_have_line">✓ %1$s</string>
+    <string name="recipe_missing_line">Fehlt: %1$s</string>
+    <plurals name="recipe_have_more">
+        <item quantity="one">… und %d weitere Zutat vorhanden</item>
+        <item quantity="other">… und %d weitere Zutaten vorhanden</item>
+    </plurals>
+    <string name="recipe_expired">ist abgelaufen</string>
+    <string name="recipe_expires_today">läuft heute ab</string>
+    <string name="recipe_expires_tomorrow">läuft morgen ab</string>
+    <plurals name="recipe_expires_in_days">
+        <item quantity="one">läuft in %d Tag ab</item>
+        <item quantity="other">läuft in %d Tagen ab</item>
+    </plurals>
+    <string name="recipe_minutes" tools:ignore="PluralsCandidate">%d Min.</string>
+    <plurals name="recipe_servings">
+        <item quantity="one">%d Portion</item>
+        <item quantity="other">%d Portionen</item>
+    </plurals>
+    <string name="recipe_vegetarian">vegetarisch</string>
+    <string name="recipe_own">eigenes Rezept</string>
+    <string name="recipe_not_found">Dieses Rezept gibt es nicht mehr.</string>
+    <string name="recipe_ingredients">Zutaten</string>
+    <string name="recipe_steps">Zubereitung</string>
+    <string name="recipe_status_have">Vorhanden</string>
+    <string name="recipe_status_missing">Fehlt</string>
+    <string name="recipe_expiry_date">MHD %1$s</string>
+    <string name="recipe_missing_to_shopping">Fehlendes auf die Einkaufsliste</string>
+    <string name="recipe_missing_added">Fehlende Zutaten stehen jetzt auf der Einkaufsliste</string>
+    <string name="recipe_missing_none_added">Alles Fehlende steht schon auf der Einkaufsliste</string>
+    <string name="recipe_cooked">Gekocht</string>
+    <string name="recipe_cooked_title">Gekocht – was entnehmen?</string>
+    <string name="recipe_cooked_text">Die Produkte mit dem frühesten Ablaufdatum werden aus dem Bestand genommen.</string>
+    <string name="recipe_cooked_stock" tools:ignore="PluralsCandidate">Bestand: %d</string>
+    <string name="recipe_cooked_confirm">Entnehmen</string>
+    <string name="recipe_cooked_done">Entnommen – guten Appetit!</string>
+    <string name="recipe_copy">Als eigenes Rezept kopieren</string>
+    <string name="recipe_delete_title">Rezept löschen?</string>
+    <string name="recipe_delete_text">„%1$s“ wird für alle im Haushalt gelöscht.</string>
+    <string name="recipe_saved">Rezept gespeichert</string>
+    <string name="recipe_new_title">Neues Rezept</string>
+    <string name="recipe_edit_title">Rezept bearbeiten</string>
+    <string name="recipe_field_title">Titel</string>
+    <string name="recipe_field_minutes">Minuten (optional)</string>
+    <string name="recipe_field_servings">Portionen (optional)</string>
+    <string name="recipe_field_vegetarian">Vegetarisch</string>
+    <string name="recipe_field_ingredient">Zutat</string>
+    <string name="recipe_field_amount">Menge</string>
+    <string name="recipe_field_group">Zutatengruppe</string>
+    <string name="recipe_field_optional">Optional</string>
+    <string name="recipe_group_none">Keine Gruppe</string>
+    <string name="recipe_group_no_match">Keine passende Gruppe</string>
+    <string name="recipe_add_ingredient">Zutat hinzufügen</string>
+    <string name="recipe_remove_ingredient">Zutat entfernen</string>
+    <string name="recipe_field_steps">Zubereitung</string>
+    <string name="recipe_field_steps_hint">Eine Zeile pro Schritt</string>
+    <string name="field_ingredient_group">Zutat für Rezepte (optional)</string>
+    <string name="field_ingredient_group_help">Damit passt das Produkt zu Rezeptvorschlägen</string>
+    <string name="ingredient_group_auto_detected">Automatisch (erkannt: %1$s)</string>
+    <string name="ingredient_group_auto_none">Automatisch (nicht erkannt)</string>
 </resources>

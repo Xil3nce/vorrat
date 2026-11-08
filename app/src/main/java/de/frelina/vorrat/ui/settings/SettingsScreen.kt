@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.History
@@ -92,6 +93,7 @@ fun SettingsScreen(
     onOpenQuantityTypes: () -> Unit,
     onOpenAbout: () -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenRecipes: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     updates: UpdateViewModel = hiltViewModel(),
 ) {
@@ -216,6 +218,10 @@ fun SettingsScreen(
                     },
                 )
             }
+
+            // ---------------- Rezepte
+            NavItem(Icons.Outlined.Restaurant, R.string.recipes_title, R.string.settings_recipes_summary, onOpenRecipes)
+            HorizontalDivider()
 
             // ---------------- Stammdaten
             SectionHeader(R.string.settings_catalogs)

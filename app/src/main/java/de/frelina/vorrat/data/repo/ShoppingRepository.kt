@@ -60,6 +60,25 @@ class ShoppingRepository @Inject constructor(
     }
 
     /**
+     * Fehlende Rezeptzutaten auf die Liste setzen – ohne Duplikate: Was schon (ohne Groß-/Kleinschreibung) mit
+     * gleichem Namen oder als verknüpftes Produkt auf der Liste steht, wird übersprungen. Liefert die Anzahl neuer Einträge.
+     */
+    suspend fun addMissing(names: List<String>): Int {
+        var added = 0
+        val known = shoppingDao.getAll().map { it.name.trim().lowercase() }.toMutableSet()
+        for (raw in names) {
+            val name = raw.trim()
+            if (name.isEmpty() || name.lowercase() in known) continue
+            val product = ShoppingLogic.matchProduct(name, productDao.getAll())
+            if (product != null && isOnList(product.id)) continue
+            addText(name) ?: continue
+            known += name.lowercase()
+            added++
+        }
+        return added
+    }
+
+    /**
      * Gescanntes, lokal unbekanntes Produkt (Daten aus Open Food Facts) auf die Liste setzen: Es wird als Produkt
      * angelegt (mit Barcode und einer Kopie des OFF-Bilds), damit die Liste das Bild zeigt, es auf das andere
      * Handy synchronisiert wird und "Gekauft" später alles vorbelegt.

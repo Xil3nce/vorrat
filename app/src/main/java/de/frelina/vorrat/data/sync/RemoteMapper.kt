@@ -8,6 +8,7 @@ import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.domain.OpenedLogic
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import java.time.LocalDate
@@ -43,6 +44,7 @@ object RemoteMapper {
         "updatedAt" to p.updatedAt,
         "minStock" to p.minStock?.toLong(),
         "openedDays" to p.openedDays?.toLong(),
+        "ingredientGroup" to p.ingredientGroup,
     )
 
     fun toMap(e: StockEntryEntity): Map<String, Any?> = mapOf(
@@ -81,6 +83,17 @@ object RemoteMapper {
         "quantity" to s.quantity.toLong(),
         "note" to s.note,
         "createdAt" to s.createdAt,
+    )
+
+    fun toMap(r: RecipeEntity): Map<String, Any?> = mapOf(
+        "title" to r.title,
+        "minutes" to r.minutes?.toLong(),
+        "servings" to r.servings?.toLong(),
+        "ingredients" to r.ingredients,
+        "steps" to r.steps,
+        "vegetarian" to r.vegetarian,
+        "createdAt" to r.createdAt,
+        "updatedAt" to r.updatedAt,
     )
 
     fun location(id: String, m: Map<String, Any?>): LocationEntity? {
@@ -123,6 +136,7 @@ object RemoteMapper {
             updatedAt = m.long("updatedAt") ?: 0,
             minStock = m.long("minStock")?.toInt()?.takeIf { it in 1..MAX_COUNT },
             openedDays = m.long("openedDays")?.toInt()?.takeIf { it in 0..OpenedLogic.MAX_DAYS },
+            ingredientGroup = m.str("ingredientGroup")?.takeIf { GROUP_ID.matches(it) },
         )
     }
 
@@ -183,6 +197,31 @@ object RemoteMapper {
             createdAt = m.long("createdAt") ?: 0,
         )
     }
+
+    fun recipe(id: String, m: Map<String, Any?>): RecipeEntity? {
+        val title = m.str("title")?.trim()?.take(MAX_TITLE)?.takeIf(String::isNotBlank) ?: return null
+        val ingredients = m.str("ingredients")?.takeIf { it.length <= MAX_INGREDIENTS_JSON } ?: return null
+        return RecipeEntity(
+            id = id,
+            title = title,
+            minutes = m.long("minutes")?.toInt()?.takeIf { it in 1..MAX_MINUTES },
+            servings = m.long("servings")?.toInt()?.takeIf { it in 1..MAX_SERVINGS },
+            ingredients = ingredients,
+            steps = m.str("steps").orEmpty().take(MAX_STEPS),
+            vegetarian = m["vegetarian"] as? Boolean ?: false,
+            createdAt = m.long("createdAt") ?: 0,
+            updatedAt = m.long("updatedAt") ?: 0,
+        )
+    }
+
+    /** Obergrenzen für Rezepte (Firestore-Dokument ≤ 1 MiB, Anzeige bleibt handhabbar). */
+    const val MAX_TITLE = 100
+    const val MAX_STEPS = 8000
+    const val MAX_INGREDIENTS_JSON = 20000
+    const val MAX_MINUTES = 9999
+    const val MAX_SERVINGS = 999
+
+    private val GROUP_ID = Regex("^[a-z][a-z0-9_]{0,39}$")
 
     /** Obergrenze für Mengen (Mindestbestand, Einkaufsliste). */
     const val MAX_COUNT = 999

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -78,6 +79,7 @@ fun StockScreen(
     onAddFrozen: () -> Unit,
     onReadNfc: () -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenRecipes: () -> Unit,
     viewModel: StockViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -90,6 +92,9 @@ fun StockScreen(
                 actions = {
                     IconButton(onClick = onReadNfc) {
                         Icon(Icons.Outlined.Nfc, contentDescription = stringResource(R.string.nfc_read_title))
+                    }
+                    IconButton(onClick = onOpenRecipes) {
+                        Icon(Icons.Outlined.Restaurant, contentDescription = stringResource(R.string.recipes_title))
                     }
                     IconButton(onClick = onOpenHistory) {
                         Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.history_title))
@@ -133,6 +138,9 @@ fun StockScreen(
                         viewModel.setFilter(if (state.expiredCount > 0) StockFilter.EXPIRED else StockFilter.SOON)
                     },
                 )
+            }
+            if (state.soonCount > 0) {
+                RecipeBanner(state.soonCount, onShow = onOpenRecipes)
             }
             if (state.unassignedCount > 0 && state.locationId != StockQueries.NO_LOCATION) {
                 UnassignedBanner(state.unassignedCount, onShow = { viewModel.setLocation(StockQueries.NO_LOCATION) })
@@ -402,6 +410,30 @@ private fun UnassignedBanner(count: Int, onShow: () -> Unit) {
                 modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
             )
             TextButton(onClick = onShow) { Text(stringResource(R.string.stock_unassigned_show)) }
+        }
+    }
+}
+
+/** Hinweis auf bald ablaufende Produkte mit Sprung zu den Rezeptvorschlägen. */
+@Composable
+private fun RecipeBanner(count: Int, onShow: () -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+        Row(
+            Modifier.padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Outlined.Restaurant, contentDescription = null)
+            Text(
+                pluralStringResource(R.plurals.recipes_banner, count, count),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+            )
+            TextButton(onClick = onShow) { Text(stringResource(R.string.recipes_banner_show)) }
         }
     }
 }

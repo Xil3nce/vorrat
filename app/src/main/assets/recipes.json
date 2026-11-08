@@ -1,0 +1,7670 @@
+[
+  {
+    "id": "builtin:spaghetti-bolognese",
+    "title": "Spaghetti Bolognese",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "zum Bestreuen",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotte und Knoblauch klein würfeln und in Öl glasig anbraten.",
+      "Hackfleisch dazugeben und krümelig braun braten.",
+      "Tomatenmark kurz mitrösten, Dosentomaten zugeben und 25 Minuten köcheln lassen.",
+      "Mit Salz und Pfeffer würzen.",
+      "Spaghetti kochen und mit der Soße servieren, nach Wunsch mit Parmesan bestreuen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:spaghetti-carbonara",
+    "title": "Spaghetti Carbonara",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckwürfel",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spaghetti in Salzwasser bissfest kochen, etwas Nudelwasser aufheben.",
+      "Speck knusprig auslassen.",
+      "Eier mit Parmesan und Pfeffer verquirlen (nach Wunsch Sahne zugeben).",
+      "Heiße Nudeln mit dem Speck vermengen, vom Herd nehmen und die Eiermasse unterrühren.",
+      "Mit einem Schuss Nudelwasser cremig rühren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:penne-arrabbiata",
+    "title": "Penne all'Arrabbiata",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "3 Zehen",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Chiliflocken",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "einige Blätter",
+        "optional": true
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Knoblauch in Olivenöl mit Chili sanft anbraten.",
+      "Tomaten zugeben und 15 Minuten einkochen lassen.",
+      "Penne bissfest kochen.",
+      "Nudeln in der Soße schwenken und mit Basilikum und Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudeln-schinken-sahne",
+    "title": "Nudeln mit Schinken-Sahne-Soße",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "zum Überstreuen",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln nach Packungsanleitung kochen.",
+      "Zwiebel und Schinkenwürfel in der Pfanne anbraten.",
+      "Sahne zugießen, aufkochen und kurz einköcheln lassen, Erbsen zugeben.",
+      "Mit Pfeffer abschmecken, Nudeln untermischen und mit Käse bestreuen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:aglio-e-olio",
+    "title": "Spaghetti Aglio e Olio",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "4 Zehen",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Chili",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Spaghetti in Salzwasser bissfest kochen.",
+      "Knoblauch in dünne Scheiben schneiden und im Olivenöl langsam goldgelb braten.",
+      "Chili zugeben und mit etwas Nudelwasser ablöschen.",
+      "Spaghetti in der Pfanne schwenken, Petersilie untermischen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pesto-nudeln-tomaten",
+    "title": "Pesto-Nudeln mit Tomaten",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": true
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Nudeln kochen und abgießen, dabei eine Tasse Kochwasser aufheben.",
+      "Tomaten würfeln.",
+      "Nudeln mit Pesto und etwas Kochwasser vermengen.",
+      "Tomaten und gewürfelten Mozzarella unterheben, mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-spinat-sahne",
+    "title": "Tortellini mit Spinat-Sahne-Soße",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini nach Packungsanleitung garen.",
+      "Knoblauch in der Pfanne andünsten, Spinat zugeben und zusammenfallen lassen.",
+      "Sahne zugießen, mit Salz und Muskat würzen und kurz köcheln.",
+      "Tortellini untermischen, mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:bunter-nudelsalat",
+    "title": "Bunter Nudelsalat",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 kleine Dose",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen, abschrecken und abkühlen lassen.",
+      "Gurke, Tomaten und Paprika klein würfeln.",
+      "Joghurt mit Essig, Salz und Pfeffer zu einem Dressing verrühren.",
+      "Alles vermengen und vor dem Servieren durchziehen lassen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:thunfisch-nudeln",
+    "title": "Thunfisch-Tomaten-Nudeln",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "ein paar Löffel",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl anschwitzen.",
+      "Tomaten zugeben und 10 Minuten köcheln lassen.",
+      "Thunfisch abtropfen lassen, mit dem Mais unterrühren und erwärmen.",
+      "Mit den gekochten Nudeln mischen und abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudeln-lachs-sahne",
+    "title": "Nudeln mit Lachs-Sahne-Soße",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Bandnudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "salmon",
+        "name": "Lachs",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Dill",
+        "amount": "1 Bund",
+        "optional": true
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen.",
+      "Zwiebel anbraten, Lachs in Würfeln zugeben und kurz braten.",
+      "Sahne zugießen und 5 Minuten sanft köcheln lassen.",
+      "Mit Salz, Pfeffer und Zitronensaft würzen, Dill unterheben und die Nudeln untermischen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudel-gemuese-pfanne",
+    "title": "Nudel-Gemüse-Pfanne",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "1 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen und abgießen.",
+      "Gemüse in kleine Stücke schneiden und in Öl 8 Minuten braten.",
+      "Tomatenmark kurz mitbraten.",
+      "Nudeln zugeben, durchschwenken und würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:mac-and-cheese",
+    "title": "Makkaroni mit Käsesoße",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Makkaroni",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "300 ml",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Makkaroni kochen.",
+      "Butter schmelzen, Mehl einrühren und mit Milch ablöschen, bis eine Soße entsteht.",
+      "Geriebenen Käse einrühren und mit Salz und Muskat würzen.",
+      "Nudeln mit der Käsesoße vermischen, nach Wunsch kurz überbacken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:lasagne",
+    "title": "Lasagne",
+    "minutes": 70,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Lasagneplatten",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Reibekäse",
+        "amount": "150 g",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch mit Zwiebel und Knoblauch anbraten, Tomaten zugeben und 15 Minuten köcheln.",
+      "Aus Butter, Mehl und Milch eine Béchamel kochen.",
+      "Auflaufform abwechselnd mit Fleischsoße, Platten und Béchamel schichten.",
+      "Mit Käse bestreuen und 35 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gemuese-lasagne",
+    "title": "Gemüselasagne",
+    "minutes": 70,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Lasagneplatten",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Spinat",
+        "amount": "150 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Gemüse klein schneiden, anbraten und mit den Tomaten 10 Minuten köcheln lassen.",
+      "Béchamel aus Butter, Mehl und Milch kochen.",
+      "Form schichten: Gemüsesoße, Platten, Béchamel, wiederholen.",
+      "Mit Mozzarella belegen und 35 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spaghetti-tomate-mozzarella",
+    "title": "Spaghetti mit Tomatensoße und Mozzarella",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "einige Blätter",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Knoblauch in Öl anbraten, Tomaten zugeben und 12 Minuten köcheln lassen.",
+      "Spaghetti kochen.",
+      "Soße würzen, Mozzarella in Stücken zugeben und schmelzen lassen.",
+      "Mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudelauflauf-schinken-kaese",
+    "title": "Nudelauflauf mit Schinken und Käse",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln halb gar kochen und in eine Form geben.",
+      "Schinken würfeln und mit den Erbsen untermischen.",
+      "Sahne mit Salz und Pfeffer würzen und darübergießen.",
+      "Mit Käse bestreuen und 25 Minuten bei 200 Grad überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:brokkoli-nudel-auflauf",
+    "title": "Brokkoli-Nudel-Auflauf",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brokkoli in Röschen teilen und 3 Minuten mitkochen, Nudeln halb gar garen.",
+      "Beides in eine Auflaufform geben.",
+      "Sahne mit Knoblauch, Salz und Muskat verrühren und darübergießen.",
+      "Mit Käse bestreuen und 25 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pilz-sahne-nudeln",
+    "title": "Pilz-Sahne-Nudeln",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Handvoll",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen.",
+      "Pilze in Scheiben und Zwiebel in Würfel schneiden, in der Pfanne kräftig anbraten.",
+      "Mit Sahne ablöschen und 5 Minuten köcheln lassen.",
+      "Würzen, Nudeln untermischen und mit Petersilie bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-tomate-mozzarella",
+    "title": "Gnocchi-Pfanne mit Tomaten und Mozzarella",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "einige Blätter",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Olivenöl goldbraun anbraten.",
+      "Knoblauch und halbierte Tomaten zugeben und 5 Minuten garen.",
+      "Mozzarella in Stücken darübergeben und schmelzen lassen.",
+      "Mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-gemuese-auflauf",
+    "title": "Gnocchi-Gemüse-Auflauf",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse würfeln und kurz anbraten.",
+      "Mit den Gnocchi in eine Form geben.",
+      "Sahne würzen, darübergießen und Käse darüberstreuen.",
+      "25 Minuten bei 200 Grad überbacken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kaesespaetzle",
+    "title": "Käsespätzle",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "spaetzle",
+        "name": "Spätzle",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Bergkäse",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebeln",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Schnittlauch",
+        "amount": "1 Bund",
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "20 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Zwiebeln in Ringen in Butter goldbraun braten.",
+      "Spätzle erwärmen oder frisch kochen.",
+      "Lagenweise mit geriebenem Käse in eine Form oder Pfanne schichten und schmelzen lassen.",
+      "Mit den Zwiebeln und Schnittlauch servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spaetzle-lauch-schinken",
+    "title": "Spätzle-Pfanne mit Lauch und Schinken",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "spaetzle",
+        "name": "Spätzle",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1 Stange",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Schinkenwürfel",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Lauch in Ringe schneiden und mit dem Schinken anbraten.",
+      "Spätzle zugeben und mit anbraten.",
+      "Sahne zugießen und kurz einköcheln.",
+      "Mit Pfeffer würzen und nach Wunsch mit Käse bestreuen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:asia-nudeln-gemuese",
+    "title": "Asia-Nudeln mit Gemüse",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "noodles_asian",
+        "name": "Mie-Nudeln",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "frozen_vegetables",
+        "name": "Wokgemüse",
+        "amount": "300 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Nudeln nach Packungsanleitung garen.",
+      "Gemüse in Streifen schneiden und mit Knoblauch im Wok scharf anbraten.",
+      "Nudeln zugeben und mit Sojasoße ablöschen.",
+      "Alles gut durchschwenken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:wok-nudeln-haehnchen",
+    "title": "Wok-Nudeln mit Hähnchen",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "noodles_asian",
+        "name": "Wok-Nudeln",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen in Streifen schneiden und im Wok kräftig anbraten.",
+      "Gemüse und Knoblauch zugeben und 5 Minuten mitbraten.",
+      "Nudeln und Sojasoße unterrühren.",
+      "Weitere 3 Minuten schwenken und servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudelsuppe-ei",
+    "title": "Schnelle Nudelsuppe mit Ei",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "noodles_asian",
+        "name": "Ramen-Nudeln",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Spinat",
+        "amount": "1 Handvoll",
+        "optional": true
+      },
+      {
+        "group": "mushrooms",
+        "name": "Pilze",
+        "amount": "100 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Eier 7 Minuten hart kochen, abschrecken und pellen.",
+      "Brühe mit Sojasoße erhitzen, Pilze darin garen.",
+      "Nudeln in der Brühe oder separat garen.",
+      "Mit Spinat und halbierten Eiern anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:thai-curry-nudeln",
+    "title": "Thai-Curry-Nudeln mit Gemüse",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "noodles_asian",
+        "name": "Reisnudeln",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "curry_paste",
+        "name": "Currypaste",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tofu",
+        "name": "Tofu",
+        "amount": "200 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Currypaste in einem Topf kurz anrösten.",
+      "Kokosmilch zugießen, Gemüse und Tofu zugeben und 10 Minuten köcheln.",
+      "Nudeln separat garen.",
+      "Nudeln in die Currysoße geben und servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gebratener-reis-ei",
+    "title": "Gebratener Reis mit Ei",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Gekochter Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Frühlingszwiebeln",
+        "amount": "2",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Karotte klein würfeln und in heißem Öl anbraten.",
+      "Reis und Erbsen zugeben und knusprig braten.",
+      "Eier an den Rand schieben, stocken lassen und unterrühren.",
+      "Mit Sojasoße abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reispfanne-gemuese",
+    "title": "Reispfanne mit Gemüse",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "frozen_vegetables",
+        "name": "TK-Gemüse",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen oder gekochten Reis bereitstellen.",
+      "Zwiebel anbraten, Gemüse zugeben und garen.",
+      "Reis unterrühren, Eier hineinschlagen und stocken lassen.",
+      "Mit Sojasoße abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pilzrisotto",
+    "title": "Pilzrisotto",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "800 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "20 g",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel in Butter glasig dünsten, Pilze zugeben und anbraten.",
+      "Reis kurz mitrösten.",
+      "Nach und nach heiße Brühe zugeben und dabei rühren, etwa 20 Minuten.",
+      "Parmesan unterrühren und sofort servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:haehnchen-curry-reis",
+    "title": "Hähnchen-Curry mit Reis",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "curry_paste",
+        "name": "Currypaste",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis nach Packungsanleitung kochen.",
+      "Hähnchen würfeln und mit der Zwiebel anbraten.",
+      "Currypaste kurz mitbraten, Paprika und Kokosmilch zugeben.",
+      "15 Minuten köcheln lassen und mit Reis servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:hack-reis-pfanne",
+    "title": "Hackfleisch-Reis-Pfanne",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": true
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 kleine Dose",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch mit Zwiebel krümelig anbraten.",
+      "Paprika würfeln und mitbraten.",
+      "Rohen Reis, Tomaten und etwa 400 ml Wasser zugeben.",
+      "Zugedeckt 15 Minuten garen, mit Paprikapulver würzen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gefuellte-paprika",
+    "title": "Gefüllte Paprika",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Reis garen. Paprika oben abschneiden und entkernen.",
+      "Hackfleisch mit Zwiebel, Reis und Gewürzen mischen und die Paprika füllen.",
+      "In eine Form auf die Tomaten setzen.",
+      "40 Minuten bei 180 Grad backen, zuletzt mit Käse überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:milchreis-apfelmus",
+    "title": "Milchreis mit Apfelmus",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Milchreis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "800 ml",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "apples",
+        "name": "Apfelmus",
+        "amount": "1 Glas",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Milch mit Zucker aufkochen.",
+      "Reis einrühren und bei kleiner Hitze 30 Minuten quellen lassen, dabei öfter rühren.",
+      "Mit Zimt bestreuen und mit Apfelmus servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:linsen-kokos-curry",
+    "title": "Rotes Linsen-Kokos-Curry mit Reis",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "lentils",
+        "name": "Rote Linsen",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Currypulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Spinat",
+        "amount": "100 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Reis garen.",
+      "Zwiebel und Knoblauch mit Currypulver anbraten.",
+      "Linsen, Kokosmilch und 200 ml Wasser zugeben und 15 Minuten köcheln.",
+      "Optional Spinat unterrühren und mit Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reis-gemuese-auflauf",
+    "title": "Reis-Gemüse-Auflauf",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis vorkochen.",
+      "Gemüse würfeln und kurz anbraten.",
+      "Alles mit Tomaten und Sahne in einer Form mischen, würzen.",
+      "Mit Käse bestreuen und 25 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:lachs-reis-brokkoli",
+    "title": "Lachs mit Reis und Brokkoli",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "salmon",
+        "name": "Lachsfilet",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "2 EL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Lachs in der Pfanne auf jeder Seite 4 Minuten braten.",
+      "Brokkoli in Röschen dämpfen oder kochen.",
+      "Mit Zitrone oder Sojasoße anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:chili-con-carne",
+    "title": "Chili con Carne",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Kidneybohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Chili",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebeln und Hackfleisch kräftig anbraten.",
+      "Paprika würfeln und mitbraten.",
+      "Tomaten, abgetropfte Bohnen und Mais zugeben.",
+      "Mit Chili und Paprikapulver würzen und 30 Minuten köcheln lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:thunfisch-reissalat",
+    "title": "Thunfisch-Reis-Salat",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Gekochter Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis abkühlen lassen.",
+      "Tomaten und Gurke würfeln.",
+      "Mit Thunfisch und Mais zum Reis geben.",
+      "Mit Essig, Öl, Salz und Pfeffer anmachen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:bratkartoffeln-spiegelei",
+    "title": "Bratkartoffeln mit Spiegelei",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Gekochte Kartoffeln",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Schnittlauch",
+        "amount": "1 Bund",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln in Scheiben schneiden.",
+      "In einer großen Pfanne mit Öl knusprig braten, Zwiebelringe zugeben.",
+      "Spiegeleier daneben braten.",
+      "Würzen und mit Schnittlauch servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kartoffelsuppe",
+    "title": "Kartoffelsuppe",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1 Stange",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Würstchen",
+        "amount": "2",
+        "optional": true
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Gemüse klein schneiden und in Öl kurz anschwitzen.",
+      "Mit Brühe aufgießen und 20 Minuten garen.",
+      "Einen Teil der Suppe pürieren, damit sie sämig wird.",
+      "Würstchen in Scheiben darin erwärmen, nach Wunsch Sahne zugeben."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kartoffelgratin",
+    "title": "Kartoffelgratin",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "250 ml",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln schälen und in dünne Scheiben hobeln.",
+      "Form mit Knoblauch ausreiben und die Kartoffeln einschichten.",
+      "Sahne und Milch mit Salz und Muskat verrühren und darübergießen.",
+      "Mit Käse bestreuen und 45 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kartoffelauflauf-hack",
+    "title": "Kartoffelauflauf mit Hackfleisch",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln in Scheiben schneiden und kurz vorgaren.",
+      "Hackfleisch mit Zwiebel anbraten und würzen.",
+      "Abwechselnd Kartoffeln und Hack in eine Form schichten.",
+      "Sahne darübergießen, Käse darüberstreuen und 35 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kartoffelpuffer",
+    "title": "Kartoffelpuffer",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "apples",
+        "name": "Apfelmus",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln und Zwiebel fein reiben und gut ausdrücken.",
+      "Mit Eiern, Mehl und Salz vermengen.",
+      "Kleine Fladen in heißem Öl auf beiden Seiten knusprig braten.",
+      "Mit Apfelmus servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ofenkartoffeln-kraeuterquark",
+    "title": "Ofenkartoffeln mit Kräuterquark",
+    "minutes": 55,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "quark",
+        "name": "Quark",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Kräuter",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln waschen, vierteln und mit Öl und Salz mischen.",
+      "40 Minuten bei 200 Grad backen.",
+      "Quark mit gehackten Kräutern und Knoblauch verrühren.",
+      "Die Kartoffeln mit dem Quark servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kartoffel-gemuese-pfanne",
+    "title": "Kartoffel-Gemüse-Pfanne",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln würfeln und 10 Minuten vorkochen.",
+      "In der Pfanne goldbraun braten.",
+      "Gemüse zugeben und weitere 8 Minuten braten.",
+      "Würzen und nach Wunsch mit zerbröseltem Feta bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kartoffelpueree-wuerstchen",
+    "title": "Kartoffelpüree mit Würstchen",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Bockwürstchen",
+        "amount": "6",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln schälen und in Salzwasser weich kochen.",
+      "Abgießen, mit Butter und warmer Milch stampfen.",
+      "Mit Salz und Muskat würzen.",
+      "Würstchen erwärmen und dazu servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kartoffelsalat",
+    "title": "Schwäbischer Kartoffelsalat",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Senf",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln kochen, pellen und in Scheiben schneiden.",
+      "Brühe erhitzen, mit Essig, Öl, Senf und gewürfelter Zwiebel mischen.",
+      "Die lauwarmen Kartoffeln mit der Marinade vermengen.",
+      "Mindestens 20 Minuten durchziehen lassen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:haehnchenschenkel-ofenkartoffeln",
+    "title": "Hähnchenschenkel mit Ofenkartoffeln",
+    "minutes": 60,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenschenkel",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "700 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchenschenkel mit Öl, Salz und Paprikapulver einreiben.",
+      "Kartoffeln, Karotten und Zwiebel in grobe Stücke schneiden.",
+      "Alles auf einem Blech verteilen.",
+      "50 Minuten bei 200 Grad backen und einmal wenden."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:shepherds-pie",
+    "title": "Hack-Püree-Auflauf",
+    "minutes": 55,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln kochen und zu Püree stampfen.",
+      "Hackfleisch mit Zwiebel, Karotte und Tomatenmark anbraten, Erbsen zugeben.",
+      "Fleischmasse in eine Form geben und das Püree darauf verstreichen.",
+      "Mit Käse bestreuen und 25 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kartoffel-linsen-eintopf",
+    "title": "Kartoffel-Linsen-Eintopf",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "lentils",
+        "name": "Linsen",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotten und Kartoffeln würfeln.",
+      "Alles mit den Linsen in Öl kurz anbraten.",
+      "Mit Brühe aufgießen und 30 Minuten köcheln lassen.",
+      "Mit Essig, Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:linseneintopf-wuerstchen",
+    "title": "Linseneintopf mit Würstchen",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "lentils",
+        "name": "Linsen",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1 Stange",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Würstchen",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse klein schneiden und in Öl andünsten.",
+      "Linsen und Brühe zugeben und 25 Minuten köcheln.",
+      "Würstchen in Scheiben zugeben und 5 Minuten ziehen lassen.",
+      "Mit Essig, Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gemuesesuppe",
+    "title": "Gemüsesuppe",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1 Stange",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "1,2 l",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Suppennudeln",
+        "amount": "50 g",
+        "optional": true
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Gemüse in kleine Würfel schneiden.",
+      "In Öl anschwitzen und mit Brühe aufgießen.",
+      "20 Minuten köcheln lassen, bei Bedarf Suppennudeln zugeben.",
+      "Mit Petersilie bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tomatensuppe",
+    "title": "Tomatensuppe",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "50 ml",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zucker",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten.",
+      "Tomaten und Brühe zugeben und 15 Minuten köcheln.",
+      "Fein pürieren und mit Salz, Pfeffer und einer Prise Zucker abschmecken.",
+      "Nach Wunsch mit Sahne verfeinern."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kuerbissuppe",
+    "title": "Kürbissuppe",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "800 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Ingwer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kürbis, Kartoffel und Zwiebel würfeln und in Öl andünsten.",
+      "Mit Brühe aufgießen und 20 Minuten garen.",
+      "Kokosmilch zugeben und alles fein pürieren.",
+      "Mit Salz, Pfeffer und Ingwer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:erbsensuppe-wiener",
+    "title": "Erbsensuppe mit Würstchen",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "peas",
+        "name": "Erbsen",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Wiener Würstchen",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "800 ml",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotte und Kartoffeln würfeln und andünsten.",
+      "Erbsen und Brühe zugeben und 20 Minuten köcheln.",
+      "Einen Teil pürieren.",
+      "Würstchenscheiben zugeben und erwärmen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:huehnersuppe-nudeln",
+    "title": "Hühnersuppe mit Nudeln",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenschenkel",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1 Stange",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Suppennudeln",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen in 1,5 l Wasser aufkochen und 30 Minuten leise köcheln, Schaum abschöpfen.",
+      "Gemüse klein schneiden und 15 Minuten mitgaren.",
+      "Fleisch herausnehmen, vom Knochen lösen und zurück in die Suppe geben.",
+      "Nudeln darin garen und abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:brokkoli-cremesuppe",
+    "title": "Brokkolicremesuppe",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "600 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel andünsten, Kartoffelwürfel und Brokkoli zugeben.",
+      "Mit Brühe aufgießen und 15 Minuten kochen.",
+      "Fein pürieren, Sahne einrühren.",
+      "Mit Salz, Pfeffer und Muskat abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:champignon-cremesuppe",
+    "title": "Champignoncremesuppe",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Pilze in Scheiben schneiden und kräftig anbraten.",
+      "Brühe zugießen und 10 Minuten köcheln.",
+      "Die Hälfte pürieren, Sahne zugeben.",
+      "Abschmecken und mit Petersilie servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spinat-kartoffelsuppe",
+    "title": "Spinat-Kartoffel-Suppe",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "spinach",
+        "name": "Blattspinat",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch andünsten, Kartoffelwürfel zugeben.",
+      "Mit Brühe 15 Minuten kochen.",
+      "Spinat unterrühren und zusammenfallen lassen.",
+      "Pürieren und nach Wunsch mit Sahne verfeinern."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:zucchinisuppe",
+    "title": "Zucchinisuppe",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "600 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "50 ml",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Kartoffel und Zucchini würfeln.",
+      "Zwiebel andünsten, Gemüse zugeben und mit Brühe aufgießen.",
+      "15 Minuten garen und pürieren.",
+      "Würzen und evtl. mit Sahne verfeinern."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:bohneneintopf-speck",
+    "title": "Bohneneintopf mit Speck",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "beans",
+        "name": "Weiße Bohnen",
+        "amount": "2 Dosen",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckwürfel",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "600 ml",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Speck auslassen, Zwiebel und Gemüsewürfel zugeben und anbraten.",
+      "Mit Brühe aufgießen und 15 Minuten köcheln.",
+      "Abgetropfte Bohnen zugeben und weitere 10 Minuten ziehen lassen.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kichererbsen-curry",
+    "title": "Kichererbsen-Curry",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "chickpeas",
+        "name": "Kichererbsen",
+        "amount": "2 Dosen",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Spinat",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Currypulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch mit Currypulver anbraten.",
+      "Tomaten, Kokosmilch und abgetropfte Kichererbsen zugeben.",
+      "15 Minuten köcheln lassen, Spinat unterrühren.",
+      "Mit Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gulaschsuppe",
+    "title": "Gulaschsuppe",
+    "minutes": 70,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "beef",
+        "name": "Rindergulasch",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebeln",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "800 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Fleisch und Zwiebeln kräftig anbraten.",
+      "Tomatenmark und Paprikapulver kurz mitrösten.",
+      "Mit Brühe aufgießen und 40 Minuten schmoren.",
+      "Paprika und Kartoffeln in Würfeln zugeben und weitere 20 Minuten garen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:minestrone",
+    "title": "Minestrone",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Weiße Bohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Zwiebel und Gemüsewürfel in Öl andünsten.",
+      "Tomaten und Brühe zugeben, 20 Minuten köcheln.",
+      "Bohnen und Nudeln zugeben und weitere 10 Minuten garen.",
+      "Mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kokos-currysuppe",
+    "title": "Kokos-Currysuppe",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "curry_paste",
+        "name": "Currypaste",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "noodles_asian",
+        "name": "Reisnudeln",
+        "amount": "100 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Currypaste in einem Topf anrösten.",
+      "Kokosmilch und Brühe zugeben und aufkochen.",
+      "Gemüsestreifen 10 Minuten mitgaren.",
+      "Optional gegarte Reisnudeln hinzufügen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:chili-sin-carne",
+    "title": "Chili sin Carne",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "beans",
+        "name": "Kidneybohnen",
+        "amount": "2 Dosen",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Chili",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Kreuzkümmel",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Paprika würfeln und anbraten.",
+      "Tomaten, Bohnen und Mais zugeben.",
+      "Mit Chili und Kreuzkümmel würzen und 25 Minuten köcheln.",
+      "Mit Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kaese-lauch-suppe",
+    "title": "Käse-Lauch-Suppe mit Hack",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "2 Stangen",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Schmelzkäse oder Frischkäse",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch krümelig anbraten.",
+      "Lauch in Ringen zugeben und mitbraten.",
+      "Brühe und Frischkäse einrühren und 15 Minuten köcheln.",
+      "Mit Pfeffer abschmecken, nach Wunsch Sahne zugeben."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:karotten-ingwer-suppe",
+    "title": "Karotten-Ingwer-Suppe",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "100 ml",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Ingwer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotten und Kartoffel würfeln und andünsten.",
+      "Geriebenen Ingwer zugeben und mit Brühe aufgießen.",
+      "20 Minuten kochen und fein pürieren.",
+      "Nach Wunsch mit Kokosmilch verfeinern und abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:griechischer-salat",
+    "title": "Griechischer Salat",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Rote Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oliven",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gurke, Tomaten und Paprika in Stücke schneiden.",
+      "Zwiebel in Ringe schneiden.",
+      "Alles mit Oliven anrichten und den Feta darauflegen.",
+      "Mit Olivenöl und Oregano beträufeln."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:caprese",
+    "title": "Tomate-Mozzarella",
+    "minutes": 10,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tomaten und Mozzarella in Scheiben schneiden.",
+      "Abwechselnd auf einem Teller anrichten.",
+      "Mit Basilikum belegen.",
+      "Mit Olivenöl, Salz und Pfeffer würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:thunfischsalat",
+    "title": "Thunfischsalat",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "salad",
+        "name": "Blattsalat",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "2 EL",
+        "optional": true
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Salat waschen und zupfen, Tomaten und Gurke schneiden.",
+      "Eier hart kochen und vierteln.",
+      "Alles mit dem abgetropften Thunfisch anrichten.",
+      "Mit Essig, Öl, Salz und Pfeffer anmachen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:salat-haehnchenstreifen",
+    "title": "Bunter Salat mit Hähnchenstreifen",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "salad",
+        "name": "Blattsalat",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "2 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen in Streifen schneiden und knusprig braten.",
+      "Salat, Tomaten und Gurke vorbereiten.",
+      "Dressing aus Essig, Öl, Salz und Pfeffer rühren.",
+      "Hähnchen warm auf dem Salat anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gurkensalat-joghurt",
+    "title": "Gurkensalat mit Joghurt",
+    "minutes": 10,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Dill",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gurke hobeln und leicht salzen.",
+      "Joghurt mit Dill und nach Wunsch Knoblauch verrühren.",
+      "Gurke ausdrücken und mit dem Joghurt vermengen.",
+      "Abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tomaten-gurken-salat",
+    "title": "Tomaten-Gurken-Salat",
+    "minutes": 10,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tomaten und Gurke in Stücke schneiden, Zwiebel in feine Ringe.",
+      "Mit Essig, Öl, Salz und Pfeffer vermengen.",
+      "Kurz durchziehen lassen und mit Kräutern bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:linsensalat",
+    "title": "Linsensalat",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "lentils",
+        "name": "Linsen",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Linsen nach Packungsanleitung garen und abkühlen lassen.",
+      "Tomaten und Zwiebel würfeln.",
+      "Alles mit Essig, Öl, Salz und Pfeffer mischen.",
+      "Petersilie und Feta unterheben."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kichererbsensalat",
+    "title": "Kichererbsensalat",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "chickpeas",
+        "name": "Kichererbsen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Rote Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kichererbsen abspülen und abtropfen lassen.",
+      "Gemüse klein würfeln.",
+      "Mit Zitronensaft, Olivenöl, Salz und Pfeffer vermengen.",
+      "Nach Wunsch Feta darüber bröseln."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:bohnensalat",
+    "title": "Bunter Bohnensalat",
+    "minutes": 15,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "beans",
+        "name": "Kidneybohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Bohnen und Mais abtropfen lassen.",
+      "Zwiebel und Paprika fein würfeln.",
+      "Alles mit Essig, Öl und Gewürzen vermengen.",
+      "Vor dem Servieren 15 Minuten ziehen lassen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:wurstsalat",
+    "title": "Wurstsalat",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "sausage",
+        "name": "Fleischwurst",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Senf",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Wurst in dünne Streifen schneiden.",
+      "Zwiebel in Ringe, Gurke in Scheiben schneiden.",
+      "Marinade aus Essig, Öl, Senf, Salz und Pfeffer rühren.",
+      "Alles vermengen und 15 Minuten ziehen lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:caesar-salat",
+    "title": "Salat mit Hähnchen und Parmesan",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "salad",
+        "name": "Römersalat",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "bread",
+        "name": "Brot",
+        "amount": "2 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Zitronensaft",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brot würfeln und in Öl zu Croûtons rösten.",
+      "Hähnchen braten und in Scheiben schneiden.",
+      "Salat mit Öl, Zitronensaft, Salz und Pfeffer anmachen.",
+      "Mit Hähnchen, Croûtons und gehobeltem Parmesan belegen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:ruehrei-toast",
+    "title": "Rührei mit Toast",
+    "minutes": 10,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "2 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "10 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "2 EL",
+        "optional": true
+      },
+      {
+        "group": "herbs",
+        "name": "Schnittlauch",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Eier mit Salz, Pfeffer und etwas Milch verquirlen.",
+      "Butter in der Pfanne schmelzen.",
+      "Eiermasse bei mittlerer Hitze stocken lassen und vorsichtig rühren.",
+      "Toast rösten und mit Schnittlauch servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:omelett-schinken-kaese",
+    "title": "Omelett mit Schinken und Käse",
+    "minutes": 15,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Schinken",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "2 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Eier mit Milch, Salz und Pfeffer verquirlen.",
+      "In einer heißen Pfanne stocken lassen.",
+      "Schinken und Käse auf eine Hälfte geben.",
+      "Zusammenklappen und kurz fertig garen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gemuese-omelett",
+    "title": "Gemüse-Omelett",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse klein schneiden und in der Pfanne anbraten.",
+      "Eier verquirlen, würzen und über das Gemüse gießen.",
+      "Bei kleiner Hitze stocken lassen.",
+      "Mit Käse bestreuen und zusammenklappen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pfannkuchen",
+    "title": "Pfannkuchen",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "für die Pfanne",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "1 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Mehl, Milch, Eier, eine Prise Salz und etwas Zucker glatt rühren.",
+      "Teig 10 Minuten ruhen lassen.",
+      "In heißer Butter dünne Pfannkuchen ausbacken.",
+      "Süß oder herzhaft füllen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:porridge-apfel-zimt",
+    "title": "Porridge mit Apfel und Zimt",
+    "minutes": 15,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "250 ml",
+        "optional": false
+      },
+      {
+        "group": "apples",
+        "name": "Apfel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Haferflocken mit Milch aufkochen und 5 Minuten quellen lassen.",
+      "Apfel grob raspeln.",
+      "Unter den Brei rühren und kurz erwärmen.",
+      "Mit Zimt und Honig servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:overnight-oats-beeren",
+    "title": "Overnight Oats mit Beeren",
+    "minutes": 10,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "berries",
+        "name": "Beeren",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Haferflocken, Joghurt und Milch verrühren.",
+      "Über Nacht im Kühlschrank quellen lassen.",
+      "Morgens mit Beeren toppen.",
+      "Nach Wunsch mit Honig süßen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:bananen-pfannkuchen",
+    "title": "Bananen-Pfannkuchen",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "bananas",
+        "name": "Bananen",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "3 EL",
+        "optional": true
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "2 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Bananen zerdrücken.",
+      "Mit Eiern und Haferflocken oder Mehl zu einem Teig verrühren.",
+      "Kleine Pfannkuchen bei mittlerer Hitze von beiden Seiten backen.",
+      "Mit Zimt bestäuben."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:arme-ritter",
+    "title": "Arme Ritter",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "1 EL",
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "zum Braten",
+        "optional": true
+      },
+      {
+        "group": "berries",
+        "name": "Beeren",
+        "amount": "zum Servieren",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Eier mit Milch, Zucker und Zimt verquirlen.",
+      "Toastscheiben darin wenden.",
+      "In Butter von beiden Seiten goldbraun braten.",
+      "Mit Beeren oder Apfelmus servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kaesetoast",
+    "title": "Überbackener Käsetoast",
+    "minutes": 10,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "2 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomate",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "10 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Toast leicht rösten oder mit Butter bestreichen.",
+      "Mit Tomatenscheiben und Käse belegen.",
+      "Im Ofen bei 200 Grad 5 bis 8 Minuten überbacken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:toast-hawaii",
+    "title": "Toast Hawaii",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "10 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Ananas",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Toast leicht rösten und mit Butter bestreichen.",
+      "Mit Schinken und Ananas belegen.",
+      "Käse darauflegen.",
+      "Im Ofen bei 200 Grad überbacken, bis der Käse zerläuft."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:quark-bananen-beeren",
+    "title": "Quark mit Banane und Beeren",
+    "minutes": 5,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "quark",
+        "name": "Quark",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "bananas",
+        "name": "Banane",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "berries",
+        "name": "Beeren",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      },
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "2 EL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Quark glatt rühren.",
+      "Banane in Scheiben schneiden.",
+      "Alles in eine Schale geben und mit Beeren und Haferflocken toppen.",
+      "Nach Wunsch mit Honig beträufeln."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:joghurt-muesli",
+    "title": "Joghurt mit Müsli und Obst",
+    "minutes": 5,
+    "servings": 1,
+    "ingredients": [
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "oats",
+        "name": "Müsli",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "apples",
+        "name": "Apfel",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "bananas",
+        "name": "Banane",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Joghurt in eine Schale geben.",
+      "Obst klein schneiden.",
+      "Mit Müsli bestreuen und nach Wunsch mit Honig süßen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:shakshuka",
+    "title": "Shakshuka",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "80 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Kreuzkümmel",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Paprika und Knoblauch in Öl anbraten.",
+      "Tomaten und Gewürze zugeben und 10 Minuten einköcheln.",
+      "Mulden bilden und die Eier hineinschlagen.",
+      "Zugedeckt stocken lassen, mit Feta bestreuen und mit Brot servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudel-rest-pfanne",
+    "title": "Nudel-Rest-Pfanne mit Ei",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Gekochte Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel in Öl anbraten.",
+      "Reste-Nudeln zugeben und knusprig braten.",
+      "Verquirlte Eier darübergießen und stocken lassen.",
+      "Mit Käse bestreuen und würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:frittata-reste",
+    "title": "Frittata aus Resten",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "5",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Gekochte Kartoffeln",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Zwiebel und Gemüse klein schneiden und in einer ofenfesten Pfanne anbraten.",
+      "Kartoffelscheiben zugeben.",
+      "Eier verquirlen, würzen und darübergießen.",
+      "Zugedeckt stocken lassen oder 10 Minuten im Ofen backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:herzhafter-brotauflauf",
+    "title": "Herzhafter Brotauflauf",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "bread",
+        "name": "Altes Brot oder Brötchen",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "300 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": true
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brot in Würfel schneiden und in eine Form geben.",
+      "Gemüse klein schneiden und untermischen.",
+      "Eier mit Milch, Salz und Pfeffer verrühren und darübergießen.",
+      "Mit Käse bestreuen und 30 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gemuesepfanne-ei",
+    "title": "Gemüsepfanne mit Ei",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "100 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Gemüse in kleine Stücke schneiden.",
+      "In Öl kräftig anbraten, bis es bissfest ist.",
+      "Eier darüberschlagen und stocken lassen.",
+      "Salzen, pfeffern und servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:bruschetta",
+    "title": "Bruschetta",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "bread",
+        "name": "Baguette oder Ciabatta",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "einige Blätter",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brotscheiben rösten und mit Knoblauch einreiben.",
+      "Tomaten fein würfeln und mit Olivenöl, Salz und Basilikum mischen.",
+      "Auf das Brot geben und sofort servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pizzatoast",
+    "title": "Pizzatoast",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "tomato_sauce",
+        "name": "Tomatensoße",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "80 g",
+        "optional": true
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Toast mit Tomatensoße bestreichen.",
+      "Mit Pilzen und Paprikawürfeln belegen.",
+      "Käse darüberstreuen und mit Oregano würzen.",
+      "Bei 200 Grad etwa 8 Minuten überbacken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:flammkuchen",
+    "title": "Flammkuchen",
+    "minutes": 35,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pizza_dough",
+        "name": "Flammkuchenteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "creme_fraiche",
+        "name": "Crème fraîche",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckwürfel",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Teig auf einem Blech ausrollen.",
+      "Crème fraîche mit Salz und Pfeffer verrühren und aufstreichen.",
+      "Mit Zwiebelringen und Speck belegen.",
+      "12 bis 15 Minuten bei 230 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:pizza-selbstgemacht",
+    "title": "Pizza aus dem Ofen",
+    "minutes": 45,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pizza_dough",
+        "name": "Pizzateig",
+        "amount": "1 Portion",
+        "optional": false
+      },
+      {
+        "group": "tomato_sauce",
+        "name": "Tomatensoße",
+        "amount": "6 EL",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Teig dünn ausrollen und auf ein Blech legen.",
+      "Mit Tomatensoße bestreichen.",
+      "Mit Mozzarella und Gemüse belegen, mit Oregano würzen.",
+      "12 bis 15 Minuten bei 230 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:quiche-lorraine",
+    "title": "Quiche Lorraine",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "puff_pastry",
+        "name": "Blätterteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckwürfel",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Blätterteig in eine Form legen und mehrfach einstechen.",
+      "Speck anbraten und auf dem Teig verteilen.",
+      "Eier mit Sahne, Muskat und Pfeffer verquirlen und darübergießen.",
+      "Mit Käse bestreuen und 35 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gemuesequiche",
+    "title": "Gemüsequiche",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "puff_pastry",
+        "name": "Blätterteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "100 g",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse klein schneiden und kurz anbraten.",
+      "Blätterteig in eine Form legen und einstechen.",
+      "Gemüse und zerbröselten Feta verteilen.",
+      "Eier mit Sahne verquirlen, darübergießen und 35 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spinat-feta-taschen",
+    "title": "Blätterteig-Taschen mit Spinat und Feta",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "puff_pastry",
+        "name": "Blätterteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1 zum Bestreichen",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spinat mit Knoblauch zusammenfallen lassen und gut ausdrücken.",
+      "Mit zerbröseltem Feta mischen.",
+      "Teig in Quadrate schneiden, füllen und zusammenklappen.",
+      "Mit Ei bestreichen und 20 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:schinken-kaese-schnecken",
+    "title": "Schinken-Käse-Schnecken",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "puff_pastry",
+        "name": "Blätterteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "3 EL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Blätterteig ausrollen und mit Frischkäse bestreichen.",
+      "Mit Schinken und Käse belegen.",
+      "Aufrollen und in Scheiben schneiden.",
+      "15 bis 20 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:wuerstchen-schlafrock",
+    "title": "Würstchen im Schlafrock",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "puff_pastry",
+        "name": "Blätterteig",
+        "amount": "1 Rolle",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Wiener Würstchen",
+        "amount": "8",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Senf",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1 zum Bestreichen",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Blätterteig in Streifen schneiden.",
+      "Würstchen mit etwas Senf bestreichen und einwickeln.",
+      "Mit Ei bestreichen.",
+      "15 bis 20 Minuten bei 200 Grad goldbraun backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:wraps-haehnchen",
+    "title": "Wraps mit Hähnchen",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tortilla",
+        "name": "Tortillas",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "salad",
+        "name": "Salat",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomate",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "3 EL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Hähnchen in Streifen braten und würzen.",
+      "Gemüse in Streifen schneiden.",
+      "Tortillas erwärmen und mit Joghurt bestreichen.",
+      "Füllen, einrollen und halbieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gemuese-wraps",
+    "title": "Gemüse-Wraps mit Frischkäse",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tortilla",
+        "name": "Tortillas",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "salad",
+        "name": "Salat",
+        "amount": "1 Handvoll",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse in dünne Streifen schneiden.",
+      "Tortillas mit Frischkäse bestreichen.",
+      "Gemüse und Salat darauf verteilen.",
+      "Fest einrollen und halbieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:quesadillas",
+    "title": "Quesadillas",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tortilla",
+        "name": "Tortillas",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "beans",
+        "name": "Bohnen",
+        "amount": "3 EL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Paprika und Zwiebel würfeln und kurz anbraten.",
+      "Eine Tortilla mit Käse, Gemüse und Mais belegen.",
+      "Zweite Tortilla darauflegen.",
+      "In der Pfanne von beiden Seiten knusprig braten und in Stücke schneiden."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:burritos-hack-bohnen",
+    "title": "Burritos mit Hack und Bohnen",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "tortilla",
+        "name": "Tortillas",
+        "amount": "6",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Kidneybohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 kleine Dose",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "100 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Chili",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch krümelig anbraten und mit Paprikapulver und Chili würzen.",
+      "Bohnen und Mais zugeben und erwärmen.",
+      "Tortillas mit Füllung und Käse belegen.",
+      "Einrollen und bei Bedarf kurz im Ofen überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:haehnchen-paprika-sahne",
+    "title": "Hähnchen-Pfanne mit Paprika und Sahne",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen würfeln und in der Pfanne anbraten.",
+      "Zwiebel und Paprika zugeben und mitbraten.",
+      "Mit Sahne ablöschen und 8 Minuten köcheln.",
+      "Mit Paprikapulver, Salz und Pfeffer abschmecken, mit Reis servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:haehnchen-gemuese-soja",
+    "title": "Hähnchen-Gemüse-Pfanne mit Soja",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "350 g",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Hähnchen in Streifen schneiden und kräftig anbraten.",
+      "Karotten in Scheiben und Brokkoli in Röschen zugeben.",
+      "Mit Sojasoße und Honig ablöschen.",
+      "8 Minuten garen und mit Reis servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:schnitzel-bratkartoffeln",
+    "title": "Paniertes Schnitzel mit Bratkartoffeln",
+    "minutes": 40,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pork",
+        "name": "Schnitzel",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "bread",
+        "name": "Paniermehl",
+        "amount": "5 EL",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Schnitzel flach klopfen und salzen.",
+      "Nacheinander in Mehl, Ei und Paniermehl wenden.",
+      "In heißem Fett goldbraun ausbacken.",
+      "Dazu gebratene Kartoffeln und Zitrone servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:rahmschnitzel-pilze",
+    "title": "Rahmschnitzel mit Pilzen",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pork",
+        "name": "Schnitzel",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "spaetzle",
+        "name": "Spätzle",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Schnitzel würzen und von beiden Seiten braten, dann herausnehmen.",
+      "Zwiebel und Pilze im Bratfett anbraten.",
+      "Mit Sahne ablöschen und einköcheln lassen.",
+      "Schnitzel kurz in der Soße ziehen lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:frikadellen",
+    "title": "Frikadellen",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bread",
+        "name": "Altes Brötchen",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Senf",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brötchen einweichen und ausdrücken.",
+      "Mit Hackfleisch, Ei, gewürfelter Zwiebel, Senf und Gewürzen verkneten.",
+      "Zu Frikadellen formen.",
+      "In der Pfanne von beiden Seiten etwa 12 Minuten braten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:hackbraten",
+    "title": "Hackbraten",
+    "minutes": 70,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bread",
+        "name": "Altes Brötchen",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckscheiben",
+        "amount": "4",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Senf",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brötchen einweichen. Mit Hackfleisch, Ei, Zwiebel und Gewürzen verkneten.",
+      "Zu einem Laib formen und in eine Form legen.",
+      "Nach Wunsch mit Speck belegen.",
+      "50 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:hackbaellchen-tomatensosse",
+    "title": "Hackbällchen in Tomatensoße",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": true
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch würzen und zu kleinen Bällchen formen.",
+      "Bällchen rundum anbraten.",
+      "Zwiebel und Tomaten zugeben, 15 Minuten köcheln.",
+      "Mit Nudeln und Parmesan servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:weisskohl-hack-pfanne",
+    "title": "Weißkohl-Hack-Pfanne",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "cabbage",
+        "name": "Weißkohl",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Kümmel",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hackfleisch mit Zwiebel anbraten.",
+      "Kohl in Streifen zugeben und mitbraten.",
+      "Mit Kümmel, Paprikapulver, Salz und Pfeffer würzen.",
+      "Zugedeckt 15 Minuten garen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gefuellte-zucchini",
+    "title": "Gefüllte Zucchini",
+    "minutes": 45,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "80 g",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zucchini halbieren und aushöhlen.",
+      "Hack mit Zwiebel und dem Zucchinifruchtfleisch anbraten, Tomaten zugeben.",
+      "Zucchini füllen und mit Käse bestreuen.",
+      "25 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:lachs-ofen-gemuese",
+    "title": "Lachs aus dem Ofen mit Gemüse",
+    "minutes": 35,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "salmon",
+        "name": "Lachsfilet",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "herbs",
+        "name": "Dill",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln in Spalten schneiden und 15 Minuten vorbacken.",
+      "Zucchini zugeben und den Lachs obenauf legen.",
+      "Mit Öl, Salz und Zitrone würzen.",
+      "Weitere 15 Minuten bei 200 Grad backen und mit Dill servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:fischstaebchen-puree-spinat",
+    "title": "Fischstäbchen mit Kartoffelpüree und Rahmspinat",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "fish_sticks",
+        "name": "Fischstäbchen",
+        "amount": "8",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Rahmspinat",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "30 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Kartoffeln weich kochen und mit Butter und Milch zu Püree stampfen.",
+      "Fischstäbchen nach Packungsanleitung braten oder backen.",
+      "Spinat erwärmen.",
+      "Alles zusammen anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:fisch-lauch-auflauf",
+    "title": "Fischfilet auf Lauchbett",
+    "minutes": 45,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "fish",
+        "name": "Fischfilet",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "2 Stangen",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "80 g",
+        "optional": true
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "als Beilage",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zitronensaft",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Lauch in Ringen kurz anbraten und in eine Form geben.",
+      "Fisch mit Zitronensaft und Salz würzen und darauflegen.",
+      "Sahne darübergießen, nach Wunsch Käse darüberstreuen.",
+      "25 Minuten bei 190 Grad backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:thunfisch-melt",
+    "title": "Thunfisch-Melts",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "toast",
+        "name": "Toast",
+        "amount": "4 Scheiben",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomate",
+        "amount": "1",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Thunfisch abtropfen lassen und mit gewürfelter Zwiebel mischen.",
+      "Auf zwei Toastscheiben verteilen, Tomate und Käse darauflegen.",
+      "Mit den restlichen Scheiben abdecken.",
+      "Im Ofen oder in der Pfanne goldbraun und knusprig backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:pesto-haehnchen-ofen",
+    "title": "Pesto-Hähnchen aus dem Ofen",
+    "minutes": 35,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "als Beilage",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Hähnchenbrüste einschneiden und mit Pesto bestreichen.",
+      "In eine Form legen und Tomatenscheiben und Mozzarella darauf verteilen.",
+      "25 Minuten bei 200 Grad backen.",
+      "Nach Wunsch mit Nudeln servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:currywurst-pommes",
+    "title": "Currywurst mit Pommes",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "sausage",
+        "name": "Bratwurst",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Pommes aus dem Ofen",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Ketchup",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Currypulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Pommes im Ofen nach Packungsanleitung backen.",
+      "Bratwurst braten.",
+      "Aus Ketchup, Tomatenmark, Currypulver und etwas Wasser eine Soße erhitzen.",
+      "Wurst in Scheiben schneiden und mit der Soße übergießen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:bratwurst-sauerkraut-puree",
+    "title": "Bratwurst mit Sauerkraut und Kartoffelpüree",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "sausage",
+        "name": "Bratwurst",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "cabbage",
+        "name": "Sauerkraut",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "700 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "30 g",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Kartoffeln kochen und mit Milch und Butter stampfen.",
+      "Sauerkraut in einem Topf erhitzen.",
+      "Bratwürste in der Pfanne braun braten.",
+      "Alles zusammen anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:tortilla-espanola",
+    "title": "Spanische Kartoffel-Tortilla",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "6",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln in dünne Scheiben schneiden und mit Zwiebel in reichlich Öl weich garen.",
+      "Abtropfen lassen und mit den verquirlten Eiern mischen.",
+      "In der Pfanne bei mittlerer Hitze stocken lassen.",
+      "Mit einem Teller wenden und fertig backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gebackener-feta-tomaten",
+    "title": "Gebackener Feta mit Tomaten",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": "bread",
+        "name": "Brot",
+        "amount": "zum Dippen",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tomaten halbieren und mit Knoblauch in eine Form geben.",
+      "Feta in die Mitte legen.",
+      "Mit Olivenöl und Oregano beträufeln.",
+      "20 Minuten bei 200 Grad backen und mit Brot servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:zucchini-puffer",
+    "title": "Zucchini-Puffer",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "80 g",
+        "optional": true
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "als Dip",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zucchini raspeln, salzen und gut ausdrücken.",
+      "Mit Eiern, Mehl und nach Wunsch Feta verrühren.",
+      "Kleine Puffer in Öl von beiden Seiten goldbraun braten.",
+      "Mit Joghurt servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ratatouille",
+    "title": "Ratatouille",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggplant",
+        "name": "Aubergine",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Kräuter",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse in gleichmäßige Würfel schneiden.",
+      "Zwiebel und Knoblauch in Olivenöl anbraten.",
+      "Das übrige Gemüse zugeben und 25 Minuten zugedeckt schmoren.",
+      "Mit Kräutern, Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:auberginen-auflauf",
+    "title": "Auberginen-Auflauf",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "eggplant",
+        "name": "Auberginen",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": true
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Auberginen in Scheiben schneiden und in Öl anbraten.",
+      "Tomaten mit Knoblauch und Gewürzen aufkochen.",
+      "Abwechselnd Auberginen und Soße in eine Form schichten.",
+      "Mit Mozzarella und Parmesan belegen und 25 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:blumenkohl-kaese-auflauf",
+    "title": "Blumenkohl-Käse-Auflauf",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "cauliflower",
+        "name": "Blumenkohl",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Blumenkohl in Röschen teilen und 5 Minuten kochen.",
+      "In eine Form legen.",
+      "Sahne mit Eiern, Muskat und Salz verrühren und darübergießen.",
+      "Mit Käse bestreuen und 25 Minuten bei 200 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ruehrei-spinat",
+    "title": "Rührei mit Spinat",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "60 g",
+        "optional": true
+      },
+      {
+        "group": "bread",
+        "name": "Brot",
+        "amount": "zum Servieren",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spinat in der Pfanne zusammenfallen lassen.",
+      "Eier verquirlen und darübergießen.",
+      "Unter Rühren stocken lassen.",
+      "Mit Feta bestreuen und mit Brot servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:pilzpfanne-ei",
+    "title": "Pilzpfanne mit Ei",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": "bread",
+        "name": "Brot",
+        "amount": "zum Servieren",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Pilze in Scheiben schneiden und kräftig anbraten.",
+      "Zwiebel zugeben und mitbraten.",
+      "Eier darüberschlagen und stocken lassen.",
+      "Mit Petersilie bestreuen und mit Brot servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tofu-gemuese-pfanne",
+    "title": "Tofu-Gemüse-Pfanne",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "tofu",
+        "name": "Tofu",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "als Beilage",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Tofu würfeln und in Öl knusprig braten, herausnehmen.",
+      "Gemüse klein schneiden und im Wok anbraten.",
+      "Tofu und Sojasoße zugeben und 3 Minuten schwenken.",
+      "Mit Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:linsen-bolognese",
+    "title": "Linsen-Bolognese",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "lentils",
+        "name": "Rote Linsen",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Karotte würfeln und anbraten.",
+      "Linsen, Tomaten und 200 ml Wasser zugeben.",
+      "20 Minuten köcheln lassen, bis die Linsen zerfallen.",
+      "Mit Oregano würzen und zu den Spaghetti servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kuerbis-feta-pfanne",
+    "title": "Kürbispfanne mit Feta",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Thymian",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kürbis in Würfel schneiden, die Schale kann dranbleiben.",
+      "Mit der Zwiebel in Olivenöl 15 Minuten braten.",
+      "Würzen und Kräuter zugeben.",
+      "Feta darüber bröseln und kurz erwärmen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:apfelpfannkuchen",
+    "title": "Apfelpfannkuchen",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "apples",
+        "name": "Äpfel",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "350 ml",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "1 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Aus Mehl, Milch, Eiern und einer Prise Salz einen Teig rühren.",
+      "Äpfel in dünne Scheiben schneiden und in der Pfanne kurz anbraten.",
+      "Teig darübergießen und stocken lassen.",
+      "Wenden, goldbraun backen und mit Zimt und Zucker bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:apfel-crumble",
+    "title": "Apfel-Haferflocken-Crumble",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "apples",
+        "name": "Äpfel",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Äpfel in Stücke schneiden und in eine Form geben.",
+      "Haferflocken, Mehl, Zucker und weiche Butter zu Streuseln verkneten.",
+      "Streusel auf den Äpfeln verteilen.",
+      "30 Minuten bei 180 Grad backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:schoko-bananen-quark",
+    "title": "Schoko-Bananen-Quark",
+    "minutes": 10,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "quark",
+        "name": "Quark",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "bananas",
+        "name": "Bananen",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "chocolate",
+        "name": "Schokolade",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Quark glatt rühren.",
+      "Bananen in Scheiben schneiden.",
+      "Schokolade hacken oder raspeln.",
+      "Alles schichten oder mischen und servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tomaten-mozzarella-ofen",
+    "title": "Tomaten-Mozzarella-Brot",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "bread",
+        "name": "Ciabatta",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "125 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      }
+    ],
+    "steps": [
+      "Brot aufschneiden und mit Knoblauch einreiben.",
+      "Mit Tomatenscheiben und Mozzarella belegen.",
+      "10 Minuten bei 200 Grad überbacken.",
+      "Mit Basilikum bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kartoffel-lauch-pfanne",
+    "title": "Kartoffel-Lauch-Pfanne",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "potatoes",
+        "name": "Kartoffeln",
+        "amount": "600 g",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "2 Stangen",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "60 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kartoffeln in Scheiben schneiden und in der Pfanne anbraten.",
+      "Lauchringe zugeben und mitbraten.",
+      "Eier verquirlen, würzen und über die Pfanne gießen.",
+      "Stocken lassen und nach Wunsch Käse darüberstreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:haferflocken-bratlinge",
+    "title": "Haferflocken-Gemüse-Bratlinge",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "oats",
+        "name": "Haferflocken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Käse",
+        "amount": "50 g",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Karotten und Zucchini raspeln und ausdrücken.",
+      "Mit Haferflocken, Eiern und Gewürzen vermengen.",
+      "Kleine Bratlinge formen.",
+      "In Öl von beiden Seiten goldbraun braten."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kokos-reis-bananen",
+    "title": "Kokosreis mit Banane",
+    "minutes": 30,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Milchreis",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "bananas",
+        "name": "Banane",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "1 EL",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis mit Kokosmilch und etwas Wasser aufkochen.",
+      "Bei kleiner Hitze 25 Minuten quellen lassen.",
+      "Bananenscheiben unterheben.",
+      "Mit Zimt und Zucker abschmecken."
+    ],
+    "vegetarian": true
+  }
+]

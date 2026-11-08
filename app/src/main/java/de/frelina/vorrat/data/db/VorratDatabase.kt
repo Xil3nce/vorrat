@@ -16,6 +16,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         LookupCacheEntity::class,
         ShoppingItemEntity::class,
         HistoryEventEntity::class,
+        RecipeEntity::class,
     ],
     version = VorratDatabase.VERSION,
     exportSchema = true,
@@ -30,16 +31,17 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun lookupCacheDao(): LookupCacheDao
     abstract fun shoppingDao(): ShoppingDao
     abstract fun historyDao(): HistoryDao
+    abstract fun recipeDao(): RecipeDao
 
     companion object {
-        const val VERSION = 6
+        const val VERSION = 7
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -224,5 +226,21 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
                 "`outOfStock` INTEGER NOT NULL, `message` TEXT, `notify` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         )
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_history_events_createdAt` ON `history_events` (`createdAt`)")
+    }
+}
+
+/**
+ * v6 → v7:
+ * - Produkte: manuell gewählte Zutatengruppe für Rezepte
+ * - neue Tabelle für eigene Rezepte
+ */
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `products` ADD COLUMN `ingredientGroup` TEXT")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `minutes` INTEGER, " +
+                "`servings` INTEGER, `ingredients` TEXT NOT NULL, `steps` TEXT NOT NULL, `vegetarian` INTEGER NOT NULL, " +
+                "`createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
     }
 }

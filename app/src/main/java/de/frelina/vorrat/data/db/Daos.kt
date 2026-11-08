@@ -243,7 +243,7 @@ interface StockEntryDao {
         const val STOCK_ITEM_SELECT = """
             SELECT e.id AS entryId, e.productId, e.locationId, e.level, e.shelf, e.expiryDate,
                    e.quantity, e.quantityTypeId, e.note, e.openedAt, e.openedDays, e.frozenAt, e.nfcTagId,
-                   p.name AS productName, p.brand, p.barcode, p.imagePath, p.category,
+                   p.name AS productName, p.brand, p.barcode, p.imagePath, p.category, p.ingredientGroup,
                    l.name AS locationName, q.symbol AS quantityTypeSymbol
             FROM stock_entries e
             JOIN products p ON p.id = e.productId
@@ -325,5 +325,35 @@ interface HistoryDao {
     suspend fun deleteOlderThan(before: Long)
 
     @Query("DELETE FROM history_events")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface RecipeDao {
+    @Query("SELECT * FROM recipes ORDER BY title COLLATE NOCASE, id")
+    fun observeAll(): Flow<List<RecipeEntity>>
+
+    @Query("SELECT * FROM recipes ORDER BY title COLLATE NOCASE, id")
+    suspend fun getAll(): List<RecipeEntity>
+
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    suspend fun getById(id: String): RecipeEntity?
+
+    @Query("SELECT * FROM recipes WHERE id = :id")
+    fun observeById(id: String): Flow<RecipeEntity?>
+
+    @Upsert
+    suspend fun upsert(recipe: RecipeEntity)
+
+    @Insert
+    suspend fun insertAll(recipes: List<RecipeEntity>)
+
+    @Query("DELETE FROM recipes WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT id FROM recipes")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM recipes")
     suspend fun deleteAll()
 }

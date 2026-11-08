@@ -16,6 +16,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class EntryDetailRoute(val entryId: String)
 @Serializable data object HistoryRoute
 
+// Rezepte ("Was koche ich heute?"): Liste, Details, Editor (id = null → neues Rezept; "builtin:…" → Kopie davon)
+@Serializable data object RecipesRoute
+@Serializable data class RecipeDetailRoute(val id: String)
+@Serializable data class EditRecipeRoute(val id: String? = null)
+
 /**
  * Erfassen:
  * - productId gesetzt (≠ NONE) → neuer Bestandseintrag für bekanntes Produkt

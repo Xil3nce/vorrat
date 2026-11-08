@@ -21,6 +21,22 @@ data class BackupData(
     val stockEntries: List<StockEntryDto>,
     /** Seit Schema 5. */
     val shoppingItems: List<ShoppingItemDto> = emptyList(),
+    /** Eigene Rezepte (seit Schema 7). */
+    val recipes: List<RecipeDto> = emptyList(),
+)
+
+@Serializable
+data class RecipeDto(
+    val id: String,
+    val title: String,
+    val minutes: Int? = null,
+    val servings: Int? = null,
+    /** Zutaten als JSON-Text (siehe RecipeJson). */
+    val ingredients: String,
+    val steps: String = "",
+    val vegetarian: Boolean = false,
+    val createdAt: Long = 0,
+    val updatedAt: Long = 0,
 )
 
 @Serializable
@@ -59,6 +75,8 @@ data class ProductDto(
     val updatedAt: Long,
     val minStock: Int? = null,
     val openedDays: Int? = null,
+    /** Manuelle Zutatengruppe für Rezepte (seit Schema 7). */
+    val ingredientGroup: String? = null,
 )
 
 @Serializable

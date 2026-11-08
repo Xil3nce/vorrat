@@ -47,6 +47,7 @@ class BackupRoundTripTest : DbTestBase() {
         db.productDao().getAll(),
         db.stockEntryDao().getAll(),
         db.shoppingDao().getAll(),
+        db.recipeDao().getAll(),
     )
 
     @Test fun `Export und Import ergeben identische Daten inkl Bild`() = runBlocking {
@@ -73,6 +74,13 @@ class BackupRoundTripTest : DbTestBase() {
         db.shoppingDao().upsert(
             de.frelina.vorrat.data.db.ShoppingItemEntity(productId = null, name = "Brot", quantity = 1, note = null, createdAt = 8),
         )
+        db.productDao().update(db.productDao().getById(p1)!!.copy(ingredientGroup = "cream"))
+        db.recipeDao().upsert(
+            de.frelina.vorrat.data.db.RecipeEntity(
+                id = "r1", title = "Suppe", minutes = 30, servings = 2,
+                ingredients = "[]", steps = "A B", vegetarian = true, createdAt = 1, updatedAt = 2,
+            ),
+        )
         val before = snapshot()
 
         val zip = exportBytes()
@@ -81,6 +89,7 @@ class BackupRoundTripTest : DbTestBase() {
         db.stockEntryDao().deleteAll()
         db.productDao().deleteAll()
         db.shoppingDao().deleteAll()
+        db.recipeDao().deleteAll()
         imageStore.delete(image)
 
         val parsed = backup.read(ByteArrayInputStream(zip))
@@ -89,6 +98,8 @@ class BackupRoundTripTest : DbTestBase() {
         backup.replaceAll(parsed)
 
         assertEquals(before, snapshot())
+        assertEquals("cream", db.productDao().getById(p1)!!.ingredientGroup)
+        assertEquals("Suppe", db.recipeDao().getById("r1")!!.title)
         assertArrayEquals(byteArrayOf(9, 8, 7, 6), imageStore.fileOrNull(image)!!.readBytes())
     }
 

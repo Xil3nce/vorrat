@@ -5,6 +5,7 @@ import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
@@ -80,6 +81,7 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.PRODUCTS -> RemoteMapper.product(id, data)
         RemoteCollection.ENTRIES -> RemoteMapper.entry(id, data)
         RemoteCollection.SHOPPING -> RemoteMapper.shopping(id, data)
+        RemoteCollection.RECIPES -> RemoteMapper.recipe(id, data)
         RemoteCollection.HISTORY -> RemoteMapper.history(id, data)
         RemoteCollection.IMAGES -> null
     }
@@ -91,6 +93,7 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.PRODUCTS -> db.productDao().getIds()
         RemoteCollection.ENTRIES -> db.stockEntryDao().getIds()
         RemoteCollection.SHOPPING -> db.shoppingDao().getIds()
+        RemoteCollection.RECIPES -> db.recipeDao().getIds()
         RemoteCollection.HISTORY -> db.historyDao().getIds()
         RemoteCollection.IMAGES -> emptyList()
     }
@@ -139,6 +142,7 @@ class SyncApplier(private val db: VorratDatabase) {
             ok
         }
         is ShoppingItemEntity -> db.shoppingDao().upsert(entity).let { true }
+        is RecipeEntity -> db.recipeDao().upsert(entity).let { true }
         is HistoryEventEntity -> db.historyDao().upsert(entity).let { true }
         else -> true
     }
@@ -146,6 +150,7 @@ class SyncApplier(private val db: VorratDatabase) {
     private suspend fun tryDelete(collection: RemoteCollection, id: String): Boolean = when (collection) {
         RemoteCollection.ENTRIES -> db.stockEntryDao().deleteById(id).let { true }
         RemoteCollection.SHOPPING -> db.shoppingDao().deleteById(id).let { true }
+        RemoteCollection.RECIPES -> db.recipeDao().deleteById(id).let { true }
         RemoteCollection.HISTORY -> db.historyDao().deleteById(id).let { true }
         // Bestandseinträge des Produkts entfernt der Fremdschlüssel (CASCADE).
         RemoteCollection.PRODUCTS -> db.productDao().deleteById(id).let { true }

@@ -19,6 +19,7 @@ fun stockItem(
     quantity: Int = 1,
     openedAt: LocalDate? = null,
     openedDays: Int? = null,
+    ingredientGroup: String? = null,
 ) = StockItem(
     entryId = entryId,
     productId = productId,
@@ -38,4 +39,5 @@ fun stockItem(
     quantityTypeSymbol = "Stck.",
     openedAt = openedAt,
     openedDays = openedDays,
+    ingredientGroup = ingredientGroup,
 )

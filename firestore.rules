@@ -7,7 +7,7 @@ rules_version = '2';
 //   invites/{code}                         {householdId, createdBy}
 //   households/{hid}                       {ownerUid, createdAt}
 //   households/{hid}/members/{uid}         {code, joinedAt}
-//   households/{hid}/{locations|units|quantityTypes|products|entries|images|shopping|history}/{id}
+//   households/{hid}/{locations|units|quantityTypes|products|entries|images|shopping|recipes|history}/{id}
 //
 // Grundsatz: Alles, was hier nicht ausdrücklich erlaubt ist, ist verboten. Nur Mitglieder eines Haushalts
 // sehen und ändern dessen Daten; Mitglied wird man als Ersteller oder mit einem gültigen Einladungscode.
@@ -63,7 +63,7 @@ service cloud.firestore {
       // Haushaltsdaten: lesen und schreiben nur für Mitglieder, nur in den bekannten Sammlungen
       // ("members" ist hier ausdrücklich ausgeschlossen).
       match /{collection}/{docId} {
-        allow read, write: if collection in ['locations', 'units', 'quantityTypes', 'products', 'entries', 'images', 'shopping', 'history']
+        allow read, write: if collection in ['locations', 'units', 'quantityTypes', 'products', 'entries', 'images', 'shopping', 'recipes', 'history']
           && isMember(hid);
       }
     }

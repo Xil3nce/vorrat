@@ -5,11 +5,13 @@ import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.image.ImageStore
+import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -92,6 +94,7 @@ class BackupManager @Inject constructor(
                 updatedAt = it.updatedAt,
                 minStock = it.minStock,
                 openedDays = it.openedDays,
+                ingredientGroup = it.ingredientGroup,
             )
         },
         stockEntries = db.stockEntryDao().getAll().map {
@@ -113,6 +116,9 @@ class BackupManager @Inject constructor(
         },
         shoppingItems = db.shoppingDao().getAll().map {
             ShoppingItemDto(it.id, it.productId, it.name, it.quantity, it.note, it.createdAt)
+        },
+        recipes = db.recipeDao().getAll().map {
+            RecipeDto(it.id, it.title, it.minutes, it.servings, it.ingredients, it.steps, it.vegetarian, it.createdAt, it.updatedAt)
         },
     )
 
@@ -180,6 +186,7 @@ class BackupManager @Inject constructor(
             val previousImages = db.productDao().getAllImagePaths().toSet()
             db.withTransaction {
                 db.shoppingDao().deleteAll()
+                db.recipeDao().deleteAll()
                 db.stockEntryDao().deleteAll()
                 db.productDao().deleteAll()
                 db.locationDao().deleteAll()
@@ -212,6 +219,7 @@ class BackupManager @Inject constructor(
                             updatedAt = it.updatedAt,
                             minStock = it.minStock?.takeIf { n -> n > 0 },
                             openedDays = it.openedDays?.takeIf { n -> n >= 0 },
+                            ingredientGroup = it.ingredientGroup?.takeIf { g -> g.matches(GROUP_ID) },
                         )
                     },
                 )
@@ -243,6 +251,21 @@ class BackupManager @Inject constructor(
                             quantity = it.quantity.coerceAtLeast(1),
                             note = it.note,
                             createdAt = it.createdAt,
+                        )
+                    },
+                )
+                db.recipeDao().insertAll(
+                    d.recipes.map {
+                        RecipeEntity(
+                            id = it.id,
+                            title = it.title.trim().take(RemoteMapper.MAX_TITLE),
+                            minutes = it.minutes?.takeIf { n -> n in 1..RemoteMapper.MAX_MINUTES },
+                            servings = it.servings?.takeIf { n -> n in 1..RemoteMapper.MAX_SERVINGS },
+                            ingredients = it.ingredients,
+                            steps = it.steps.take(RemoteMapper.MAX_STEPS),
+                            vegetarian = it.vegetarian,
+                            createdAt = it.createdAt,
+                            updatedAt = it.updatedAt,
                         )
                     },
                 )
@@ -288,6 +311,11 @@ class BackupManager @Inject constructor(
         if (productIds.size != d.products.size) invalid("doppelte Produkt-IDs")
         if (d.stockEntries.map { it.id }.toSet().size != d.stockEntries.size) invalid("doppelte Eintrags-IDs")
         if (d.shoppingItems.map { it.id }.toSet().size != d.shoppingItems.size) invalid("doppelte Einkaufslisten-IDs")
+        if (d.recipes.map { it.id }.toSet().size != d.recipes.size) invalid("doppelte Rezept-IDs")
+        d.recipes.forEach { r ->
+            if (r.title.isBlank()) invalid("Rezept ${r.id} ohne Titel")
+            if (r.ingredients.length > RemoteMapper.MAX_INGREDIENTS_JSON) invalid("Rezept ${r.id}: Zutaten zu lang")
+        }
 
         if (d.locations.any { it.name.isBlank() }) invalid("Ort ohne Namen")
         if (d.locations.map { it.name.trim().lowercase() }.toSet().size != d.locations.size) invalid("doppelte Ortsnamen")
@@ -331,6 +359,7 @@ class BackupManager @Inject constructor(
         const val JSON_NAME = "backup.json"
         const val IMAGES_PREFIX = "images/"
         private val SAFE_NAME = Regex("^[A-Za-z0-9._-]{1,128}$")
+        private val GROUP_ID = Regex("^[a-z][a-z0-9_]{0,39}$")
     }
 
     private fun productIdsOf(d: BackupData): Set<String> = d.products.map { it.id }.toSet()

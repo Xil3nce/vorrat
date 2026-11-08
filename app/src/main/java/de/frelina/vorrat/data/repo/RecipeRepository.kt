@@ -1,0 +1,95 @@
+package de.frelina.vorrat.data.repo
+
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import de.frelina.vorrat.data.db.RecipeDao
+import de.frelina.vorrat.data.db.RecipeEntity
+import de.frelina.vorrat.data.db.newId
+import de.frelina.vorrat.data.sync.RemoteCollection
+import de.frelina.vorrat.data.sync.RemoteMapper
+import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.domain.Recipe
+import de.frelina.vorrat.domain.RecipeJson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/** Quelle der eingebauten Rezepte (in der App: assets/recipes.json; in Tests austauschbar). */
+fun interface BuiltinRecipeSource {
+    fun load(): List<Recipe>
+}
+
+class AssetRecipeSource @Inject constructor(
+    @param:ApplicationContext private val context: Context,
+) : BuiltinRecipeSource {
+    override fun load(): List<Recipe> = runCatching {
+        context.assets.open(ASSET_NAME).bufferedReader(Charsets.UTF_8).use { RecipeJson.parseRecipes(it.readText()) }
+    }.getOrDefault(emptyList())
+
+    companion object {
+        const val ASSET_NAME = "recipes.json"
+    }
+}
+
+/** Eingebaute und eigene Rezepte als gemeinsames Modell [Recipe]. Eigene werden im Haushalt synchronisiert. */
+@Singleton
+class RecipeRepository @Inject constructor(
+    private val dao: RecipeDao,
+    private val remote: RemoteWriter,
+    builtinSource: BuiltinRecipeSource,
+) {
+    val builtin: List<Recipe> by lazy { builtinSource.load() }
+
+    /** Alle Rezepte: eigene zuerst nach Titel, danach die eingebauten. */
+    fun observeAll(): Flow<List<Recipe>> = dao.observeAll().map { own -> own.map(::toRecipe) + builtin }
+
+    fun observe(id: String): Flow<Recipe?> =
+        if (id.startsWith(Recipe.BUILTIN_PREFIX)) {
+            kotlinx.coroutines.flow.flowOf(builtin.firstOrNull { it.id == id })
+        } else {
+            dao.observeById(id).map { it?.let(::toRecipe) }
+        }
+
+    suspend fun get(id: String): Recipe? =
+        if (id.startsWith(Recipe.BUILTIN_PREFIX)) builtin.firstOrNull { it.id == id } else dao.getById(id)?.let(::toRecipe)
+
+    /**
+     * Speichert ein eigenes Rezept (neu oder geändert). Eine ID mit "builtin:" oder ohne Eintrag ergibt ein neues
+     * Rezept – so wird aus einem eingebauten Rezept eine eigene Kopie. Liefert die ID.
+     */
+    suspend fun save(recipe: Recipe): String {
+        val existing = if (recipe.builtin) null else dao.getById(recipe.id)
+        val now = System.currentTimeMillis()
+        val entity = RecipeEntity(
+            id = if (existing != null) recipe.id else newId(),
+            title = recipe.title.trim().take(RemoteMapper.MAX_TITLE),
+            minutes = recipe.minutes?.takeIf { it in 1..RemoteMapper.MAX_MINUTES },
+            servings = recipe.servings?.takeIf { it in 1..RemoteMapper.MAX_SERVINGS },
+            ingredients = RecipeJson.encodeIngredients(recipe.ingredients.filter { it.name.isNotBlank() }),
+            steps = RecipeJson.stepsToText(recipe.steps).take(RemoteMapper.MAX_STEPS),
+            vegetarian = recipe.vegetarian,
+            createdAt = existing?.createdAt ?: now,
+            updatedAt = now,
+        )
+        dao.upsert(entity)
+        remote.putRecipe(entity)
+        return entity.id
+    }
+
+    suspend fun delete(id: String) {
+        if (id.startsWith(Recipe.BUILTIN_PREFIX)) return
+        dao.deleteById(id)
+        remote.delete(RemoteCollection.RECIPES, id)
+    }
+
+    private fun toRecipe(e: RecipeEntity) = Recipe(
+        id = e.id,
+        title = e.title,
+        minutes = e.minutes,
+        servings = e.servings,
+        ingredients = RecipeJson.decodeIngredients(e.ingredients),
+        steps = RecipeJson.textToSteps(e.steps),
+        vegetarian = e.vegetarian,
+    )
+}

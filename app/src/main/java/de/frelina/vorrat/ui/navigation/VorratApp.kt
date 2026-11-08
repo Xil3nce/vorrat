@@ -43,6 +43,9 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.locations.LocationsScreen
 import de.frelina.vorrat.ui.product.StockFormScreen
+import de.frelina.vorrat.ui.recipes.EditRecipeScreen
+import de.frelina.vorrat.ui.recipes.RecipeDetailScreen
+import de.frelina.vorrat.ui.recipes.RecipesScreen
 import de.frelina.vorrat.ui.scan.ScanScreen
 import de.frelina.vorrat.ui.search.SearchScreen
 import de.frelina.vorrat.ui.settings.AboutScreen
@@ -98,7 +101,7 @@ fun VorratRoot(
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
     // Screens mit FAB bzw. unterer Bedienleiste: Snackbar darüber anzeigen, damit sie nichts verdeckt.
-    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class)
+    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class, RecipesRoute::class)
         .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
 
     LaunchedEffect(Unit) {
@@ -184,6 +187,7 @@ fun VorratRoot(
                     onAddFrozen = { navController.navigate(AddStockRoute(frozen = true)) },
                     onReadNfc = { nfcReadDialog = true },
                     onOpenHistory = { navController.navigate(HistoryRoute) },
+                    onOpenRecipes = { navController.navigate(RecipesRoute) },
                 )
             }
             composable<SearchRoute> {
@@ -212,6 +216,7 @@ fun VorratRoot(
                     onOpenQuantityTypes = { navController.navigate(CatalogRoute(CatalogRoute.QUANTITY_TYPES)) },
                     onOpenAbout = { navController.navigate(AboutRoute) },
                     onOpenHistory = { navController.navigate(HistoryRoute) },
+                    onOpenRecipes = { navController.navigate(RecipesRoute) },
                 )
             }
             composable<EntryDetailRoute> {
@@ -232,6 +237,21 @@ fun VorratRoot(
             composable<EditProductRoute> { StockFormScreen(onDone = { navController.popBackStack() }) }
             composable<CatalogRoute> { CatalogScreen(onBack = { navController.popBackStack() }) }
             composable<AboutRoute> { AboutScreen(onBack = { navController.popBackStack() }) }
+            composable<RecipesRoute> {
+                RecipesScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
+                    onAddRecipe = { navController.navigate(EditRecipeRoute()) },
+                )
+            }
+            composable<RecipeDetailRoute> {
+                RecipeDetailScreen(
+                    onBack = { navController.popBackStack() },
+                    onEdit = { navController.navigate(EditRecipeRoute(it)) },
+                    onCopy = { navController.navigate(EditRecipeRoute(it)) },
+                )
+            }
+            composable<EditRecipeRoute> { EditRecipeScreen(onDone = { navController.popBackStack() }) }
             composable<HistoryRoute> {
                 de.frelina.vorrat.ui.history.HistoryScreen(onBack = { navController.popBackStack() })
             }

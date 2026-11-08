@@ -17,6 +17,8 @@ data class ProductForm(
     val barcode: String = "",
     val imagePath: String? = null,
     val minStock: String = "",
+    /** Manuell gewählte Zutatengruppe für Rezepte; null = automatisch erkennen. */
+    val ingredientGroup: String? = null,
     val nameError: ValidationError? = null,
     val packageSizeError: ValidationError? = null,
     val minStockError: ValidationError? = null,
@@ -43,6 +45,7 @@ data class ProductForm(
             barcode = barcode.trim().ifEmpty { null },
             // 0 = kein Mindestbestand
             minStock = minV.value?.takeIf { it > 0 }?.coerceAtMost(999),
+            ingredientGroup = ingredientGroup,
         )
     }
 
@@ -56,6 +59,7 @@ data class ProductForm(
             barcode = p.barcode.orEmpty(),
             imagePath = p.imagePath,
             minStock = p.minStock?.toString().orEmpty(),
+            ingredientGroup = p.ingredientGroup,
         )
     }
 }
@@ -68,6 +72,7 @@ data class ProductFields(
     val unitId: String?,
     val barcode: String?,
     val minStock: Int? = null,
+    val ingredientGroup: String? = null,
 ) {
     fun toNewEntity(imagePath: String?, source: ProductSource, now: Long) = ProductEntity(
         barcode = barcode,
@@ -81,6 +86,7 @@ data class ProductFields(
         createdAt = now,
         updatedAt = now,
         minStock = minStock,
+        ingredientGroup = ingredientGroup,
     )
 
     fun applyTo(p: ProductEntity, imagePath: String?) = p.copy(
@@ -92,6 +98,7 @@ data class ProductFields(
         unitId = unitId,
         imagePath = imagePath,
         minStock = minStock,
+        ingredientGroup = ingredientGroup,
     )
 }
 

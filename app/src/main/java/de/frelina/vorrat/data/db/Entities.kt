@@ -93,6 +93,8 @@ data class ProductEntity(
     val minStock: Int? = null,
     /** Zuletzt verwendete Haltbarkeit nach dem Öffnen in Tagen (Vorschlag beim nächsten Öffnen). Seit Schema 5. */
     val openedDays: Int? = null,
+    /** Manuell gewählte Zutatengruppe für Rezepte (ID aus IngredientGroups); null = automatisch erkennen. Seit Schema 7. */
+    val ingredientGroup: String? = null,
 )
 
 @Entity(
@@ -210,6 +212,25 @@ data class ShoppingItemEntity(
     val quantity: Int,
     val note: String?,
     val createdAt: Long,
+)
+
+/**
+ * Eigenes Rezept (gemeinsam im Haushalt). Eingebaute Rezepte stehen in assets/recipes.json und nicht hier.
+ * Seit Schema 7.
+ */
+@Entity(tableName = "recipes")
+data class RecipeEntity(
+    @PrimaryKey val id: String = newId(),
+    val title: String,
+    val minutes: Int? = null,
+    val servings: Int? = null,
+    /** Zutaten als JSON-Liste von {name, amount?, group?, optional} (siehe RecipeJson). */
+    val ingredients: String,
+    /** Freitext, eine Zeile = ein Schritt. */
+    val steps: String,
+    val vegetarian: Boolean = false,
+    val createdAt: Long,
+    val updatedAt: Long,
 )
 
 /**

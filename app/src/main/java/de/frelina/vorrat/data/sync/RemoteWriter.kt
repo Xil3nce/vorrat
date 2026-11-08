@@ -5,6 +5,7 @@ import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
@@ -36,6 +37,8 @@ class RemoteWriter @Inject constructor(
     suspend fun putEntry(e: StockEntryEntity) = set(RemoteCollection.ENTRIES, e.id, RemoteMapper.toMap(e))
 
     suspend fun putShopping(s: ShoppingItemEntity) = set(RemoteCollection.SHOPPING, s.id, RemoteMapper.toMap(s))
+
+    suspend fun putRecipe(e: RecipeEntity) = set(RemoteCollection.RECIPES, e.id, RemoteMapper.toMap(e))
 
     suspend fun putHistory(e: HistoryEventEntity) = set(RemoteCollection.HISTORY, e.id, RemoteMapper.toMap(e))
 
@@ -104,7 +107,8 @@ class RemoteWriter @Inject constructor(
             db.locationDao().getAll().map { RemoteOp.Set(RemoteCollection.LOCATIONS, it.id, RemoteMapper.toMap(it)) } +
             db.productDao().getAll().map { RemoteOp.Set(RemoteCollection.PRODUCTS, it.id, RemoteMapper.toMap(it)) } +
             db.stockEntryDao().getAll().map { RemoteOp.Set(RemoteCollection.ENTRIES, it.id, RemoteMapper.toMap(it)) } +
-            db.shoppingDao().getAll().map { RemoteOp.Set(RemoteCollection.SHOPPING, it.id, RemoteMapper.toMap(it)) }
+            db.shoppingDao().getAll().map { RemoteOp.Set(RemoteCollection.SHOPPING, it.id, RemoteMapper.toMap(it)) } +
+            db.recipeDao().getAll().map { RemoteOp.Set(RemoteCollection.RECIPES, it.id, RemoteMapper.toMap(it)) }
 
     private suspend fun imageOps(names: List<String>): List<RemoteOp.Set> = names.mapNotNull { name ->
         imageDoc(name)?.let { RemoteOp.Set(RemoteCollection.IMAGES, name, it) }

@@ -80,6 +80,7 @@ object AppModule {
     @Provides fun lookupCacheDao(db: VorratDatabase): LookupCacheDao = db.lookupCacheDao()
     @Provides fun shoppingDao(db: VorratDatabase): ShoppingDao = db.shoppingDao()
     @Provides fun historyDao(db: VorratDatabase): HistoryDao = db.historyDao()
+    @Provides fun recipeDao(db: VorratDatabase): de.frelina.vorrat.data.db.RecipeDao = db.recipeDao()
 
     @Provides
     @Singleton
@@ -135,6 +136,9 @@ abstract class BindingsModule {
 
     @Binds
     abstract fun remoteStore(impl: FirestoreRemoteStore): RemoteStore
+
+    @Binds
+    abstract fun builtinRecipes(impl: de.frelina.vorrat.data.repo.AssetRecipeSource): de.frelina.vorrat.data.repo.BuiltinRecipeSource
 
     @Binds
     abstract fun historyRecorder(impl: de.frelina.vorrat.data.repo.HistoryRepository): de.frelina.vorrat.data.repo.HistoryRecorder

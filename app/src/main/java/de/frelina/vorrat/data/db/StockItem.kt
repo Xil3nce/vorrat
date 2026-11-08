@@ -26,6 +26,8 @@ data class StockItem(
     val openedDays: Int? = null,
     val frozenAt: LocalDate? = null,
     val nfcTagId: String? = null,
+    /** Manuell gewählte Zutatengruppe des Produkts (null = automatisch). */
+    val ingredientGroup: String? = null,
 ) {
     /** Maßgebliches Datum: Ablaufdatum oder – bei geöffneten Packungen – das frühere "verbrauchen bis". */
     val effectiveExpiry: LocalDate?

@@ -238,6 +238,36 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 6 nach 7 ergaenzt Zutatengruppe und Rezepte`() {
+        createAt(6) {
+            execSQL(
+                "INSERT INTO products (id, barcode, name, brand, category, packageSize, unitId, imagePath, source, " +
+                    "createdAt, updatedAt, minStock, openedDays) VALUES " +
+                    "('p1', NULL, 'Sahne', NULL, NULL, NULL, NULL, NULL, 'MANUAL', 1, 2, NULL, NULL)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val p = db.productDao().getById("p1")!!
+                assertEquals("Sahne", p.name)
+                assertNull(p.ingredientGroup)
+                db.productDao().update(p.copy(ingredientGroup = "cream"))
+                assertEquals("cream", db.productDao().getById("p1")!!.ingredientGroup)
+                assertTrue(db.recipeDao().getAll().isEmpty())
+                db.recipeDao().upsert(
+                    RecipeEntity(id = "r1", title = "Suppe", ingredients = "[]", steps = "Kochen", createdAt = 1, updatedAt = 2),
+                )
+                assertEquals(listOf("Suppe"), db.recipeDao().getAll().map { it.title })
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 
