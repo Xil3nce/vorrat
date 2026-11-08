@@ -15,10 +15,11 @@ die App funktioniert auch offline. Open Food Facts erhält nur Barcodes.
 
 | Bereich | Inhalt |
 |---|---|
-| **Bestand** (Start) | Karten mit Bild, Name, Marke, Ort/Ebene/Fach, Anzahl + Menge-Art, Ablaufdatum. Sortierung nach Ablaufdatum (Standard, ohne Datum am Ende) oder Ort; Filter „läuft bald ab“, „abgelaufen“, Ort. Farbliche Hervorhebung über Material-3-Rollen (`tertiaryContainer` = bald, `errorContainer` = abgelaufen), Banner oben. Wischen nach links löscht (mit Rückgängig), nach rechts öffnet „Eintrag duplizieren“ (vorbelegtes Formular, z. B. für anderen Ort/Fach; die Kopie entsteht erst beim Speichern). Auslösen ab 40 % der Kartenbreite oder per schnellem Wischen. Details: +/−, bearbeiten, löschen, Produktdaten bearbeiten; Info-Button neben dem Namen zeigt die Nährwerte je 100 g/ml aus Open Food Facts (falls vorhanden, im OFF-Cache gespeichert, für ältere Produkte einmal nachgeladen). |
+| **Bestand** (Start) | Karten mit Bild, Name, Marke, Ort/Ebene/Fach, Anzahl + Menge-Art, Ablaufdatum. Sortierung nach Ablaufdatum (Standard, ohne Datum am Ende) oder Ort; Filter „läuft bald ab“, „abgelaufen“, Ort, „Ohne Ort“ (Hinweis-Banner mit Anzahl, solange Einträge keinem Ort zugeordnet sind). Geöffnete Packungen zählen mit „verbrauchen bis“ (Öffnungsdatum + Haltbarkeit nach dem Öffnen, höchstens MHD). Farbliche Hervorhebung über Material-3-Rollen (`tertiaryContainer` = bald, `errorContainer` = abgelaufen), Banner oben. Wischen nach links löscht (mit Rückgängig), nach rechts öffnet „Eintrag duplizieren“ (vorbelegtes Formular, z. B. für anderen Ort/Fach; die Kopie entsteht erst beim Speichern). Auslösen ab 40 % der Kartenbreite oder per schnellem Wischen. Details: +/−, bearbeiten, löschen, Produktdaten bearbeiten, „Geöffnet am …“ (bei mehreren Packungen wird eine abgetrennt; Haltbarkeit wird pro Produkt gemerkt, Vorschlag aus dem OFF-Lagerhinweis), auf die Einkaufsliste; Info-Button neben dem Namen zeigt die Nährwerte je 100 g/ml aus Open Food Facts (falls vorhanden, im OFF-Cache gespeichert, für ältere Produkte einmal nachgeladen). |
 | **Suche** | Teilstring-Suche (Groß-/Kleinschreibung egal, auch Umlaute) über Produktname, Marke, Barcode, Ortsname, Notiz. |
-| **Scannen** | CameraX + ML Kit (EAN-13, EAN-8, UPC-A, UPC-E), automatische Erkennung, großer „Neu scannen“-Button unten, Taschenlampe, Barcode-Eingabe per Tastatur. Ergebnis: (1) im Bestand, (2) Alternativprodukte in eigenem, deutlich markiertem Abschnitt, (3) nichts vorrätig. „Zum Bestand hinzufügen“ inkl. Abfrage „Anzahl erhöhen oder neuer Eintrag“. „Produkt manuell anlegen“ ohne Scan. |
-| **Orte** | Anlegen, umbenennen, löschen (Löschschutz). Beim Erfassen Auswahl aus der Liste + direktes Neuanlegen. |
+| **Scannen** | CameraX + ML Kit (EAN-13, EAN-8, UPC-A, UPC-E), automatische Erkennung, großer „Neu scannen“-Button unten, Taschenlampe, Barcode-Eingabe per Tastatur. Ergebnis: (1) im Bestand, (2) Alternativprodukte in eigenem, deutlich markiertem Abschnitt, (3) nichts vorrätig. „Zum Bestand hinzufügen“ inkl. Abfrage „Anzahl erhöhen oder neuer Eintrag“. „Produkt manuell anlegen“ ohne Scan. Modus „Entnehmen“: Scan öffnet direkt den Entnehmen-Dialog (früheste Ablauf zuerst, −/+ und Schnellwahl 1/2/3/Alle, Rückgängig). Hinweis, wenn das Produkt auf der Einkaufsliste steht. Ort beim Erfassen optional (später zuordnen). Ablaufdatum per Kamera (ML Kit Texterkennung) oder Eingabe nur mit Ziffern (Punkte automatisch, Jahr auch zweistellig). |
+| **Einkauf** | Gemeinsame Einkaufsliste (über den Haushalt synchronisiert): „Nachkaufen“ automatisch für Produkte unter Mindestbestand (im Produktformular), dazu eigene Einträge (Freitext oder Produkt, Anzahl ±, abhaken mit Rückgängig). „Gekauft – zum Bestand“ öffnet das Erfassen (ohne Ort möglich) und entfernt den Eintrag. |
+| **Orte** (in Einstellungen) | Anlegen, umbenennen, löschen (Löschschutz). Beim Erfassen Auswahl aus der Liste + direktes Neuanlegen. |
 | **Haushalt** | Erststart: „Haushalt anlegen“ (vorhandene lokale Daten werden hochgeladen) oder „Haushalt beitreten“ per Einladungscode (lokale Daten werden nach Warnung ersetzt). Einstellungen → Haushalt: Code `XXXXX-XXXXX` anzeigen/teilen, Mitgliederzahl. |
 | **Einstellungen** | Haushalt, Packungseinheiten & Menge-Arten (mit Löschschutz), Erinnerungen (an/aus, Uhrzeit, Vorlauf – pro Gerät), Backup (Export/Import), Über (Version, OFF-Attribution, Datenschutz). |
 
@@ -87,7 +88,7 @@ Firestore-Struktur und Regeln (`firestore.rules` im Repo):
 | `invites/{code}` | householdId, createdBy | `get` für Angemeldete, kein `list`; anlegen nur durch Mitglied des Haushalts |
 | `households/{hid}` | ownerUid, createdAt | lesen nur Mitglieder; anlegen nur mit eigener `ownerUid` |
 | `households/{hid}/members/{uid}` | code, joinedAt | lesen Mitglieder; anlegen nur für sich selbst als Besitzer oder mit Code, der auf `hid` zeigt |
-| `households/{hid}/{locations,units,quantityTypes,products,entries,images}/{id}` | Datensätze (Felder wie Room, Datum/Dezimal als Text) | lesen/schreiben nur Mitglieder |
+| `households/{hid}/{locations,units,quantityTypes,products,entries,images,shopping}/{id}` | Datensätze (Felder wie Room, Datum/Dezimal als Text) | lesen/schreiben nur Mitglieder |
 
 Alles andere ist verboten (insbesondere jeder Zugriff von Nicht-Mitgliedern).
 
@@ -102,9 +103,10 @@ zwei Handys können offline denselben Namen anlegen. Die Eindeutigkeit prüfen R
 | `locations` | id, name | Name eindeutig (NOCASE, geprüft im Repository) |
 | `units` | id, symbol (Kürzel), name | Start: g, kg, ml, l |
 | `quantity_types` | id, symbol, name | Start: Stck. (Stück), Pck. (Packungen) |
-| `products` | id, barcode?, name, brand?, category?, packageSize? (Dezimal als Text), unitId?, imagePath?, source (OPEN_FOOD_FACTS/MANUAL), createdAt, updatedAt | Barcode eindeutig (geprüft im Formular), FK `unitId` → units (RESTRICT) |
-| `stock_entries` | id, productId, locationId, level?, shelf?, expiryDate?, quantity (>0), quantityTypeId, note? | FK product (CASCADE), location & quantity_type (RESTRICT); Indizes auf allen FKs + expiryDate |
-| `lookup_cache` | barcode, found, name, brand, category, packageSize, unitSymbol, imagePath, fetchedAt | Cache der OFF-Abfragen (pro Gerät) |
+| `products` | id, barcode?, name, brand?, category?, packageSize? (Dezimal als Text), unitId?, imagePath?, source (OPEN_FOOD_FACTS/MANUAL), createdAt, updatedAt, minStock?, openedDays? | Barcode eindeutig (geprüft im Formular), FK `unitId` → units (RESTRICT) |
+| `stock_entries` | id, productId, locationId? (null = noch kein Ort), level?, shelf?, expiryDate?, quantity (>0), quantityTypeId, note?, openedAt?, openedDays? | FK product (CASCADE), location & quantity_type (RESTRICT); Indizes auf allen FKs + expiryDate |
+| `lookup_cache` | barcode, found, name, brand, category, packageSize, unitSymbol, imagePath, fetchedAt, nutrition?, nutritionLoaded, openedDays? | Cache der OFF-Abfragen (pro Gerät) |
+| `shopping_items` | id, productId? (ohne FK), name, quantity, note?, createdAt | manuelle Einkaufsliste; „Nachkaufen“ wird aus minStock berechnet |
 
 - Löschschutz: Repository prüft Verwendungen und liefert eine verständliche Meldung;
   der Fremdschlüssel (RESTRICT) ist zusätzliche Absicherung.

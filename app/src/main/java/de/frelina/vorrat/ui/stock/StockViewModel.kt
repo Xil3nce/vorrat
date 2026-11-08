@@ -35,6 +35,8 @@ data class StockUiState(
     val totalCount: Int = 0,
     val expiredCount: Int = 0,
     val soonCount: Int = 0,
+    /** Einträge, die noch keinem Ort zugeordnet sind. */
+    val unassignedCount: Int = 0,
     val sort: StockSort = StockSort.EXPIRY,
     val filter: StockFilter = StockFilter.ALL,
     val locationId: String? = null,
@@ -80,26 +82,33 @@ class StockViewModel @Inject constructor(
     ) { items, locations, settings, c ->
         val today = LocalDate.now()
         val lead = settings.leadDays
-        val statuses = items.map { ExpiryLogic.status(it.expiryDate, today, lead) }
+        val statuses = items.map { ExpiryLogic.status(it.effectiveExpiry, today, lead) }
+        val noLocation = c.locationId == StockQueries.NO_LOCATION
         val location = locations.firstOrNull { it.id == c.locationId }
-        val atLocation = if (location == null) items else items.filter { it.locationId == location.id }
+        val locationFilter = if (noLocation) StockQueries.NO_LOCATION else location?.id
+        val atLocation = when {
+            noLocation -> items.filter { it.locationId == null }
+            location == null -> items
+            else -> items.filter { it.locationId == location.id }
+        }
         StockUiState(
             loading = false,
             items = StockQueries.sort(
-                StockQueries.filter(items, c.filter, location?.id, today, lead, c.level, c.shelf),
+                StockQueries.filter(items, c.filter, locationFilter, today, lead, c.level, c.shelf),
                 c.sort,
             ),
             totalCount = items.size,
             expiredCount = statuses.count { it == ExpiryStatus.EXPIRED },
             soonCount = statuses.count { it == ExpiryStatus.SOON },
+            unassignedCount = items.count { it.locationId == null },
             sort = c.sort,
             filter = c.filter,
-            locationId = location?.id,
+            locationId = locationFilter,
             locations = locations,
             level = c.level,
             shelf = c.shelf,
-            levelOptions = StockQueries.slotOptions(atLocation.map { it.level }, location?.levels),
-            shelfOptions = StockQueries.slotOptions(atLocation.map { it.shelf }, location?.shelves),
+            levelOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.level }, location?.levels),
+            shelfOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.shelf }, location?.shelves),
             today = today,
             leadDays = lead,
         )

@@ -89,6 +89,10 @@ data class ProductEntity(
     val source: ProductSource,
     val createdAt: Long,
     val updatedAt: Long,
+    /** Mindestbestand (Summe aller Einträge); darunter steht das Produkt auf der Einkaufsliste. Seit Schema 5. */
+    val minStock: Int? = null,
+    /** Zuletzt verwendete Haltbarkeit nach dem Öffnen in Tagen (Vorschlag beim nächsten Öffnen). Seit Schema 5. */
+    val openedDays: Int? = null,
 )
 
 @Entity(
@@ -123,7 +127,8 @@ data class ProductEntity(
 data class StockEntryEntity(
     @PrimaryKey val id: String = newId(),
     val productId: String,
-    val locationId: String,
+    /** Ort; null = noch keinem Ort zugeordnet (z. B. im Laden erfasst). Seit Schema 5 optional. */
+    val locationId: String?,
     /** Ebene (optional). */
     val level: Int?,
     /** Fach (optional). */
@@ -133,6 +138,25 @@ data class StockEntryEntity(
     val quantity: Int,
     val quantityTypeId: String,
     val note: String?,
+    /** Geöffnet am (nur für geöffnete Packungen). Seit Schema 5. */
+    val openedAt: LocalDate? = null,
+    /** Haltbarkeit nach dem Öffnen in Tagen (zusammen mit [openedAt]). */
+    val openedDays: Int? = null,
+)
+
+/**
+ * Einkaufsliste (gemeinsam im Haushalt). Einträge unter Mindestbestand werden nicht gespeichert,
+ * sondern aus den Produkten berechnet (siehe ShoppingLogic); hier stehen nur manuell hinzugefügte.
+ */
+@Entity(tableName = "shopping_items")
+data class ShoppingItemEntity(
+    @PrimaryKey val id: String = newId(),
+    /** Verknüpftes Produkt (optional, ohne Fremdschlüssel: Produkt kann auf dem anderen Handy fehlen). */
+    val productId: String?,
+    val name: String,
+    val quantity: Int,
+    val note: String?,
+    val createdAt: Long,
 )
 
 /**
@@ -158,4 +182,6 @@ data class LookupCacheEntity(
      * Einträge von vor Schema 4 haben false → die Detailansicht fragt einmal nach.
      */
     @ColumnInfo(defaultValue = "0") val nutritionLoaded: Boolean = false,
+    /** Haltbarkeit nach dem Öffnen laut OFF-Lagerhinweis (Tage), falls erkennbar. Seit Schema 5. */
+    val openedDays: Int? = null,
 )

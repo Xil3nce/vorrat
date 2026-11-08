@@ -13,6 +13,7 @@ import de.frelina.vorrat.data.repo.CatalogRepository
 import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.QuantityChange
 import de.frelina.vorrat.data.repo.ScanRepository
+import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.domain.ExpiryLogic
@@ -53,7 +54,8 @@ class EntryDetailViewModel @Inject constructor(
     productRepository: ProductRepository,
     catalogRepository: CatalogRepository,
     settingsRepository: SettingsRepository,
-    scanRepository: ScanRepository,
+    private val scanRepository: ScanRepository,
+    private val shoppingRepository: ShoppingRepository,
     private val messages: UiMessages,
 ) : ViewModel() {
 
@@ -79,6 +81,36 @@ class EntryDetailViewModel @Inject constructor(
     ) { item, product, units, settings ->
         EntryDetailState(false, item, product, units, settings.leadDays, LocalDate.now())
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EntryDetailState())
+
+    /** Vorschlag für die Haltbarkeit nach dem Öffnen: zuletzt verwendet, sonst laut OFF-Lagerhinweis. */
+    suspend fun openedDaysSuggestion(): Pair<Int?, Boolean> {
+        val product = state.value.product ?: return null to false
+        product.openedDays?.let { return it to false }
+        val hint = product.barcode?.let { scanRepository.openedDaysHint(it) }
+        return hint to (hint != null)
+    }
+
+    /** Nach dem Abspalten einer geöffneten Packung zeigt der Screen den neuen Eintrag. */
+    private val _replaced = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val replaced: SharedFlow<String> = _replaced
+
+    fun markOpened(date: LocalDate, days: Int?) = viewModelScope.launch {
+        val id = stockRepository.markOpened(entryId, date, days) ?: return@launch
+        if (id != entryId) {
+            messages.show(UiMessage(R.string.opened_split_done))
+            _replaced.tryEmit(id)
+        } else {
+            messages.show(UiMessage(R.string.opened_done))
+        }
+    }
+
+    fun clearOpened() = viewModelScope.launch { stockRepository.clearOpened(entryId) }
+
+    fun addToShoppingList() = viewModelScope.launch {
+        val product = state.value.product ?: return@launch
+        shoppingRepository.addProduct(product)
+        messages.show(UiMessage(R.string.shopping_added))
+    }
 
     /** Signalisiert dem Screen, dass der Eintrag entfernt wurde → zurück navigieren. */
     private val _closed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)

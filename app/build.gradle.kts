@@ -28,8 +28,8 @@ android {
         minSdk = 34
         targetSdk = 37
         // Für ein Update beide erhöhen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
-        versionCode = 6
-        versionName = "1.3.1"
+        versionCode = 7
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.mlkit.text.recognition)
 
     implementation(libs.work.runtime.ktx)
     implementation(libs.coil.compose)

@@ -20,6 +20,7 @@ import de.frelina.vorrat.data.repo.CatalogRepository
 import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.SaveResult
 import de.frelina.vorrat.data.repo.ScanRepository
+import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
@@ -81,6 +82,7 @@ class StockFormViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     private val catalogRepository: CatalogRepository,
     private val scanRepository: ScanRepository,
+    private val shoppingRepository: ShoppingRepository,
     private val imageStore: ImageStore,
     private val messages: UiMessages,
 ) : ViewModel() {
@@ -91,6 +93,9 @@ class StockFormViewModel @Inject constructor(
     private val addProductId: String? = savedStateHandle.get<String>("productId")?.takeIf { it.isNotBlank() }
     private val barcodeArg: String? = savedStateHandle.get<String>("barcode")?.takeIf { it.isNotBlank() }
     private val copyFromEntryId: String? = savedStateHandle.get<String>("copyFromEntryId")
+
+    /** Kauf von der Einkaufsliste: dieser Eintrag wird nach dem Speichern entfernt. */
+    private val shoppingItemId: String? = savedStateHandle.get<String>("shoppingItemId")?.takeIf { it.isNotBlank() }
 
     /** Duplizieren: Formular mit den Werten eines bestehenden Eintrags; gespeichert wird ein neuer Eintrag. */
     val duplicating: Boolean = copyFromEntryId != null
@@ -160,7 +165,16 @@ class StockFormViewModel @Inject constructor(
             }
             addProductId != null -> loadExisting(addProductId, defaultEntry)
             barcodeArg != null -> loadForBarcode(barcodeArg, defaultEntry)
-            else -> _state.value = StockFormState(FormMode.NEW_PRODUCT, loading = false, entry = defaultEntry)
+            else -> {
+                // Freitext von der Einkaufsliste: Namen vorbelegen.
+                val name = shoppingItemId?.let { shoppingRepository.getById(it)?.name }.orEmpty()
+                _state.value = StockFormState(
+                    FormMode.NEW_PRODUCT,
+                    loading = false,
+                    entry = defaultEntry,
+                    product = ProductForm(name = name),
+                )
+            }
         }
     }
 
@@ -240,7 +254,7 @@ class StockFormViewModel @Inject constructor(
     /** Ort direkt beim Erfassen anlegen; liefert ein Ergebnis für Fehlermeldungen im Dialog. */
     suspend fun createLocation(name: String): SaveResult {
         val result = catalogRepository.addLocation(name)
-        if (result is SaveResult.Saved) updateEntry { it.copy(locationId = result.id, locationMissing = false) }
+        if (result is SaveResult.Saved) updateEntry { it.copy(locationId = result.id) }
         return result
     }
 
@@ -273,9 +287,10 @@ class StockFormViewModel @Inject constructor(
         }
         val image = if (imageFromCache) s.product.imagePath?.let { imageStore.copy(it) } else s.product.imagePath
         val source = if (s.prefilledFromOff) ProductSource.OPEN_FOOD_FACTS else ProductSource.MANUAL
-        stockRepository.addProductWithEntry(fields.toNewEntity(image, source, System.currentTimeMillis()), entry)
+        val product = fields.toNewEntity(image, source, System.currentTimeMillis())
+        stockRepository.addProductWithEntry(product, entry)
         pendingImage = null
-        finish()
+        finish(purchasedProductId = product.id)
     }
 
     private suspend fun saveExistingProductEntry(s: StockFormState) {
@@ -285,7 +300,7 @@ class StockFormViewModel @Inject constructor(
         if (entry == null) return
         if (offerMerge(entry)) return
         stockRepository.addEntry(entry)
-        finish()
+        finish(purchasedProductId = product.id)
     }
 
     private suspend fun saveEditEntry(s: StockFormState) {
@@ -323,7 +338,7 @@ class StockFormViewModel @Inject constructor(
         _state.update { it.copy(mergeOffer = null, saving = true) }
         try {
             action(offer)
-            finish()
+            finish(purchasedProductId = offer.entry.productId.takeIf { _state.value.mode != FormMode.EDIT_ENTRY })
         } finally {
             _state.update { it.copy(saving = false) }
         }
@@ -350,8 +365,16 @@ class StockFormViewModel @Inject constructor(
         finish()
     }
 
-    private fun finish() {
-        messages.show(UiMessage(R.string.saved))
+    /**
+     * Abschluss. Wurde ein Produkt zum Bestand hinzugefügt ([purchasedProductId]), gilt es als gekauft:
+     * passende Einträge der Einkaufsliste (und der Eintrag, von dem aus erfasst wurde) werden entfernt.
+     */
+    private suspend fun finish(purchasedProductId: String? = null) {
+        val removed = buildList {
+            shoppingItemId?.let { id -> shoppingRepository.remove(id)?.let(::add) }
+            purchasedProductId?.let { addAll(shoppingRepository.removeForProduct(it)) }
+        }
+        messages.show(UiMessage(if (removed.isEmpty()) R.string.saved else R.string.shopping_removed_after_purchase))
         _saved.tryEmit(Unit)
     }
 

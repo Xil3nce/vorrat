@@ -19,6 +19,18 @@ data class BackupData(
     val quantityTypes: List<QuantityTypeDto>,
     val products: List<ProductDto>,
     val stockEntries: List<StockEntryDto>,
+    /** Seit Schema 5. */
+    val shoppingItems: List<ShoppingItemDto> = emptyList(),
+)
+
+@Serializable
+data class ShoppingItemDto(
+    val id: String,
+    val productId: String? = null,
+    val name: String,
+    val quantity: Int = 1,
+    val note: String? = null,
+    val createdAt: Long = 0,
 )
 
 @Serializable
@@ -45,13 +57,16 @@ data class ProductDto(
     val source: String,
     val createdAt: Long,
     val updatedAt: Long,
+    val minStock: Int? = null,
+    val openedDays: Int? = null,
 )
 
 @Serializable
 data class StockEntryDto(
     val id: String,
     val productId: String,
-    val locationId: String,
+    /** null = keinem Ort zugeordnet (seit Schema 5). */
+    val locationId: String? = null,
     val level: Int? = null,
     val shelf: Int? = null,
     /** ISO-8601, z. B. "2026-12-31" */
@@ -59,6 +74,9 @@ data class StockEntryDto(
     val quantity: Int,
     val quantityTypeId: String,
     val note: String? = null,
+    /** ISO-8601 (seit Schema 5). */
+    val openedAt: String? = null,
+    val openedDays: Int? = null,
 )
 
 /** Validierungs-/Lesefehler beim Import; [reason] wird in der UI übersetzt. */

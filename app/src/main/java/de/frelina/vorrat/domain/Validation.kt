@@ -45,14 +45,31 @@ object Validation {
         return if (n == null || n < 0) Validated.Error(ValidationError.WHOLE_NUMBER) else Validated.Ok(n)
     }
 
-    /** Ablaufdatum: optional, sonst gültiges Datum im Format TT.MM.JJJJ. */
+    /** Ablaufdatum: optional, sonst gültiges Datum im Format TT.MM.JJJJ (oder TT.MM.JJ → 20JJ). */
     fun optionalDate(text: String): Validated<LocalDate?> {
         val t = text.trim()
         if (t.isEmpty()) return Validated.Ok(null)
+        val full = SHORT_YEAR.matchEntire(t)?.let { m -> "${m.groupValues[1]}20${m.groupValues[2]}" } ?: t
         return try {
-            Validated.Ok(LocalDate.parse(t, DATE_FORMAT))
+            Validated.Ok(LocalDate.parse(full, DATE_FORMAT))
         } catch (_: DateTimeParseException) {
             Validated.Error(ValidationError.INVALID_DATE)
+        }
+    }
+
+    private val SHORT_YEAR = Regex("""^(\d{2}\.\d{2}\.)(\d{2})$""")
+
+    /**
+     * Eingabehilfe fürs Datumsfeld: nur Ziffern zählen, die Punkte werden automatisch gesetzt
+     * ("24122026" → "24.12.2026", "2412" → "24.12"). Höchstens 8 Ziffern.
+     */
+    fun formatDateInput(raw: String): String {
+        val digits = raw.filter(Char::isDigit).take(8)
+        return buildString {
+            digits.forEachIndexed { i, c ->
+                if (i == 2 || i == 4) append('.')
+                append(c)
+            }
         }
     }
 

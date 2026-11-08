@@ -46,6 +46,7 @@ class BackupRoundTripTest : DbTestBase() {
         db.quantityTypeDao().getAll(),
         db.productDao().getAll(),
         db.stockEntryDao().getAll(),
+        db.shoppingDao().getAll(),
     )
 
     @Test fun `Export und Import ergeben identische Daten inkl Bild`() = runBlocking {
@@ -57,6 +58,21 @@ class BackupRoundTripTest : DbTestBase() {
         val p2 = product(name = "Ohne Barcode", barcode = null, category = null)
         entry(p1, loc, quantity = 3)
         entry(p2, loc, quantity = 1, expiry = null)
+        // Neu in 1.4: Mindestbestand, Öffnungsdaten, Eintrag ohne Ort, Einkaufsliste
+        db.productDao().update(db.productDao().getById(p2)!!.copy(minStock = 2, openedDays = 4))
+        val typeId = db.quantityTypeDao().findBySymbol("Stck.")!!.id
+        db.stockEntryDao().insert(
+            de.frelina.vorrat.data.db.StockEntryEntity(
+                productId = p2, locationId = null, level = null, shelf = null, expiryDate = null, quantity = 1,
+                quantityTypeId = typeId, note = null, openedAt = java.time.LocalDate.of(2026, 11, 1), openedDays = 4,
+            ),
+        )
+        db.shoppingDao().upsert(
+            de.frelina.vorrat.data.db.ShoppingItemEntity(productId = p1, name = "Nutella", quantity = 2, note = null, createdAt = 7),
+        )
+        db.shoppingDao().upsert(
+            de.frelina.vorrat.data.db.ShoppingItemEntity(productId = null, name = "Brot", quantity = 1, note = null, createdAt = 8),
+        )
         val before = snapshot()
 
         val zip = exportBytes()
@@ -64,11 +80,12 @@ class BackupRoundTripTest : DbTestBase() {
         // Daten verändern/löschen und Bild entfernen
         db.stockEntryDao().deleteAll()
         db.productDao().deleteAll()
+        db.shoppingDao().deleteAll()
         imageStore.delete(image)
 
         val parsed = backup.read(ByteArrayInputStream(zip))
         assertEquals(2, parsed.productCount)
-        assertEquals(2, parsed.entryCount)
+        assertEquals(3, parsed.entryCount)
         backup.replaceAll(parsed)
 
         assertEquals(before, snapshot())

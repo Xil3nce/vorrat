@@ -5,6 +5,7 @@ import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
@@ -89,6 +90,8 @@ class BackupManager @Inject constructor(
                 source = it.source.name,
                 createdAt = it.createdAt,
                 updatedAt = it.updatedAt,
+                minStock = it.minStock,
+                openedDays = it.openedDays,
             )
         },
         stockEntries = db.stockEntryDao().getAll().map {
@@ -102,7 +105,12 @@ class BackupManager @Inject constructor(
                 quantity = it.quantity,
                 quantityTypeId = it.quantityTypeId,
                 note = it.note,
+                openedAt = it.openedAt?.toString(),
+                openedDays = it.openedDays,
             )
+        },
+        shoppingItems = db.shoppingDao().getAll().map {
+            ShoppingItemDto(it.id, it.productId, it.name, it.quantity, it.note, it.createdAt)
         },
     )
 
@@ -169,6 +177,7 @@ class BackupManager @Inject constructor(
         try {
             val previousImages = db.productDao().getAllImagePaths().toSet()
             db.withTransaction {
+                db.shoppingDao().deleteAll()
                 db.stockEntryDao().deleteAll()
                 db.productDao().deleteAll()
                 db.locationDao().deleteAll()
@@ -199,6 +208,8 @@ class BackupManager @Inject constructor(
                             source = ProductSource.valueOf(it.source),
                             createdAt = it.createdAt,
                             updatedAt = it.updatedAt,
+                            minStock = it.minStock?.takeIf { n -> n > 0 },
+                            openedDays = it.openedDays?.takeIf { n -> n >= 0 },
                         )
                     },
                 )
@@ -214,6 +225,20 @@ class BackupManager @Inject constructor(
                             quantity = it.quantity,
                             quantityTypeId = it.quantityTypeId,
                             note = it.note,
+                            openedAt = it.openedAt?.let(LocalDate::parse),
+                            openedDays = it.openedDays?.takeIf { n -> n >= 0 },
+                        )
+                    },
+                )
+                db.shoppingDao().insertAll(
+                    d.shoppingItems.filter { it.name.isNotBlank() }.map {
+                        ShoppingItemEntity(
+                            id = it.id,
+                            productId = it.productId?.takeIf { id -> id in productIdsOf(d) },
+                            name = it.name.trim(),
+                            quantity = it.quantity.coerceAtLeast(1),
+                            note = it.note,
+                            createdAt = it.createdAt,
                         )
                     },
                 )
@@ -258,6 +283,7 @@ class BackupManager @Inject constructor(
         if (typeIds.size != d.quantityTypes.size) invalid("doppelte Menge-Art-IDs")
         if (productIds.size != d.products.size) invalid("doppelte Produkt-IDs")
         if (d.stockEntries.map { it.id }.toSet().size != d.stockEntries.size) invalid("doppelte Eintrags-IDs")
+        if (d.shoppingItems.map { it.id }.toSet().size != d.shoppingItems.size) invalid("doppelte Einkaufslisten-IDs")
 
         if (d.locations.any { it.name.isBlank() }) invalid("Ort ohne Namen")
         if (d.locations.map { it.name.trim().lowercase() }.toSet().size != d.locations.size) invalid("doppelte Ortsnamen")
@@ -281,11 +307,11 @@ class BackupManager @Inject constructor(
         }
         d.stockEntries.forEach { e ->
             if (e.productId !in productIds) invalid("Eintrag ${e.id}: unbekanntes Produkt")
-            if (e.locationId !in locationIds) invalid("Eintrag ${e.id}: unbekannter Ort")
+            if (e.locationId != null && e.locationId !in locationIds) invalid("Eintrag ${e.id}: unbekannter Ort")
             if (e.quantityTypeId !in typeIds) invalid("Eintrag ${e.id}: unbekannte Menge-Art")
             if (e.quantity < 1) invalid("Eintrag ${e.id}: Anzahl < 1")
             if ((e.level ?: 0) < 0 || (e.shelf ?: 0) < 0) invalid("Eintrag ${e.id}: Ebene/Fach")
-            e.expiryDate?.let {
+            listOfNotNull(e.expiryDate, e.openedAt).forEach {
                 try {
                     LocalDate.parse(it)
                 } catch (_: DateTimeParseException) {
@@ -302,4 +328,6 @@ class BackupManager @Inject constructor(
         const val IMAGES_PREFIX = "images/"
         private val SAFE_NAME = Regex("^[A-Za-z0-9._-]{1,128}$")
     }
+
+    private fun productIdsOf(d: BackupData): Set<String> = d.products.map { it.id }.toSet()
 }

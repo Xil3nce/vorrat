@@ -10,14 +10,18 @@ enum class StockFilter { ALL, SOON, EXPIRED }
 
 object StockQueries {
 
-    private val byExpiry = compareBy<StockItem, LocalDate?>(nullsLast()) { it.expiryDate }
+    /** Ortsfilter-Wert für "noch keinem Ort zugeordnet". */
+    const val NO_LOCATION = "\u0000ohne-ort"
+
+    private val byExpiry = compareBy<StockItem, LocalDate?>(nullsLast()) { it.effectiveExpiry }
         .thenBy(String.CASE_INSENSITIVE_ORDER) { it.productName }
 
-    /** Standard: Ablaufdatum aufsteigend, Einträge ohne Datum am Ende. */
+    /** Standard: Ablaufdatum (bei geöffneten Packungen "verbrauchen bis") aufsteigend, ohne Datum am Ende. */
     fun sort(items: List<StockItem>, sort: StockSort): List<StockItem> = when (sort) {
         StockSort.EXPIRY -> items.sortedWith(byExpiry)
         StockSort.LOCATION -> items.sortedWith(
-            compareBy<StockItem, String>(String.CASE_INSENSITIVE_ORDER) { it.locationName }
+            // Einträge ohne Ort zuerst – die sollen noch einsortiert werden.
+            compareBy<StockItem, String?>(nullsFirst(String.CASE_INSENSITIVE_ORDER)) { it.locationName }
                 .thenBy(nullsLast()) { it.level }
                 .thenBy(nullsLast()) { it.shelf }
                 .then(byExpiry),
@@ -35,11 +39,11 @@ object StockQueries {
     ): List<StockItem> = items.filter { item ->
         val statusOk = when (filter) {
             StockFilter.ALL -> true
-            StockFilter.SOON -> ExpiryLogic.status(item.expiryDate, today, leadDays) == ExpiryStatus.SOON
-            StockFilter.EXPIRED -> ExpiryLogic.status(item.expiryDate, today, leadDays) == ExpiryStatus.EXPIRED
+            StockFilter.SOON -> ExpiryLogic.status(item.effectiveExpiry, today, leadDays) == ExpiryStatus.SOON
+            StockFilter.EXPIRED -> ExpiryLogic.status(item.effectiveExpiry, today, leadDays) == ExpiryStatus.EXPIRED
         }
         statusOk &&
-            (locationId == null || item.locationId == locationId) &&
+            (locationId == null || item.locationId == locationId || (locationId == NO_LOCATION && item.locationId == null)) &&
             (level == null || item.level == level) &&
             (shelf == null || item.shelf == shelf)
     }

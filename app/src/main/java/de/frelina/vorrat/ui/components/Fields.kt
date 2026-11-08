@@ -1,5 +1,8 @@
 package de.frelina.vorrat.ui.components
 
+import androidx.compose.material.icons.outlined.DocumentScanner
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
@@ -46,12 +49,14 @@ fun <T> SelectField(
     modifier: Modifier = Modifier,
     isError: Boolean = false,
     supportingText: (@Composable () -> Unit)? = null,
+    /** Angezeigter Text, wenn nichts ausgewählt ist (z. B. "Ohne Ort"). */
+    emptyText: String? = null,
     extraItem: (@Composable (close: () -> Unit) -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }, modifier = modifier) {
         OutlinedTextField(
-            value = selected?.let(optionLabel) ?: "",
+            value = selected?.let(optionLabel) ?: emptyText ?: "",
             onValueChange = {},
             readOnly = true,
             label = { Text(label) },
@@ -146,7 +151,10 @@ fun NumberField(
     )
 }
 
-/** Datumseingabe: Text (TT.MM.JJJJ) oder Auswahl per DatePicker. */
+/**
+ * Datumseingabe: Ziffern tippen (Punkte werden automatisch gesetzt, TT.MM.JJJJ oder TT.MM.JJ),
+ * Auswahl per DatePicker oder – mit [scanEnabled] – Ablaufdatum per Kamera lesen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateField(
@@ -155,11 +163,20 @@ fun DateField(
     label: String,
     error: ValidationError?,
     modifier: Modifier = Modifier,
+    scanEnabled: Boolean = false,
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    var showScanner by remember { mutableStateOf(false) }
+    // Eigene TextFieldValue, damit der Cursor nach dem automatisch gesetzten Punkt am Ende steht.
+    var field by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+    if (field.text != value) field = TextFieldValue(value, TextRange(value.length))
     OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = field,
+        onValueChange = { input ->
+            val formatted = Validation.formatDateInput(input.text)
+            field = TextFieldValue(formatted, TextRange(formatted.length))
+            if (formatted != value) onValueChange(formatted)
+        },
         label = { Text(label) },
         singleLine = true,
         isError = error != null,
@@ -172,6 +189,11 @@ fun DateField(
                         Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.field_clear_date))
                     }
                 }
+                if (scanEnabled) {
+                    IconButton(onClick = { showScanner = true }) {
+                        Icon(Icons.Outlined.DocumentScanner, contentDescription = stringResource(R.string.expiry_scan_title))
+                    }
+                }
                 IconButton(onClick = { showPicker = true }) {
                     Icon(Icons.Outlined.CalendarMonth, contentDescription = stringResource(R.string.field_pick_date))
                 }
@@ -179,6 +201,15 @@ fun DateField(
         },
         modifier = modifier,
     )
+    if (showScanner) {
+        ExpiryScanDialog(
+            onDismiss = { showScanner = false },
+            onDate = { date ->
+                showScanner = false
+                onValueChange(Validation.formatDate(date))
+            },
+        )
+    }
     if (showPicker) {
         val current = (Validation.optionalDate(value) as? de.frelina.vorrat.domain.Validated.Ok)?.value
         val state = rememberDatePickerState(

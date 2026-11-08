@@ -31,15 +31,20 @@ import java.time.LocalDate
 /** "Keller · Ebene 2 · Fach 3" */
 @Composable
 fun locationText(item: StockItem): String = buildList {
-    add(item.locationName)
+    add(item.locationName ?: stringResource(R.string.location_none))
     item.level?.let { add(stringResource(R.string.level_label, it)) }
     item.shelf?.let { add(stringResource(R.string.shelf_label, it)) }
 }.joinToString(" · ")
 
 @Composable
 fun expiryText(item: StockItem, today: LocalDate, leadDays: Int): String {
-    val date = item.expiryDate ?: return stringResource(R.string.expiry_none)
-    val base = stringResource(R.string.expiry_label, Validation.formatDate(date))
+    val date = item.effectiveExpiry ?: return stringResource(R.string.expiry_none)
+    val opened = item.openedAt != null && date != item.expiryDate
+    val base = if (opened) {
+        stringResource(R.string.expiry_opened_label, Validation.formatDate(date))
+    } else {
+        stringResource(R.string.expiry_label, Validation.formatDate(date))
+    }
     val suffix = when (ExpiryLogic.status(date, today, leadDays)) {
         ExpiryStatus.EXPIRED -> stringResource(R.string.expiry_expired)
         ExpiryStatus.SOON ->
@@ -58,7 +63,7 @@ fun StockItemCard(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val status = ExpiryLogic.status(item.expiryDate, today, leadDays)
+    val status = ExpiryLogic.status(item.effectiveExpiry, today, leadDays)
     val colors = expiryColors(status)
     val cardColors = if (colors != null) {
         CardDefaults.cardColors(containerColor = colors.container, contentColor = colors.content)

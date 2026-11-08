@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.settings
 
+import androidx.compose.material.icons.outlined.Place
 import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
@@ -81,6 +82,7 @@ private fun notificationsAllowed(context: Context): Boolean =
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
+    onOpenLocations: () -> Unit,
     onOpenUnits: () -> Unit,
     onOpenQuantityTypes: () -> Unit,
     onOpenAbout: () -> Unit,
@@ -158,6 +160,7 @@ fun SettingsScreen(
 
             // ---------------- Stammdaten
             SectionHeader(R.string.settings_catalogs)
+            NavItem(Icons.Outlined.Place, R.string.settings_locations, R.string.settings_locations_summary, onOpenLocations)
             NavItem(Icons.Outlined.Straighten, R.string.settings_units, R.string.settings_units_summary, onOpenUnits)
             NavItem(Icons.Outlined.Category, R.string.settings_quantity_types, R.string.settings_quantity_types_summary, onOpenQuantityTypes)
             HorizontalDivider()

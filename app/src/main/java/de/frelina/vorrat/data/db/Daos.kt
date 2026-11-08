@@ -148,6 +148,9 @@ interface ProductDao {
     @Query("SELECT * FROM products ORDER BY createdAt, id")
     suspend fun getAll(): List<ProductEntity>
 
+    @Query("SELECT * FROM products ORDER BY name COLLATE NOCASE")
+    fun observeAll(): Flow<List<ProductEntity>>
+
     @Query(
         "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' " +
             "ORDER BY category COLLATE NOCASE",
@@ -229,12 +232,12 @@ interface StockEntryDao {
     companion object {
         const val STOCK_ITEM_SELECT = """
             SELECT e.id AS entryId, e.productId, e.locationId, e.level, e.shelf, e.expiryDate,
-                   e.quantity, e.quantityTypeId, e.note,
+                   e.quantity, e.quantityTypeId, e.note, e.openedAt, e.openedDays,
                    p.name AS productName, p.brand, p.barcode, p.imagePath, p.category,
                    l.name AS locationName, q.symbol AS quantityTypeSymbol
             FROM stock_entries e
             JOIN products p ON p.id = e.productId
-            JOIN locations l ON l.id = e.locationId
+            LEFT JOIN locations l ON l.id = e.locationId
             JOIN quantity_types q ON q.id = e.quantityTypeId
         """
     }
@@ -252,5 +255,35 @@ interface LookupCacheDao {
     suspend fun getAllImagePaths(): List<String>
 
     @Query("DELETE FROM lookup_cache")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface ShoppingDao {
+    @Query("SELECT * FROM shopping_items ORDER BY createdAt, id")
+    fun observeAll(): Flow<List<ShoppingItemEntity>>
+
+    @Query("SELECT * FROM shopping_items ORDER BY createdAt, id")
+    suspend fun getAll(): List<ShoppingItemEntity>
+
+    @Query("SELECT * FROM shopping_items WHERE id = :id")
+    suspend fun getById(id: String): ShoppingItemEntity?
+
+    @Query("SELECT * FROM shopping_items WHERE productId = :productId")
+    suspend fun getForProduct(productId: String): List<ShoppingItemEntity>
+
+    @Upsert
+    suspend fun upsert(item: ShoppingItemEntity)
+
+    @Insert
+    suspend fun insertAll(items: List<ShoppingItemEntity>)
+
+    @Query("DELETE FROM shopping_items WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT id FROM shopping_items")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM shopping_items")
     suspend fun deleteAll()
 }

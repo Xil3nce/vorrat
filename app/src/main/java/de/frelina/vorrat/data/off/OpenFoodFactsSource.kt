@@ -2,6 +2,7 @@ package de.frelina.vorrat.data.off
 
 import de.frelina.vorrat.domain.CategoryResolver
 import de.frelina.vorrat.domain.NutritionParser
+import de.frelina.vorrat.domain.OpenedLogic
 import de.frelina.vorrat.domain.QuantityParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -79,6 +80,8 @@ class OpenFoodFactsSource @Inject constructor(
                     imageUrl = product.imageFrontUrl?.takeIf { it.isNotBlank() }
                         ?: product.imageUrl?.takeIf { it.isNotBlank() },
                     nutrition = NutritionParser.fromNutriments(product.nutriments, quantity?.unitSymbol),
+                    openedDays = OpenedLogic.daysFromHint(product.conservationConditionsDe)
+                        ?: OpenedLogic.daysFromHint(product.conservationConditions),
                 ),
             )
         }

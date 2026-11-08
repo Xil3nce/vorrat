@@ -29,7 +29,8 @@ interface OffApi {
         /** Nur die benötigten, in der OFF-Doku beschriebenen Felder abfragen. */
         const val FIELDS =
             "code,product_name,product_name_de,brands,quantity,product_quantity," +
-                "product_quantity_unit,image_front_url,image_url,categories_tags,nutriments"
+                "product_quantity_unit,image_front_url,image_url,categories_tags,nutriments," +
+                "conservation_conditions_de,conservation_conditions"
     }
 }
 
@@ -56,6 +57,9 @@ data class OffProduct(
     @SerialName("categories_tags") val categoriesTags: List<String>? = null,
     /** Nährwerte; ausgewertet werden nur die `_100g`-Werte (siehe NutritionParser). */
     val nutriments: JsonObject? = null,
+    /** Lagerhinweis, z. B. "Nach dem Öffnen innerhalb von 3 Tagen verbrauchen". */
+    @SerialName("conservation_conditions_de") val conservationConditionsDe: String? = null,
+    @SerialName("conservation_conditions") val conservationConditions: String? = null,
 ) {
     val productQuantityText: String?
         get() = (productQuantity as? JsonPrimitive)?.contentOrNull

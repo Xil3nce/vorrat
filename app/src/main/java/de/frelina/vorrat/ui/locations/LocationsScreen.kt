@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.locations
 
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -89,7 +90,7 @@ class LocationsViewModel @Inject constructor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationsScreen(viewModel: LocationsViewModel = hiltViewModel()) {
+fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltViewModel()) {
     val locations by viewModel.locations.collectAsStateWithLifecycle()
     val inUse by viewModel.inUse.collectAsStateWithLifecycle()
     var addDialog by remember { mutableStateOf(false) }
@@ -97,7 +98,16 @@ fun LocationsScreen(viewModel: LocationsViewModel = hiltViewModel()) {
     var deleteTarget by remember { mutableStateOf<LocationEntity?>(null) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.locations_title)) }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.locations_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+            )
+        },
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { addDialog = true },

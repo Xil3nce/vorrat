@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.stock
 
+import de.frelina.vorrat.domain.StockQueries
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -116,6 +117,9 @@ fun StockScreen(
                     },
                 )
             }
+            if (state.unassignedCount > 0 && state.locationId != StockQueries.NO_LOCATION) {
+                UnassignedBanner(state.unassignedCount, onShow = { viewModel.setLocation(StockQueries.NO_LOCATION) })
+            }
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -177,7 +181,11 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
             )
         }
         Box {
-            val selectedName = state.locations.firstOrNull { it.id == state.locationId }?.name
+            val selectedName = if (state.locationId == StockQueries.NO_LOCATION) {
+                stringResource(R.string.location_none)
+            } else {
+                state.locations.firstOrNull { it.id == state.locationId }?.name
+            }
             FilterChip(
                 selected = selectedName != null,
                 onClick = { locationMenu = true },
@@ -189,6 +197,12 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
                     text = { Text(stringResource(R.string.stock_filter_all_locations)) },
                     onClick = { viewModel.setLocation(null); locationMenu = false },
                 )
+                if (state.unassignedCount > 0 || state.locationId == StockQueries.NO_LOCATION) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.stock_filter_no_location, state.unassignedCount)) },
+                        onClick = { viewModel.setLocation(StockQueries.NO_LOCATION); locationMenu = false },
+                    )
+                }
                 state.locations.forEach { loc ->
                     DropdownMenuItem(
                         text = { Text(loc.name) },
@@ -346,6 +360,30 @@ private fun SwipeBackground(direction: SwipeToDismissBoxValue, deleteLabel: Stri
                 Icon(Icons.Outlined.Delete, contentDescription = null, tint = content)
             }
             SwipeToDismissBoxValue.Settled -> Unit
+        }
+    }
+}
+
+/** Hinweis auf Einträge ohne Ort (z. B. im Laden erfasst) mit Sprung zum Filter "Ohne Ort". */
+@Composable
+private fun UnassignedBanner(count: Int, onShow: () -> Unit) {
+    Surface(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+        Row(
+            Modifier.padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Outlined.Place, contentDescription = null)
+            Text(
+                pluralStringResource(R.plurals.stock_unassigned_banner, count, count),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+            )
+            TextButton(onClick = onShow) { Text(stringResource(R.string.stock_unassigned_show)) }
         }
     }
 }

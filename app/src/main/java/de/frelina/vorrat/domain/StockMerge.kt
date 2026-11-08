@@ -15,6 +15,8 @@ object StockMerge {
             a.shelf == b.shelf &&
             a.expiryDate == b.expiryDate &&
             a.quantityTypeId == b.quantityTypeId &&
+            a.openedAt == b.openedAt &&
+            a.openedDays == b.openedDays &&
             normalizeNote(a.note) == normalizeNote(b.note)
 
     /** Erster anderer Eintrag mit denselben Daten wie [entry] (der Eintrag selbst zählt nicht). */

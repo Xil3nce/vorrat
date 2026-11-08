@@ -93,6 +93,7 @@ class ScanRepository @Inject constructor(
                         fetchedAt = now,
                         nutrition = NutritionParser.encode(p.nutrition),
                         nutritionLoaded = true,
+                        openedDays = p.openedDays,
                     )
                     cacheDao.get(barcode)?.imagePath?.let { imageStore.delete(it) }
                     cacheDao.upsert(cached)
@@ -118,6 +119,9 @@ class ScanRepository @Inject constructor(
         )
     }
 
+    /** Haltbarkeit nach dem Öffnen laut OFF-Lagerhinweis (nur aus dem Cache, keine Netzabfrage). */
+    suspend fun openedDaysHint(barcode: String): Int? = cacheDao.get(barcode.trim())?.openedDays
+
     /** Für das Erfassen: Vorbelegung aus dem Cache (ohne erneute Netzabfrage). */
     suspend fun cachedPrefill(barcode: String): ProductPrefill? =
         cacheDao.get(barcode.trim())?.takeIf { it.found }?.toPrefill()
@@ -140,8 +144,8 @@ class ScanRepository @Inject constructor(
                 val encoded = NutritionParser.encode(p.nutrition)
                 cacheDao.upsert(
                     if (row != null && row.found) {
-                        // Vorhandene Daten (inkl. Bild) behalten, nur Nährwerte ergänzen.
-                        row.copy(nutrition = encoded, nutritionLoaded = true)
+                        // Vorhandene Daten (inkl. Bild) behalten, nur Nährwerte (und Lagerhinweis) ergänzen.
+                        row.copy(nutrition = encoded, nutritionLoaded = true, openedDays = p.openedDays ?: row.openedDays)
                     } else {
                         LookupCacheEntity(
                             barcode = barcode,
@@ -155,6 +159,7 @@ class ScanRepository @Inject constructor(
                             fetchedAt = now,
                             nutrition = encoded,
                             nutritionLoaded = true,
+                            openedDays = p.openedDays,
                         )
                     },
                 )

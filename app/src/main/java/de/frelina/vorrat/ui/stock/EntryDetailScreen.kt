@@ -1,5 +1,14 @@
 package de.frelina.vorrat.ui.stock
 
+import java.time.LocalDate
+import de.frelina.vorrat.ui.components.NumberField
+import de.frelina.vorrat.ui.components.DateField
+import de.frelina.vorrat.domain.ValidationError
+import de.frelina.vorrat.domain.Validation
+import de.frelina.vorrat.domain.Validated
+import de.frelina.vorrat.domain.OpenedLogic
+import androidx.compose.material.icons.outlined.AddShoppingCart
+import androidx.compose.material.icons.outlined.LockOpen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +65,8 @@ import de.frelina.vorrat.ui.components.StockItemCard
 @Composable
 fun EntryDetailScreen(
     onBack: () -> Unit,
+    /** Anderen Eintrag anstelle dieses zeigen (nach dem Abspalten einer geöffneten Packung). */
+    onReplace: (String) -> Unit,
     onEditEntry: (String) -> Unit,
     onEditProduct: (String) -> Unit,
     viewModel: EntryDetailViewModel = hiltViewModel(),
@@ -67,6 +78,8 @@ fun EntryDetailScreen(
     var confirmDelete by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.closed.collect { onBack() } }
+    LaunchedEffect(Unit) { viewModel.replaced.collect { onReplace(it) } }
+    var openedDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -132,6 +145,24 @@ fun EntryDetailScreen(
                 }
 
                 StockItemCard(item, state.today, state.leadDays, onClick = null)
+                item.openedAt?.let { opened ->
+                    Text(
+                        stringResource(R.string.opened_since, Validation.formatDate(opened)),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(onClick = { openedDialog = true }, modifier = Modifier.weight(1f).height(48.dp)) {
+                        Icon(Icons.Outlined.LockOpen, contentDescription = null)
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(if (item.openedAt == null) R.string.opened_action else R.string.opened_edit))
+                    }
+                    OutlinedButton(onClick = viewModel::addToShoppingList, modifier = Modifier.weight(1f).height(48.dp)) {
+                        Icon(Icons.Outlined.AddShoppingCart, contentDescription = null)
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.shopping_add_short))
+                    }
+                }
                 item.note?.takeIf { it.isNotBlank() }?.let {
                     Text(stringResource(R.string.detail_note, it), style = MaterialTheme.typography.bodyMedium)
                 }
@@ -179,6 +210,19 @@ fun EntryDetailScreen(
         }
     }
 
+    val openedItem = state.item
+    if (openedDialog && openedItem != null) {
+        OpenedDialog(
+            initialDate = openedItem.openedAt ?: LocalDate.now(),
+            initialDays = openedItem.openedDays,
+            alreadyOpened = openedItem.openedAt != null,
+            expiry = openedItem.expiryDate,
+            suggestion = viewModel::openedDaysSuggestion,
+            onDismiss = { openedDialog = false },
+            onConfirm = { date, days -> openedDialog = false; viewModel.markOpened(date, days) },
+            onClear = { openedDialog = false; viewModel.clearOpened() },
+        )
+    }
     val shownNutrition = nutrition
     if (showNutrition && shownNutrition != null) {
         NutritionDialog(shownNutrition, onDismiss = { showNutrition = false })
@@ -269,5 +313,88 @@ private fun NutritionDialog(nutrition: Nutrition, onDismiss: () -> Unit) {
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },
+    )
+}
+
+/** "Geöffnet am": Datum (heute vorbelegt) und Haltbarkeit nach dem Öffnen in Tagen (mit Vorschlag). */
+@Composable
+private fun OpenedDialog(
+    initialDate: LocalDate,
+    initialDays: Int?,
+    alreadyOpened: Boolean,
+    expiry: LocalDate?,
+    suggestion: suspend () -> Pair<Int?, Boolean>,
+    onDismiss: () -> Unit,
+    onConfirm: (LocalDate, Int?) -> Unit,
+    onClear: () -> Unit,
+) {
+    var dateText by remember { mutableStateOf(Validation.formatDate(initialDate)) }
+    var daysText by remember { mutableStateOf(initialDays?.toString().orEmpty()) }
+    var fromOff by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (initialDays == null) {
+            val (days, off) = suggestion()
+            if (days != null && daysText.isEmpty()) {
+                daysText = days.toString()
+                fromOff = off
+            }
+        }
+    }
+    val date = (Validation.optionalDate(dateText) as? Validated.Ok)?.value
+    val daysV = Validation.optionalWholeNumber(daysText)
+    val days = (daysV as? Validated.Ok)?.value
+    val useBy = OpenedLogic.useBy(date, days)
+    val valid = date != null && daysV is Validated.Ok && (days == null || days <= OpenedLogic.MAX_DAYS)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Outlined.LockOpen, contentDescription = null) },
+        title = { Text(stringResource(R.string.opened_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                DateField(
+                    value = dateText,
+                    onValueChange = { dateText = it },
+                    label = stringResource(R.string.opened_date),
+                    error = if (dateText.isNotEmpty() && date == null) ValidationError.INVALID_DATE else null,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                NumberField(
+                    value = daysText,
+                    onValueChange = { v -> daysText = v.filter(Char::isDigit).take(4); fromOff = false },
+                    label = stringResource(R.string.opened_days) + " (" + stringResource(R.string.optional) + ")",
+                    error = (daysV as? Validated.Error)?.error,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                if (fromOff) {
+                    Text(stringResource(R.string.opened_days_from_off), style = MaterialTheme.typography.bodySmall)
+                }
+                if (useBy != null) {
+                    val effective = OpenedLogic.effectiveExpiry(expiry, date, days)
+                    Text(
+                        stringResource(R.string.opened_use_by, Validation.formatDate(effective)),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
+                if (!alreadyOpened) {
+                    Text(
+                        stringResource(R.string.opened_split_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { if (date != null) onConfirm(date, days) }, enabled = valid) {
+                Text(stringResource(R.string.action_save))
+            }
+        },
+        dismissButton = {
+            Row {
+                if (alreadyOpened) TextButton(onClick = onClear) { Text(stringResource(R.string.opened_clear)) }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+            }
+        },
     )
 }

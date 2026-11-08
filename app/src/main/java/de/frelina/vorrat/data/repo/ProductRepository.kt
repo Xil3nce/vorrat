@@ -22,6 +22,8 @@ class ProductRepository @Inject constructor(
 
     fun observeCategories(): Flow<List<String>> = productDao.observeCategories()
 
+    fun observeAll(): Flow<List<ProductEntity>> = productDao.observeAll()
+
     /** Speichert Änderungen; ein ersetztes Bild wird aus dem Speicher entfernt. */
     suspend fun update(product: ProductEntity) {
         val old = productDao.getById(product.id)

@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class StockRoute(val filter: String? = null)
 @Serializable data object SearchRoute
 @Serializable data object ScanRoute
+@Serializable data object ShoppingRoute
+
+// Unterseiten (Orte: über Einstellungen erreichbar)
 @Serializable data object LocationsRoute
 @Serializable data object SettingsRoute
 
@@ -17,8 +20,13 @@ import kotlinx.serialization.Serializable
  * - productId gesetzt (≠ NONE) → neuer Bestandseintrag für bekanntes Produkt
  * - nur barcode gesetzt → neues Produkt (Vorbelegung aus Open Food Facts, falls vorhanden)
  * - nichts gesetzt → Produkt manuell anlegen
+ * - shoppingItemId: Kauf von der Einkaufsliste – Name vorbelegen, Listeneintrag nach dem Speichern entfernen
  */
-@Serializable data class AddStockRoute(val barcode: String? = null, val productId: String? = null)
+@Serializable data class AddStockRoute(
+    val barcode: String? = null,
+    val productId: String? = null,
+    val shoppingItemId: String? = null,
+)
 @Serializable data class EditEntryRoute(val editEntryId: String)
 
 /** Formular vorbelegt mit den Werten eines Eintrags; neuer Eintrag entsteht erst beim Speichern. */

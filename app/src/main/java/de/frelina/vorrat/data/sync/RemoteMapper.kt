@@ -3,6 +3,8 @@ package de.frelina.vorrat.data.sync
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
+import de.frelina.vorrat.data.db.ShoppingItemEntity
+import de.frelina.vorrat.domain.OpenedLogic
 import de.frelina.vorrat.data.db.QuantityTypeEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
@@ -37,6 +39,8 @@ object RemoteMapper {
         "source" to p.source.name,
         "createdAt" to p.createdAt,
         "updatedAt" to p.updatedAt,
+        "minStock" to p.minStock?.toLong(),
+        "openedDays" to p.openedDays?.toLong(),
     )
 
     fun toMap(e: StockEntryEntity): Map<String, Any?> = mapOf(
@@ -48,6 +52,16 @@ object RemoteMapper {
         FIELD_QUANTITY to e.quantity.toLong(),
         "quantityTypeId" to e.quantityTypeId,
         "note" to e.note,
+        "openedAt" to e.openedAt?.toString(),
+        "openedDays" to e.openedDays?.toLong(),
+    )
+
+    fun toMap(s: ShoppingItemEntity): Map<String, Any?> = mapOf(
+        "productId" to s.productId,
+        "name" to s.name,
+        "quantity" to s.quantity.toLong(),
+        "note" to s.note,
+        "createdAt" to s.createdAt,
     )
 
     fun location(id: String, m: Map<String, Any?>): LocationEntity? {
@@ -88,12 +102,14 @@ object RemoteMapper {
             source = source,
             createdAt = m.long("createdAt") ?: 0,
             updatedAt = m.long("updatedAt") ?: 0,
+            minStock = m.long("minStock")?.toInt()?.takeIf { it in 1..MAX_COUNT },
+            openedDays = m.long("openedDays")?.toInt()?.takeIf { it in 0..OpenedLogic.MAX_DAYS },
         )
     }
 
     fun entry(id: String, m: Map<String, Any?>): StockEntryEntity? {
         val productId = m.str("productId") ?: return null
-        val locationId = m.str("locationId") ?: return null
+        val locationId = m.str("locationId") // null = noch keinem Ort zugeordnet
         val typeId = m.str("quantityTypeId") ?: return null
         val quantity = m.long(FIELD_QUANTITY)?.toInt()?.takeIf { it > 0 } ?: return null
         return StockEntryEntity(
@@ -106,8 +122,25 @@ object RemoteMapper {
             quantity = quantity,
             quantityTypeId = typeId,
             note = m.str("note"),
+            openedAt = m.str("openedAt")?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+            openedDays = m.long("openedDays")?.toInt()?.takeIf { it in 0..OpenedLogic.MAX_DAYS },
         )
     }
+
+    fun shopping(id: String, m: Map<String, Any?>): ShoppingItemEntity? {
+        val name = m.str("name")?.takeIf(String::isNotBlank) ?: return null
+        return ShoppingItemEntity(
+            id = id,
+            productId = m.str("productId")?.takeIf(String::isNotBlank),
+            name = name,
+            quantity = m.long("quantity")?.toInt()?.takeIf { it in 1..MAX_COUNT } ?: 1,
+            note = m.str("note"),
+            createdAt = m.long("createdAt") ?: 0,
+        )
+    }
+
+    /** Obergrenze für Mengen (Mindestbestand, Einkaufsliste). */
+    const val MAX_COUNT = 999
 
     /** Nur einfache Dateinamen (kein Pfad) – Bilder werden unter diesem Namen lokal abgelegt. */
     fun isSafeFileName(name: String): Boolean = SAFE_NAME.matches(name)

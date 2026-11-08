@@ -1,12 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Vorrat</string>
 
     <!-- Navigation -->
     <string name="nav_stock">Bestand</string>
     <string name="nav_search">Suche</string>
     <string name="nav_scan">Scannen</string>
-    <string name="nav_locations">Orte</string>
+    <string name="nav_shopping">Einkauf</string>
+    <string name="settings_locations">Orte</string>
+    <string name="settings_locations_summary">Lagerorte mit Ebenen und Fächern verwalten</string>
+    <string name="shopping_title">Einkaufsliste</string>
+    <string name="shopping_add_hint">Artikel hinzufügen</string>
+    <string name="shopping_add">Hinzufügen</string>
+    <string name="shopping_empty">Die Einkaufsliste ist leer.\n\nTipp: Mit einem Mindestbestand (Produkt bearbeiten) landen Produkte automatisch hier, sobald der Vorrat knapp wird.</string>
+    <string name="shopping_section_shortage">Nachkaufen (unter Mindestbestand)</string>
+    <string name="shopping_section_items">Auf der Liste</string>
+    <string name="shopping_shortage_detail" tools:ignore="PluralsCandidate">Vorrat %1$d von %2$d – es fehlen %3$d</string>
+    <string name="shopping_bought">Gekauft</string>
+    <string name="shopping_bought_to_stock">Gekauft – zum Bestand hinzufügen</string>
+    <string name="shopping_quantity">%1$d×</string>
+    <string name="shopping_checked">„%1$s“ abgehakt</string>
+    <string name="shopping_removed_after_purchase">Gespeichert – von der Einkaufsliste genommen</string>
+    <string name="shopping_add_product">Auf die Einkaufsliste</string>
+    <string name="shopping_add_short">Einkaufsliste</string>
+    <string name="opened_action">Geöffnet</string>
+    <string name="opened_edit">Öffnung ändern</string>
+    <string name="opened_title">Geöffnet am …</string>
+    <string name="opened_date">Geöffnet am</string>
+    <string name="opened_days">Haltbar nach dem Öffnen (Tage)</string>
+    <string name="opened_days_from_off">Vorschlag laut Lagerhinweis (Open Food Facts) – bitte prüfen.</string>
+    <string name="opened_use_by">Verbrauchen bis %1$s</string>
+    <string name="opened_split_hint">Bei mehreren Packungen wird eine als eigener, geöffneter Eintrag abgetrennt.</string>
+    <string name="opened_clear">Nicht geöffnet</string>
+    <string name="opened_since">Geöffnet am %1$s</string>
+    <string name="opened_done">Als geöffnet markiert</string>
+    <string name="opened_split_done">Eine Packung als geöffnet abgetrennt</string>
+    <string name="shopping_added">Auf die Einkaufsliste gesetzt</string>
+    <string name="shopping_on_list">Steht auf der Einkaufsliste</string>
+    <string name="field_min_stock">Mindestbestand</string>
+    <string name="field_min_stock_hint">Fällt der Vorrat darunter, steht das Produkt auf der Einkaufsliste.</string>
     <string name="nav_settings">Einstellungen</string>
 
     <!-- Allgemein -->
@@ -34,7 +66,6 @@
     <string name="error_duplicate_name">Dieser Name ist bereits vergeben.</string>
     <string name="error_duplicate_symbol">Dieses Kürzel ist bereits vergeben.</string>
     <string name="error_duplicate_barcode">Ein Produkt mit diesem Barcode existiert bereits.</string>
-    <string name="error_location_required">Bitte einen Ort auswählen.</string>
 
     <!-- Bestand -->
     <string name="stock_title">Bestand</string>
@@ -64,6 +95,16 @@
     <string name="banner_show">Anzeigen</string>
     <string name="expiry_label">Ablauf: %1$s</string>
     <string name="expiry_none">Kein Ablaufdatum</string>
+    <string name="expiry_opened_label">Geöffnet – verbrauchen bis %1$s</string>
+    <string name="location_none">Ohne Ort</string>
+    <string name="location_none_later">Ohne Ort (später zuordnen)</string>
+    <string name="field_location_optional_hint">Optional – z. B. im Laden erfasst, später einsortieren.</string>
+    <string name="stock_filter_no_location">Ohne Ort (%1$d)</string>
+    <string name="stock_unassigned_show">Anzeigen</string>
+    <plurals name="stock_unassigned_banner">
+        <item quantity="one">%1$d Eintrag ist noch keinem Ort zugeordnet</item>
+        <item quantity="other">%1$d Einträge sind noch keinem Ort zugeordnet</item>
+    </plurals>
     <string name="expiry_expired">abgelaufen</string>
     <string name="expiry_today">läuft heute ab</string>
     <string name="expiry_soon">läuft bald ab</string>
@@ -149,6 +190,20 @@
     <string name="scan_existing_increase_action">Erhöhen</string>
     <string name="scan_existing_new_entry">Neuer Eintrag</string>
     <string name="scan_increased">Anzahl erhöht</string>
+    <string name="scan_mode_check">Prüfen</string>
+    <string name="scan_mode_consume">Entnehmen</string>
+    <string name="scan_hint_consume">Entnehmen: Barcode scannen, Anzahl wählen – fertig.</string>
+    <string name="expiry_scan_title">Ablaufdatum scannen</string>
+    <string name="expiry_scan_hint">Das aufgedruckte Datum (MHD) in den Rahmen halten …</string>
+    <string name="expiry_scan_found">Erkannt: %1$s</string>
+    <string name="expiry_scan_apply">Übernehmen</string>
+    <string name="consume_title">Entnehmen</string>
+    <string name="consume_choose_entry">Aus welchem Eintrag? (Was zuerst abläuft, ist vorausgewählt.)</string>
+    <string name="consume_all">Alle (%1$d)</string>
+    <string name="consume_removes_entry">Der Eintrag wird damit aus dem Bestand entfernt.</string>
+    <string name="consume_action">Entnehmen</string>
+    <string name="consume_done">%1$d %2$s entnommen</string>
+    <string name="consume_done_shopping">%1$d %2$s entnommen – steht jetzt auf der Einkaufsliste</string>
     <string name="scan_source_off">Daten von Open Food Facts</string>
 
     <!-- Erfassen / Produkt -->
@@ -184,7 +239,7 @@
     <string name="add_prefilled_hint">Vorbelegt mit Daten von Open Food Facts – bitte prüfen und ergänzen.</string>
     <string name="add_package_unparsed">Die Packungsgröße konnte nicht eindeutig erkannt werden – bitte bei Bedarf ergänzen.</string>
     <string name="add_new_location">Neuen Ort anlegen</string>
-    <string name="add_no_locations">Noch keine Orte vorhanden – bitte zuerst einen Ort anlegen.</string>
+    <string name="add_no_locations">Noch keine Orte vorhanden – du kannst ohne Ort speichern oder einen Ort anlegen.</string>
     <string name="saved">Gespeichert</string>
     <string name="merge_title">Einträge zusammenführen?</string>
     <string name="merge_text">Diesen Artikel gibt es dort bereits mit genau denselben Daten (Anzahl %1$d). Sollen die beiden Einträge zu einem zusammengeführt werden?

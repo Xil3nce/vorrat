@@ -59,7 +59,7 @@ class SyncManager @Inject constructor(
         if (household.currentId() == null) return false
         start()
         return withTimeoutOrNull(timeoutMs) {
-            serverSynced.first { it.containsAll(RemoteCollection.DATA) }
+            serverSynced.first { it.containsAll(RemoteCollection.STOCK) }
             true
         } ?: false
     }

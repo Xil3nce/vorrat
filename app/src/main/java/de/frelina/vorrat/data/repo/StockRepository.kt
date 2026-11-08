@@ -127,6 +127,50 @@ class StockRepository @Inject constructor(
         return entry
     }
 
+    /**
+     * Eine Packung als geöffnet markieren. Bei Anzahl > 1 wird genau eine Packung als eigener Eintrag
+     * abgespalten (die übrigen bleiben ungeöffnet). Liefert die ID des geöffneten Eintrags (null = nicht gefunden).
+     */
+    suspend fun markOpened(entryId: String, openedAt: java.time.LocalDate, openedDays: Int?): String? {
+        val days = openedDays?.takeIf { it in 0..de.frelina.vorrat.domain.OpenedLogic.MAX_DAYS }
+        val (opened, split) = db.withTransaction {
+            val entry = stockDao.getById(entryId) ?: return@withTransaction null
+            if (entry.quantity > 1 && entry.openedAt == null) {
+                val single = entry.copy(id = de.frelina.vorrat.data.db.newId(), quantity = 1, openedAt = openedAt, openedDays = days)
+                stockDao.update(entry.copy(quantity = entry.quantity - 1))
+                stockDao.insert(single)
+                single to true
+            } else {
+                val updated = entry.copy(openedAt = openedAt, openedDays = days)
+                stockDao.update(updated)
+                updated to false
+            }
+        } ?: return null
+        if (split) {
+            remote.incrementQuantity(entryId, -1)
+            remote.putEntry(opened)
+        } else {
+            remote.putEntry(opened)
+        }
+        // Haltbarkeit fürs nächste Öffnen dieses Produkts merken.
+        if (days != null) {
+            productDao.getById(opened.productId)?.takeIf { it.openedDays != days }?.let { p ->
+                val updated = p.copy(openedDays = days, updatedAt = System.currentTimeMillis())
+                productDao.update(updated)
+                remote.putProduct(updated, previousImage = p.imagePath)
+            }
+        }
+        return opened.id
+    }
+
+    /** "Doch nicht geöffnet": Öffnungsdaten entfernen. */
+    suspend fun clearOpened(entryId: String) {
+        val entry = stockDao.getById(entryId) ?: return
+        val updated = entry.copy(openedAt = null, openedDays = null)
+        stockDao.update(updated)
+        remote.putEntry(updated)
+    }
+
     /** Rückgängig nach Löschen: Eintrag mit derselben ID wiederherstellen (legt auch das Dokument neu an). */
     suspend fun restoreEntry(entry: StockEntryEntity) {
         stockDao.upsert(entry)

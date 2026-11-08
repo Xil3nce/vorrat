@@ -14,6 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ProductEntity::class,
         StockEntryEntity::class,
         LookupCacheEntity::class,
+        ShoppingItemEntity::class,
     ],
     version = VorratDatabase.VERSION,
     exportSchema = true,
@@ -26,16 +27,17 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun stockEntryDao(): StockEntryDao
     abstract fun lookupCacheDao(): LookupCacheDao
+    abstract fun shoppingDao(): ShoppingDao
 
     companion object {
-        const val VERSION = 4
+        const val VERSION = 5
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -157,5 +159,48 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE `lookup_cache` ADD COLUMN `nutrition` TEXT")
         db.execSQL("ALTER TABLE `lookup_cache` ADD COLUMN `nutritionLoaded` INTEGER NOT NULL DEFAULT 0")
+    }
+}
+
+/**
+ * v4 → v5:
+ * - Bestandseinträge: Ort optional (Tabelle neu anlegen, da SQLite NOT NULL nicht ändern kann), "Geöffnet am"
+ * - Produkte: Mindestbestand, gemerkte Haltbarkeit nach dem Öffnen
+ * - OFF-Cache: Haltbarkeit nach dem Öffnen laut Lagerhinweis
+ * - neue Tabelle für die Einkaufsliste
+ */
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `products` ADD COLUMN `minStock` INTEGER")
+        db.execSQL("ALTER TABLE `products` ADD COLUMN `openedDays` INTEGER")
+        db.execSQL("ALTER TABLE `lookup_cache` ADD COLUMN `openedDays` INTEGER")
+
+        db.execSQL("ALTER TABLE `stock_entries` RENAME TO `stock_entries_old`")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `stock_entries` (`id` TEXT NOT NULL, `productId` TEXT NOT NULL, " +
+                "`locationId` TEXT, `level` INTEGER, `shelf` INTEGER, `expiryDate` INTEGER, " +
+                "`quantity` INTEGER NOT NULL, `quantityTypeId` TEXT NOT NULL, `note` TEXT, `openedAt` INTEGER, " +
+                "`openedDays` INTEGER, PRIMARY KEY(`id`), " +
+                "FOREIGN KEY(`productId`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , " +
+                "FOREIGN KEY(`locationId`) REFERENCES `locations`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , " +
+                "FOREIGN KEY(`quantityTypeId`) REFERENCES `quantity_types`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        )
+        db.execSQL(
+            "INSERT INTO `stock_entries` (id, productId, locationId, level, shelf, expiryDate, quantity, " +
+                "quantityTypeId, note) SELECT id, productId, locationId, level, shelf, expiryDate, quantity, " +
+                "quantityTypeId, note FROM `stock_entries_old`",
+        )
+        db.execSQL("DROP TABLE `stock_entries_old`")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_productId` ON `stock_entries` (`productId`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_locationId` ON `stock_entries` (`locationId`)")
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_stock_entries_quantityTypeId` ON `stock_entries` (`quantityTypeId`)",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_stock_entries_expiryDate` ON `stock_entries` (`expiryDate`)")
+
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `shopping_items` (`id` TEXT NOT NULL, `productId` TEXT, `name` TEXT NOT NULL, " +
+                "`quantity` INTEGER NOT NULL, `note` TEXT, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
     }
 }

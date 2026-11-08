@@ -89,7 +89,7 @@ class ReminderNotifications @Inject constructor(
     }
 
     private fun label(item: StockItem) =
-        "${item.productName} (${Validation.formatDate(item.expiryDate)})"
+        "${item.productName} (${Validation.formatDate(item.effectiveExpiry)})"
 
     companion object {
         const val CHANNEL_ID = "expiry_reminders"

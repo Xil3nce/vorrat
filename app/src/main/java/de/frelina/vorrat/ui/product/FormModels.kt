@@ -16,20 +16,24 @@ data class ProductForm(
     val unitId: String? = null,
     val barcode: String = "",
     val imagePath: String? = null,
+    val minStock: String = "",
     val nameError: ValidationError? = null,
     val packageSizeError: ValidationError? = null,
+    val minStockError: ValidationError? = null,
     val barcodeDuplicate: Boolean = false,
 ) {
     /** Validiert und baut die Entity; null bei Fehlern (Fehler stehen dann im zurückgegebenen Formular). */
     fun validate(): Pair<ProductForm, ProductFields?> {
         val nameV = Validation.required(name)
         val sizeV = Validation.optionalPositiveDecimal(packageSize)
+        val minV = Validation.optionalWholeNumber(minStock)
         val checked = copy(
             nameError = (nameV as? Validated.Error)?.error,
             packageSizeError = (sizeV as? Validated.Error)?.error,
+            minStockError = (minV as? Validated.Error)?.error,
             barcodeDuplicate = false,
         )
-        if (nameV !is Validated.Ok || sizeV !is Validated.Ok) return checked to null
+        if (nameV !is Validated.Ok || sizeV !is Validated.Ok || minV !is Validated.Ok) return checked to null
         return checked to ProductFields(
             name = nameV.value,
             brand = brand.trim().ifEmpty { null },
@@ -37,6 +41,8 @@ data class ProductForm(
             packageSize = sizeV.value,
             unitId = unitId,
             barcode = barcode.trim().ifEmpty { null },
+            // 0 = kein Mindestbestand
+            minStock = minV.value?.takeIf { it > 0 }?.coerceAtMost(999),
         )
     }
 
@@ -49,6 +55,7 @@ data class ProductForm(
             unitId = p.unitId,
             barcode = p.barcode.orEmpty(),
             imagePath = p.imagePath,
+            minStock = p.minStock?.toString().orEmpty(),
         )
     }
 }
@@ -60,6 +67,7 @@ data class ProductFields(
     val packageSize: java.math.BigDecimal?,
     val unitId: String?,
     val barcode: String?,
+    val minStock: Int? = null,
 ) {
     fun toNewEntity(imagePath: String?, source: ProductSource, now: Long) = ProductEntity(
         barcode = barcode,
@@ -72,6 +80,7 @@ data class ProductFields(
         source = source,
         createdAt = now,
         updatedAt = now,
+        minStock = minStock,
     )
 
     fun applyTo(p: ProductEntity, imagePath: String?) = p.copy(
@@ -82,6 +91,7 @@ data class ProductFields(
         packageSize = packageSize,
         unitId = unitId,
         imagePath = imagePath,
+        minStock = minStock,
     )
 }
 
@@ -93,7 +103,9 @@ data class EntryForm(
     val quantity: String = "1",
     val quantityTypeId: String? = null,
     val note: String = "",
-    val locationMissing: Boolean = false,
+    /** Beim Bearbeiten unverändert übernommen ("Geöffnet am" wird in den Details gesetzt). */
+    val openedAt: java.time.LocalDate? = null,
+    val openedDays: Int? = null,
     val levelError: ValidationError? = null,
     val shelfError: ValidationError? = null,
     val expiryError: ValidationError? = null,
@@ -106,14 +118,13 @@ data class EntryForm(
         val expiryV = Validation.optionalDate(expiry)
         val qtyV = Validation.quantity(quantity)
         val checked = copy(
-            locationMissing = locationId == null,
             levelError = (levelV as? Validated.Error)?.error,
             shelfError = (shelfV as? Validated.Error)?.error,
             expiryError = (expiryV as? Validated.Error)?.error,
             quantityError = (qtyV as? Validated.Error)?.error,
             quantityTypeMissing = quantityTypeId == null,
         )
-        if (locationId == null || quantityTypeId == null || levelV !is Validated.Ok || shelfV !is Validated.Ok ||
+        if (quantityTypeId == null || levelV !is Validated.Ok || shelfV !is Validated.Ok ||
             expiryV !is Validated.Ok || qtyV !is Validated.Ok
         ) {
             return checked to null
@@ -128,6 +139,8 @@ data class EntryForm(
             quantity = qtyV.value,
             quantityTypeId = quantityTypeId,
             note = note.trim().ifEmpty { null },
+            openedAt = openedAt,
+            openedDays = openedDays,
         )
     }
 
@@ -140,6 +153,8 @@ data class EntryForm(
             quantity = e.quantity.toString(),
             quantityTypeId = e.quantityTypeId,
             note = e.note.orEmpty(),
+            openedAt = e.openedAt,
+            openedDays = e.openedDays,
         )
     }
 }

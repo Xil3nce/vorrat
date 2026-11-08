@@ -4,6 +4,7 @@ import androidx.room.withTransaction
 import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
+import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
@@ -71,6 +72,7 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.LOCATIONS -> RemoteMapper.location(id, data)
         RemoteCollection.PRODUCTS -> RemoteMapper.product(id, data)
         RemoteCollection.ENTRIES -> RemoteMapper.entry(id, data)
+        RemoteCollection.SHOPPING -> RemoteMapper.shopping(id, data)
         RemoteCollection.IMAGES -> null
     }
 
@@ -80,6 +82,7 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.LOCATIONS -> db.locationDao().getIds()
         RemoteCollection.PRODUCTS -> db.productDao().getIds()
         RemoteCollection.ENTRIES -> db.stockEntryDao().getIds()
+        RemoteCollection.SHOPPING -> db.shoppingDao().getIds()
         RemoteCollection.IMAGES -> emptyList()
     }
 
@@ -119,16 +122,18 @@ class SyncApplier(private val db: VorratDatabase) {
         }
         is StockEntryEntity -> {
             val ok = db.productDao().getById(entity.productId) != null &&
-                db.locationDao().getById(entity.locationId) != null &&
+                (entity.locationId == null || db.locationDao().getById(entity.locationId) != null) &&
                 db.quantityTypeDao().getById(entity.quantityTypeId) != null
             if (ok) db.stockEntryDao().upsert(entity)
             ok
         }
+        is ShoppingItemEntity -> db.shoppingDao().upsert(entity).let { true }
         else -> true
     }
 
     private suspend fun tryDelete(collection: RemoteCollection, id: String): Boolean = when (collection) {
         RemoteCollection.ENTRIES -> db.stockEntryDao().deleteById(id).let { true }
+        RemoteCollection.SHOPPING -> db.shoppingDao().deleteById(id).let { true }
         // Bestandseinträge des Produkts entfernt der Fremdschlüssel (CASCADE).
         RemoteCollection.PRODUCTS -> db.productDao().deleteById(id).let { true }
         RemoteCollection.LOCATIONS ->

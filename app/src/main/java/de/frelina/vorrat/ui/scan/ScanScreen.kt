@@ -1,5 +1,12 @@
 package de.frelina.vorrat.ui.scan
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material.icons.outlined.AddShoppingCart
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -94,6 +101,16 @@ fun ScanScreen(
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val leadDays by viewModel.leadDays.collectAsStateWithLifecycle()
+    val mode by viewModel.mode.collectAsStateWithLifecycle()
+    var consumeFor by remember { mutableStateOf<ScanOutcome?>(null) }
+
+    // Entnehmen-Modus: bei einem Treffer im Bestand sofort die Mengenauswahl öffnen.
+    val current = state
+    LaunchedEffect(current, mode) {
+        if (mode == ScanMode.CONSUME && current is ScanUiState.Result && current.outcome.exactMatches.isNotEmpty()) {
+            consumeFor = current.outcome
+        }
+    }
 
     var hasPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
@@ -113,6 +130,17 @@ fun ScanScreen(
     }
 
     Column(Modifier.fillMaxSize()) {
+        // ---------------- Modus
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+            listOf(ScanMode.CHECK to R.string.scan_mode_check, ScanMode.CONSUME to R.string.scan_mode_consume)
+                .forEachIndexed { index, (m, label) ->
+                    SegmentedButton(
+                        selected = mode == m,
+                        onClick = { viewModel.setMode(m) },
+                        shape = SegmentedButtonDefaults.itemShape(index, 2),
+                    ) { Text(stringResource(label)) }
+                }
+        }
         // ---------------- Kamera
         Box(
             Modifier
@@ -144,7 +172,11 @@ fun ScanScreen(
                         shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
                     ) {
-                        Text(stringResource(R.string.scan_hint), Modifier.padding(12.dp), textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(if (mode == ScanMode.CONSUME) R.string.scan_hint_consume else R.string.scan_hint),
+                            Modifier.padding(12.dp),
+                            textAlign = TextAlign.Center,
+                        )
                     }
                 }
             } else {
@@ -172,9 +204,12 @@ fun ScanScreen(
             }
             is ScanUiState.Result -> ResultPanel(
                 outcome = s.outcome,
+                onShoppingList = s.onShoppingList,
                 leadDays = leadDays,
                 onOpenEntry = onOpenEntry,
                 onRetry = viewModel::retry,
+                onConsume = { consumeFor = s.outcome },
+                onAddToShoppingList = viewModel::addToShoppingList,
                 onAdd = {
                     val o = s.outcome
                     when {
@@ -217,6 +252,18 @@ fun ScanScreen(
             onConfirm = { manualDialog = false; viewModel.rescan(); viewModel.onBarcode(it) },
         )
     }
+    consumeFor?.let { outcome ->
+        if (outcome.exactMatches.isEmpty()) {
+            consumeFor = null
+        } else {
+            ConsumeDialog(
+                entries = outcome.exactMatches,
+                leadDays = leadDays,
+                onDismiss = { consumeFor = null },
+                onConsume = { entryId, amount -> consumeFor = null; viewModel.consume(entryId, amount) },
+            )
+        }
+    }
     existingDialogFor?.let { outcome ->
         ExistingEntryDialog(
             entries = outcome.exactMatches,
@@ -252,9 +299,12 @@ private fun PermissionRequest(denied: Boolean, onRequest: () -> Unit, onOpenSett
 @Composable
 private fun ResultPanel(
     outcome: ScanOutcome,
+    onShoppingList: Boolean,
     leadDays: Int,
     onOpenEntry: (String) -> Unit,
     onRetry: () -> Unit,
+    onConsume: () -> Unit,
+    onAddToShoppingList: () -> Unit,
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -318,6 +368,11 @@ private fun ResultPanel(
             outcome.exactMatches.forEach { item ->
                 StockItemCard(item, today, leadDays, onClick = { onOpenEntry(item.entryId) })
             }
+            OutlinedButton(onClick = onConsume, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Icon(Icons.Outlined.RemoveCircleOutline, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.consume_action))
+            }
         } else {
             Text(
                 stringResource(R.string.scan_not_in_stock),
@@ -363,6 +418,23 @@ private fun ResultPanel(
             }
         }
 
+        if (onShoppingList) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.ShoppingCart, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    stringResource(R.string.shopping_on_list),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+        } else if (outcome.displayName != null) {
+            TextButton(onClick = onAddToShoppingList) {
+                Icon(Icons.Outlined.AddShoppingCart, contentDescription = null)
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.shopping_add_product))
+            }
+        }
         FilledTonalButton(onClick = onAdd, modifier = Modifier.fillMaxWidth().height(56.dp)) {
             Icon(Icons.Outlined.Add, contentDescription = null)
             Spacer(Modifier.size(8.dp))

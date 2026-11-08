@@ -166,6 +166,45 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 4 nach 5 erhaelt Bestand und ergaenzt Einkaufsliste und Oeffnungsdaten`() {
+        createAt(4) {
+            execSQL("INSERT INTO locations (id, name, levels, shelves) VALUES ('l1', 'Keller', 2, NULL)")
+            execSQL("INSERT INTO quantity_types (id, symbol, name) VALUES ('q1', 'Stck.', 'Stück')")
+            execSQL(
+                "INSERT INTO products (id, barcode, name, brand, category, packageSize, unitId, imagePath, source, " +
+                    "createdAt, updatedAt) VALUES ('p1', '123', 'Nudeln', NULL, NULL, NULL, NULL, NULL, 'MANUAL', 1, 2)",
+            )
+            execSQL(
+                "INSERT INTO stock_entries (id, productId, locationId, level, shelf, expiryDate, quantity, " +
+                    "quantityTypeId, note) VALUES ('e1', 'p1', 'l1', 1, NULL, ${LocalDate.of(2027, 1, 2).toEpochDay()}, 3, 'q1', 'n')",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val e = db.stockEntryDao().getById("e1")!!
+                assertEquals("l1", e.locationId)
+                assertEquals(3, e.quantity)
+                assertEquals(LocalDate.of(2027, 1, 2), e.expiryDate)
+                assertNull(e.openedAt)
+                assertNull(e.openedDays)
+                val p = db.productDao().getById("p1")!!
+                assertNull(p.minStock)
+                assertNull(p.openedDays)
+                assertEquals("Keller", db.stockEntryDao().getAllItems().single().locationName)
+                assertTrue(db.shoppingDao().getAll().isEmpty())
+                // Ort ist jetzt optional
+                db.stockEntryDao().insert(e.copy(id = "e2", locationId = null))
+                assertNull(db.stockEntryDao().getById("e2")!!.locationId)
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

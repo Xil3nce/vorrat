@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
-import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -44,6 +44,7 @@ import de.frelina.vorrat.ui.search.SearchScreen
 import de.frelina.vorrat.ui.settings.AboutScreen
 import de.frelina.vorrat.ui.settings.CatalogScreen
 import de.frelina.vorrat.ui.settings.SettingsScreen
+import de.frelina.vorrat.ui.shopping.ShoppingScreen
 import de.frelina.vorrat.ui.stock.EntryDetailScreen
 import de.frelina.vorrat.ui.stock.StockScreen
 import de.frelina.vorrat.ui.update.UpdateDialog
@@ -58,7 +59,7 @@ private val TOP_LEVEL = listOf(
     TopLevel(StockRoute(), StockRoute::class, R.string.nav_stock, Icons.Outlined.Inventory2),
     TopLevel(SearchRoute, SearchRoute::class, R.string.nav_search, Icons.Outlined.Search),
     TopLevel(ScanRoute, ScanRoute::class, R.string.nav_scan, Icons.Outlined.QrCodeScanner),
-    TopLevel(LocationsRoute, LocationsRoute::class, R.string.nav_locations, Icons.Outlined.Place),
+    TopLevel(ShoppingRoute, ShoppingRoute::class, R.string.nav_shopping, Icons.Outlined.ShoppingCart),
     TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings),
 )
 
@@ -75,7 +76,7 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
     // Screens mit FAB bzw. unterer Bedienleiste: Snackbar darüber anzeigen, damit sie nichts verdeckt.
-    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class)
+    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class)
         .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
 
     LaunchedEffect(Unit) {
@@ -141,9 +142,17 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
                     onCreateManual = { navController.navigate(AddStockRoute()) },
                 )
             }
-            composable<LocationsRoute> { LocationsScreen() }
+            composable<ShoppingRoute> {
+                ShoppingScreen(
+                    onBought = { productId, itemId ->
+                        navController.navigate(AddStockRoute(productId = productId, shoppingItemId = itemId))
+                    },
+                )
+            }
+            composable<LocationsRoute> { LocationsScreen(onBack = { navController.popBackStack() }) }
             composable<SettingsRoute> {
                 SettingsScreen(
+                    onOpenLocations = { navController.navigate(LocationsRoute) },
                     onOpenUnits = { navController.navigate(CatalogRoute(CatalogRoute.UNITS)) },
                     onOpenQuantityTypes = { navController.navigate(CatalogRoute(CatalogRoute.QUANTITY_TYPES)) },
                     onOpenAbout = { navController.navigate(AboutRoute) },
@@ -152,6 +161,11 @@ fun VorratRoot(messages: UiMessages, openSoonFilter: Flow<Unit>, updates: Update
             composable<EntryDetailRoute> {
                 EntryDetailScreen(
                     onBack = { navController.popBackStack() },
+                    onReplace = { id ->
+                        navController.navigate(EntryDetailRoute(id)) {
+                            popUpTo<EntryDetailRoute> { inclusive = true }
+                        }
+                    },
                     onEditEntry = { navController.navigate(EditEntryRoute(it)) },
                     onEditProduct = { navController.navigate(EditProductRoute(it)) },
                 )

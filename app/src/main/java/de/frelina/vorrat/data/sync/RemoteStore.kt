@@ -10,11 +10,15 @@ enum class RemoteCollection(val path: String) {
     PRODUCTS("products"),
     ENTRIES("entries"),
     IMAGES("images"),
+    SHOPPING("shopping"),
     ;
 
     companion object {
         /** Datensammlungen, die in Room gespiegelt werden – in Abhängigkeitsreihenfolge (Eltern zuerst). */
-        val DATA = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES)
+        val DATA = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES, SHOPPING)
+
+        /** Für den Bestand nötige Sammlungen (Erinnerungen warten nur auf diese). */
+        val STOCK = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES)
     }
 }
 

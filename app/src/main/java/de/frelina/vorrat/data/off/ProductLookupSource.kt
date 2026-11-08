@@ -14,6 +14,8 @@ data class LookedUpProduct(
     val imageUrl: String?,
     /** Nährwerte je 100 g/ml, null wenn OFF keine hat. */
     val nutrition: Nutrition? = null,
+    /** Haltbarkeit nach dem Öffnen laut Lagerhinweis (Tage), falls erkennbar. */
+    val openedDays: Int? = null,
 )
 
 enum class LookupErrorKind { NO_NETWORK, TIMEOUT, RATE_LIMITED, SERVER }

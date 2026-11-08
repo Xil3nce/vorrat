@@ -16,15 +16,15 @@ data class ReminderDigest(
 
     companion object {
         fun from(items: List<StockItem>, today: LocalDate, leadDays: Int): ReminderDigest {
-            val sorted = items.sortedBy { it.expiryDate }
+            val sorted = items.sortedBy { it.effectiveExpiry }
             val expired = mutableListOf<StockItem>()
             val dueToday = mutableListOf<StockItem>()
             val soon = mutableListOf<StockItem>()
             sorted.forEach { item ->
-                when (ExpiryLogic.status(item.expiryDate, today, leadDays)) {
+                when (ExpiryLogic.status(item.effectiveExpiry, today, leadDays)) {
                     ExpiryStatus.EXPIRED -> expired += item
                     ExpiryStatus.SOON ->
-                        if (ExpiryLogic.isExpiringToday(item.expiryDate, today)) dueToday += item else soon += item
+                        if (ExpiryLogic.isExpiringToday(item.effectiveExpiry, today)) dueToday += item else soon += item
                     else -> Unit
                 }
             }

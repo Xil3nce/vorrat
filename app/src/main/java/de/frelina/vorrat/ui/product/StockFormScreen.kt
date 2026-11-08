@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.AddLocationAlt
+import androidx.compose.material.icons.outlined.WrongLocation
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PhotoLibrary
@@ -329,6 +330,20 @@ fun ProductFormSection(
         ),
         modifier = Modifier.fillMaxWidth(),
     )
+    NumberField(
+        value = form.minStock,
+        onValueChange = { v -> onChange { it.copy(minStock = v.filter(Char::isDigit).take(3), minStockError = null) } },
+        label = stringResource(R.string.field_min_stock) + " (" + stringResource(R.string.optional) + ")",
+        error = form.minStockError,
+        modifier = Modifier.fillMaxWidth(),
+    )
+    if (form.minStockError == null) {
+        Text(
+            stringResource(R.string.field_min_stock_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 @Composable
@@ -350,15 +365,20 @@ fun EntryFormSection(
             options = locations,
             selected = locations.firstOrNull { it.id == form.locationId },
             optionLabel = { it.name },
-            onSelect = { loc -> onChange { it.copy(locationId = loc.id, locationMissing = false) } },
-            isError = form.locationMissing,
-            supportingText = if (form.locationMissing) {
-                { Text(stringResource(R.string.error_location_required), color = MaterialTheme.colorScheme.error) }
+            onSelect = { loc -> onChange { it.copy(locationId = loc.id) } },
+            emptyText = stringResource(R.string.location_none_later),
+            supportingText = if (form.locationId == null) {
+                { Text(stringResource(R.string.field_location_optional_hint)) }
             } else {
                 null
             },
             modifier = Modifier.weight(1f),
             extraItem = { close ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.location_none_later)) },
+                    leadingIcon = { Icon(Icons.Outlined.WrongLocation, contentDescription = null) },
+                    onClick = { close(); onChange { it.copy(locationId = null, level = "", shelf = "") } },
+                )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.add_new_location)) },
                     leadingIcon = { Icon(Icons.Outlined.AddLocationAlt, contentDescription = null) },
@@ -395,6 +415,7 @@ fun EntryFormSection(
         label = stringResource(R.string.field_expiry),
         error = form.expiryError,
         modifier = Modifier.fillMaxWidth(),
+        scanEnabled = true,
     )
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilledTonalIconButton(

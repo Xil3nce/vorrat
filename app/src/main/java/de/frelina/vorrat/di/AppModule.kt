@@ -16,6 +16,7 @@ import dagger.hilt.components.SingletonComponent
 import de.frelina.vorrat.BuildConfig
 import de.frelina.vorrat.data.db.LocationDao
 import de.frelina.vorrat.data.db.LookupCacheDao
+import de.frelina.vorrat.data.db.ShoppingDao
 import de.frelina.vorrat.data.db.ProductDao
 import de.frelina.vorrat.data.db.QuantityTypeDao
 import de.frelina.vorrat.data.db.StockEntryDao
@@ -76,6 +77,7 @@ object AppModule {
     @Provides fun productDao(db: VorratDatabase): ProductDao = db.productDao()
     @Provides fun stockEntryDao(db: VorratDatabase): StockEntryDao = db.stockEntryDao()
     @Provides fun lookupCacheDao(db: VorratDatabase): LookupCacheDao = db.lookupCacheDao()
+    @Provides fun shoppingDao(db: VorratDatabase): ShoppingDao = db.shoppingDao()
 
     @Provides
     @Singleton
