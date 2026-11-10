@@ -17,6 +17,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         ShoppingItemEntity::class,
         HistoryEventEntity::class,
         RecipeEntity::class,
+        DepartmentEntity::class,
+        DepartmentAssignmentEntity::class,
+        MealPlanEntity::class,
+        StapleEntity::class,
     ],
     version = VorratDatabase.VERSION,
     exportSchema = true,
@@ -32,16 +36,20 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun shoppingDao(): ShoppingDao
     abstract fun historyDao(): HistoryDao
     abstract fun recipeDao(): RecipeDao
+    abstract fun departmentDao(): DepartmentDao
+    abstract fun departmentAssignmentDao(): DepartmentAssignmentDao
+    abstract fun mealPlanDao(): MealPlanDao
+    abstract fun stapleDao(): StapleDao
 
     companion object {
-        const val VERSION = 7
+        const val VERSION = 8
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -241,6 +249,32 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
             "CREATE TABLE IF NOT EXISTS `recipes` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `minutes` INTEGER, " +
                 "`servings` INTEGER, `ingredients` TEXT NOT NULL, `steps` TEXT NOT NULL, `vegetarian` INTEGER NOT NULL, " +
                 "`createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
+    }
+}
+
+/**
+ * v7 → v8: neue Tabellen für Abteilungen der Einkaufsliste (samt gemerkten Zuordnungen), den Wochenplan und die
+ * "Immer zuhause"-Liste. Die Standard-Abteilungen legt die App an (feste IDs, siehe DepartmentRepository).
+ */
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `departments` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, " +
+                "`position` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `department_assignments` (`key` TEXT NOT NULL, `departmentId` TEXT NOT NULL, " +
+                "`updatedAt` INTEGER NOT NULL, PRIMARY KEY(`key`))",
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `meal_plan` (`id` TEXT NOT NULL, `date` INTEGER NOT NULL, " +
+                "`recipeId` TEXT NOT NULL, `persons` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_meal_plan_date` ON `meal_plan` (`date`)")
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `staples` (`key` TEXT NOT NULL, `label` TEXT NOT NULL, " +
+                "`createdAt` INTEGER NOT NULL, PRIMARY KEY(`key`))",
         )
     }
 }

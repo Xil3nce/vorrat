@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
@@ -55,6 +56,7 @@ fun RecipesScreen(
     onBack: () -> Unit,
     onOpenRecipe: (String) -> Unit,
     onAddRecipe: () -> Unit,
+    onOpenMealPlan: () -> Unit,
     viewModel: RecipesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -66,6 +68,11 @@ fun RecipesScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenMealPlan) {
+                        Icon(Icons.Outlined.CalendarMonth, contentDescription = stringResource(R.string.mealplan_title))
                     }
                 },
             )

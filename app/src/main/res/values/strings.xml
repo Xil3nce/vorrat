@@ -574,4 +574,93 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="field_ingredient_group_help">Damit passt das Produkt zu Rezeptvorschlägen</string>
     <string name="ingredient_group_auto_detected">Automatisch (erkannt: %1$s)</string>
     <string name="ingredient_group_auto_none">Automatisch (nicht erkannt)</string>
+    <!-- Einkaufsliste nach Abteilungen -->
+    <string name="shopping_menu_more">Weitere Optionen</string>
+    <string name="shopping_group_by_department">Nach Abteilungen gruppieren</string>
+    <string name="shopping_open_departments">Abteilungen verwalten</string>
+    <string name="shopping_open_mealplan">Wochenplan</string>
+    <string name="shopping_department_header">%1$s (%2$d)</string>
+    <string name="shopping_department_drag">Abteilung „%1$s“ samt Inhalt verschieben</string>
+    <string name="shopping_change_department">Abteilung ändern …</string>
+    <string name="shopping_change_department_title">Abteilung für „%1$s“</string>
+    <string name="shopping_department_assigned">„%1$s“ gehört jetzt zu „%2$s“</string>
+    <string name="shopping_item_options">Optionen für „%1$s“</string>
+
+    <!-- Abteilungen verwalten -->
+    <string name="departments_title">Abteilungen</string>
+    <string name="settings_departments_summary">Reihenfolge der Einkaufsliste, umbenennen, hinzufügen</string>
+    <string name="departments_hint">Die Reihenfolge gilt für alle im Haushalt. Zum Verschieben am Griff ziehen.</string>
+    <string name="departments_drag">„%1$s“ verschieben</string>
+    <string name="departments_move_up">Nach oben</string>
+    <string name="departments_move_down">Nach unten</string>
+    <string name="departments_add">Abteilung hinzufügen</string>
+    <string name="departments_rename">Umbenennen</string>
+    <string name="departments_name">Name der Abteilung</string>
+    <string name="departments_name_exists">Diese Abteilung gibt es schon.</string>
+    <string name="departments_name_invalid">Bitte einen Namen mit höchstens 40 Zeichen eingeben.</string>
+    <string name="departments_other_hint">Auffangabteilung – kann nicht gelöscht werden</string>
+    <string name="departments_delete_title">Abteilung löschen?</string>
+    <string name="departments_delete_text">„%1$s“ wird für alle im Haushalt gelöscht. Artikel, die du dieser Abteilung zugeordnet hast, landen wieder in ihrer Standard-Abteilung.</string>
+    <string name="departments_loading">Die Abteilungen werden mit dem Haushalt abgeglichen …</string>
+    <string name="departments_reset">Auf Standard zurücksetzen</string>
+    <string name="departments_reset_text">Reihenfolge und Namen der Standard-Abteilungen werden wiederhergestellt (gelöschte kommen zurück). Eigene Abteilungen bleiben und folgen am Ende.</string>
+    <string name="departments_reset_done">Abteilungen zurückgesetzt</string>
+
+    <!-- Wochenplan -->
+    <string name="mealplan_title">Wochenplan</string>
+    <string name="settings_mealplan_summary">Rezepte für die Woche planen, Zutaten auf die Einkaufsliste setzen</string>
+    <string name="mealplan_week_prev">Vorherige Woche</string>
+    <string name="mealplan_week_next">Nächste Woche</string>
+    <string name="mealplan_this_week">Diese Woche</string>
+    <string name="mealplan_today">Heute</string>
+    <string name="mealplan_week_range">%1$s – %2$s</string>
+    <string name="mealplan_add_for_day">Rezept für %1$s hinzufügen</string>
+    <string name="mealplan_day_empty">Noch nichts geplant</string>
+    <plurals name="mealplan_for_persons">
+        <item quantity="one">für %d Person</item>
+        <item quantity="other">für %d Personen</item>
+    </plurals>
+    <string name="mealplan_recipe_missing">Rezept nicht mehr vorhanden</string>
+    <string name="mealplan_entry_options">Optionen für „%1$s“</string>
+    <string name="mealplan_move">Auf anderen Tag verschieben</string>
+    <string name="mealplan_move_title">Auf welchen Tag?</string>
+    <string name="mealplan_remove">Entfernen</string>
+    <string name="mealplan_removed">„%1$s“ aus dem Wochenplan entfernt</string>
+    <string name="mealplan_pick_title">Rezept für %1$s</string>
+    <string name="mealplan_pick_search">Rezept suchen</string>
+    <string name="mealplan_pick_suggestions">Vorschläge aus deinem Vorrat</string>
+    <string name="mealplan_pick_all">Alle Rezepte</string>
+    <string name="mealplan_pick_empty">Keine Rezepte gefunden.</string>
+    <string name="mealplan_add_title">Zum Wochenplan hinzufügen</string>
+    <string name="mealplan_add_confirm">Hinzufügen</string>
+    <string name="mealplan_day_label">Tag</string>
+    <string name="mealplan_to_plan">Zum Wochenplan</string>
+    <string name="mealplan_added">„%1$s“ steht jetzt im Wochenplan</string>
+    <string name="mealplan_shopping">Zutaten auf die Einkaufsliste</string>
+    <string name="mealplan_range_title">Für welchen Zeitraum?</string>
+    <string name="mealplan_range_week">Ganze Woche (Mo–So)</string>
+    <string name="mealplan_range_from_today">Ab heute bis Sonntag</string>
+    <string name="mealplan_menu_staples">Immer zuhause verwalten</string>
+    <string name="mealplan_staples_title">Immer zuhause</string>
+    <string name="mealplan_staples_hint">Diese Zutaten gelten beim Einkaufen aus dem Wochenplan als vorhanden und sind nicht vorausgewählt.</string>
+    <string name="mealplan_staples_empty">Noch nichts eingetragen. In der Zutatenprüfung kannst du Zutaten mit „Immer zuhause“ hierher legen.</string>
+    <string name="mealplan_staples_remove">„%1$s“ entfernen</string>
+
+    <!-- Zutaten aus dem Wochenplan prüfen -->
+    <string name="planshop_title">Zutaten prüfen</string>
+    <string name="planshop_all">Alle</string>
+    <string name="planshop_none">Keine</string>
+    <string name="planshop_apply">Übernehmen (%1$d)</string>
+    <string name="planshop_for">für: %1$s</string>
+    <string name="planshop_hint_pantry">im Vorrat: %1$s</string>
+    <string name="planshop_hint_list">steht schon auf der Liste</string>
+    <string name="planshop_hint_staple">immer zuhause</string>
+    <string name="planshop_hint_basic">Grundvorrat – vermutlich zuhause</string>
+    <string name="planshop_staple_action_for">„%1$s“ immer zuhause</string>
+    <string name="planshop_empty">Im gewählten Zeitraum ist nichts geplant.</string>
+    <plurals name="planshop_done">
+        <item quantity="one">%d Zutat übernommen</item>
+        <item quantity="other">%d Zutaten übernommen</item>
+    </plurals>
+    <string name="planshop_nothing_new">Alles Gewählte steht schon auf der Einkaufsliste</string>
 </resources>

@@ -79,6 +79,33 @@ class ShoppingRepository @Inject constructor(
     }
 
     /**
+     * Zutaten aus dem Wochenplan (Name, Notiz mit Menge und Rezepten) auf die Liste setzen – ohne Duplikate wie
+     * bei [addMissing]. Liefert die Anzahl neuer Einträge.
+     */
+    suspend fun addPlanned(items: List<Pair<String, String?>>): Int {
+        var added = 0
+        val known = shoppingDao.getAll().map { it.name.trim().lowercase() }.toMutableSet()
+        for ((raw, note) in items) {
+            val name = raw.trim()
+            if (name.isEmpty() || name.lowercase() in known) continue
+            val product = ShoppingLogic.matchProduct(name, productDao.getAll())
+            if (product != null && isOnList(product.id)) continue
+            val item = addText(name) ?: continue
+            if (note != null) save(item.copy(note = note.take(RemoteMapper.MAX_PLAN_NOTE)))
+            known += name.lowercase()
+            added++
+        }
+        return added
+    }
+
+    /** Namen aller Einträge auf der Liste (manuell und unter Mindestbestand) für den Abgleich mit dem Wochenplan. */
+    suspend fun listedNames(): List<String> {
+        val manual = shoppingDao.getAll().map { it.name }
+        val shortages = ShoppingLogic.shortages(productDao.getAll(), stockDao.getAllItems()).map { it.product.name }
+        return manual + shortages
+    }
+
+    /**
      * Gescanntes, lokal unbekanntes Produkt (Daten aus Open Food Facts) auf die Liste setzen: Es wird als Produkt
      * angelegt (mit Barcode und einer Kopie des OFF-Bilds), damit die Liste das Bild zeigt, es auf das andere
      * Handy synchronisiert wird und "Gekauft" später alles vorbelegt.

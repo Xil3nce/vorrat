@@ -30,6 +30,8 @@ class VorratApp : Application(), Configuration.Provider {
     @Inject lateinit var historyRepository: de.frelina.vorrat.data.repo.HistoryRepository
     @Inject lateinit var settingsRepository: de.frelina.vorrat.data.settings.SettingsRepository
     @Inject lateinit var workManager: androidx.work.WorkManager
+    @Inject lateinit var householdStore: de.frelina.vorrat.data.household.HouseholdStore
+    @Inject lateinit var departmentRepository: de.frelina.vorrat.data.repo.DepartmentRepository
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -51,6 +53,10 @@ class VorratApp : Application(), Configuration.Provider {
         }
         // Sobald ein Haushalt bekannt ist: Firestore-Listener → Room.
         syncManager.start()
+        // Ohne Haushalt gibt es keinen Server-Stand, auf den man warten müsste: Standard-Abteilungen gleich anlegen.
+        // Mit Haushalt übernimmt das der SyncManager nach dem ersten Server-Stand (sonst würde ein beitretendes
+        // Handy die Reihenfolge des Haushalts überschreiben).
+        appScope.launch { if (householdStore.currentId() == null) runCatching { departmentRepository.ensureDefaults() } }
         appScope.launch { reminderScheduler.ensureScheduled() }
         // Verwaiste Bilder (z. B. abgebrochene Erfassung) entfernen.
         appScope.launch {

@@ -7,12 +7,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-/** Snackbar-Nachricht; Texte als String-Ressourcen (keine Hardcodes). */
+/**
+ * Snackbar-Nachricht; Texte als Ressourcen (keine Hardcodes). Mit [pluralCount] ist [text] eine Plurals-Ressource
+ * (die Anzahl steht dann auch als erstes Argument zur Verfügung: `%1$d`).
+ */
 data class UiMessage(
-    @StringRes val text: Int,
+    val text: Int,
     val args: List<Any> = emptyList(),
     @StringRes val actionLabel: Int? = null,
     val onAction: (suspend () -> Unit)? = null,
+    val pluralCount: Int? = null,
 )
 
 /**

@@ -2,12 +2,19 @@ package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.backup.BackupException
 import de.frelina.vorrat.data.backup.BackupManager
+import de.frelina.vorrat.data.db.DepartmentAssignmentEntity
+import de.frelina.vorrat.data.db.DepartmentEntity
+import de.frelina.vorrat.data.db.MealPlanEntity
+import de.frelina.vorrat.data.db.StapleEntity
 import de.frelina.vorrat.data.db.VorratDatabase
+import de.frelina.vorrat.data.sync.RemoteCollection
+import de.frelina.vorrat.domain.DepartmentDefaults
 import de.frelina.vorrat.data.image.ImageStore
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -16,6 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.time.LocalDate
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -48,6 +56,10 @@ class BackupRoundTripTest : DbTestBase() {
         db.stockEntryDao().getAll(),
         db.shoppingDao().getAll(),
         db.recipeDao().getAll(),
+        db.departmentDao().getAll(),
+        db.departmentAssignmentDao().getAll(),
+        db.mealPlanDao().getAll(),
+        db.stapleDao().getAll(),
     )
 
     @Test fun `Export und Import ergeben identische Daten inkl Bild`() = runBlocking {
@@ -81,6 +93,14 @@ class BackupRoundTripTest : DbTestBase() {
                 ingredients = "[]", steps = "A B", vegetarian = true, createdAt = 1, updatedAt = 2,
             ),
         )
+        // Neu in 1.8: Abteilungen, Zuordnungen, Wochenplan, "Immer zuhause"
+        db.departmentDao().upsertAll(DepartmentDefaults.entities())
+        db.departmentDao().upsert(DepartmentEntity("dept_custom", "Bio-Laden", 13))
+        db.departmentAssignmentDao().upsert(DepartmentAssignmentEntity("product:$p1", "dept_custom", 5))
+        db.departmentAssignmentDao().upsert(DepartmentAssignmentEntity("name:brot", "dept_bakery", 6))
+        db.mealPlanDao().upsert(MealPlanEntity("m1", LocalDate.of(2026, 11, 12), "r1", 4, 7))
+        db.mealPlanDao().upsert(MealPlanEntity("m2", LocalDate.of(2026, 11, 13), "builtin:Suppe", 2, 8))
+        db.stapleDao().upsert(StapleEntity("group:spices", "Salz, Pfeffer & Gewürze", 9))
         val before = snapshot()
 
         val zip = exportBytes()
@@ -90,6 +110,10 @@ class BackupRoundTripTest : DbTestBase() {
         db.productDao().deleteAll()
         db.shoppingDao().deleteAll()
         db.recipeDao().deleteAll()
+        db.departmentAssignmentDao().deleteAll()
+        db.departmentDao().deleteAll()
+        db.mealPlanDao().deleteAll()
+        db.stapleDao().deleteAll()
         imageStore.delete(image)
 
         val parsed = backup.read(ByteArrayInputStream(zip))
@@ -100,7 +124,52 @@ class BackupRoundTripTest : DbTestBase() {
         assertEquals(before, snapshot())
         assertEquals("cream", db.productDao().getById(p1)!!.ingredientGroup)
         assertEquals("Suppe", db.recipeDao().getById("r1")!!.title)
+        assertEquals(14, db.departmentDao().getAll().size)
+        assertEquals(2, db.departmentAssignmentDao().getAll().size)
+        assertEquals(2, db.mealPlanDao().getAll().size)
+        assertEquals("Salz, Pfeffer & Gewürze", db.stapleDao().getAll().single().label)
+        // alles auch im Haushalt (Firestore) – dort stand vorher nichts
+        assertEquals(14, remote.docs.getValue(RemoteCollection.DEPARTMENTS).size)
+        assertEquals(2, remote.docs.getValue(RemoteCollection.DEPARTMENT_ASSIGNMENTS).size)
+        assertEquals(2, remote.docs.getValue(RemoteCollection.MEAL_PLAN).size)
+        assertEquals(1, remote.docs.getValue(RemoteCollection.STAPLES).size)
         assertArrayEquals(byteArrayOf(9, 8, 7, 6), imageStore.fileOrNull(image)!!.readBytes())
+    }
+
+    @Test fun `Backup ohne Abteilungen (aelteres Backup) bekommt die Standard-Abteilungen`() = runBlocking {
+        val old = """
+            {"formatVersion": 1, "schemaVersion": 7, "exportedAt": 1, "appVersion": "1.7.2",
+             "locations": [{"id": "l1", "name": "Keller"}], "units": [], "quantityTypes": [], "products": [], "stockEntries": []}
+        """.trimIndent()
+        backup.replaceAll(backup.read(ByteArrayInputStream(zipOf(old))))
+        assertEquals(13, db.departmentDao().getAll().size)
+        assertEquals(13, remote.docs.getValue(RemoteCollection.DEPARTMENTS).size)
+        assertTrue(db.mealPlanDao().getAll().isEmpty())
+    }
+
+    @Test fun `Backup mit doppeltem Wochenplan-Eintrag oder kaputtem Schluessel wird abgelehnt`() = runBlocking {
+        db.mealPlanDao().upsert(MealPlanEntity("m1", LocalDate.of(2026, 11, 12), "r1", 4, 7))
+        val dupe = String(unzipJson(exportBytes())).replace(
+            "\"mealPlan\": [",
+            "\"mealPlan\": [{\"id\": \"m1\", \"date\": \"2026-11-12\", \"recipeId\": \"r1\", \"persons\": 1, \"createdAt\": 1},",
+        )
+        try {
+            backup.read(ByteArrayInputStream(zipOf(dupe)))
+            fail("Validierungsfehler erwartet")
+        } catch (e: BackupException) {
+            assertEquals(BackupException.Reason.INVALID_DATA, e.reason)
+        }
+        db.stapleDao().upsert(StapleEntity("salz", "Salz", 1))
+        val badKey = String(unzipJson(exportBytes())).replace(
+            "\"staples\": [",
+            "\"staples\": [{\"key\": \"a/b\", \"label\": \"x\", \"createdAt\": 1},",
+        )
+        try {
+            backup.read(ByteArrayInputStream(zipOf(badKey)))
+            fail("Validierungsfehler erwartet")
+        } catch (e: BackupException) {
+            assertEquals(BackupException.Reason.INVALID_DATA, e.reason)
+        }
     }
 
     @Test fun `ungueltiges Backup wird abgelehnt und Daten bleiben unveraendert`() = runBlocking {

@@ -1,18 +1,23 @@
 package de.frelina.vorrat.data.backup
 
 import androidx.room.withTransaction
+import de.frelina.vorrat.data.db.DepartmentAssignmentEntity
+import de.frelina.vorrat.data.db.DepartmentEntity
 import de.frelina.vorrat.data.db.LocationEntity
+import de.frelina.vorrat.data.db.MealPlanEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.QuantityTypeEntity
 import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.ShoppingItemEntity
+import de.frelina.vorrat.data.db.StapleEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.domain.DepartmentDefaults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -120,6 +125,11 @@ class BackupManager @Inject constructor(
         recipes = db.recipeDao().getAll().map {
             RecipeDto(it.id, it.title, it.minutes, it.servings, it.ingredients, it.steps, it.vegetarian, it.createdAt, it.updatedAt)
         },
+        departments = db.departmentDao().getAll().map { DepartmentDto(it.id, it.name, it.position) },
+        departmentAssignments = db.departmentAssignmentDao().getAll()
+            .map { DepartmentAssignmentDto(it.key, it.departmentId, it.updatedAt) },
+        mealPlan = db.mealPlanDao().getAll().map { MealPlanDto(it.id, it.date.toString(), it.recipeId, it.persons, it.createdAt) },
+        staples = db.stapleDao().getAll().map { StapleDto(it.key, it.label, it.createdAt) },
     )
 
     // ------------------------------------------------------------------ Import
@@ -187,6 +197,10 @@ class BackupManager @Inject constructor(
             db.withTransaction {
                 db.shoppingDao().deleteAll()
                 db.recipeDao().deleteAll()
+                db.departmentAssignmentDao().deleteAll()
+                db.departmentDao().deleteAll()
+                db.mealPlanDao().deleteAll()
+                db.stapleDao().deleteAll()
                 db.stockEntryDao().deleteAll()
                 db.productDao().deleteAll()
                 db.locationDao().deleteAll()
@@ -269,6 +283,33 @@ class BackupManager @Inject constructor(
                         )
                     },
                 )
+                // Backups von vor Schema 8 kennen keine Abteilungen → Standard-Abteilungen anlegen.
+                db.departmentDao().insertAll(
+                    if (d.departments.isEmpty()) {
+                        DepartmentDefaults.entities()
+                    } else {
+                        d.departments.map {
+                            DepartmentEntity(it.id, it.name.trim().take(RemoteMapper.MAX_DEPARTMENT_NAME), it.position)
+                        }
+                    },
+                )
+                db.departmentAssignmentDao().insertAll(
+                    d.departmentAssignments.map { DepartmentAssignmentEntity(it.key, it.departmentId, it.updatedAt) },
+                )
+                db.mealPlanDao().insertAll(
+                    d.mealPlan.map {
+                        MealPlanEntity(
+                            id = it.id,
+                            date = LocalDate.parse(it.date),
+                            recipeId = it.recipeId,
+                            persons = it.persons.coerceIn(1, RemoteMapper.MAX_PLAN_PERSONS),
+                            createdAt = it.createdAt,
+                        )
+                    },
+                )
+                db.stapleDao().insertAll(
+                    d.staples.map { StapleEntity(it.key, it.label.trim().take(RemoteMapper.MAX_STAPLE_LABEL), it.createdAt) },
+                )
             }
             // Commit erfolgreich → Bilder übernehmen, nicht mehr benötigte entfernen.
             parsed.stagingDir.listFiles()?.forEach { f ->
@@ -315,6 +356,28 @@ class BackupManager @Inject constructor(
         d.recipes.forEach { r ->
             if (r.title.isBlank()) invalid("Rezept ${r.id} ohne Titel")
             if (r.ingredients.length > RemoteMapper.MAX_INGREDIENTS_JSON) invalid("Rezept ${r.id}: Zutaten zu lang")
+        }
+
+        if (d.departments.map { it.id }.toSet().size != d.departments.size) invalid("doppelte Abteilungs-IDs")
+        if (d.departments.any { it.name.isBlank() }) invalid("Abteilung ohne Namen")
+        if (d.departmentAssignments.map { it.key }.toSet().size != d.departmentAssignments.size) {
+            invalid("doppelte Zuordnungen")
+        }
+        d.departmentAssignments.forEach { a ->
+            if (!RemoteMapper.isValidAssignmentKey(a.key)) invalid("Zuordnung ${a.key}: Schlüssel")
+        }
+        if (d.mealPlan.map { it.id }.toSet().size != d.mealPlan.size) invalid("doppelte Wochenplan-IDs")
+        d.mealPlan.forEach { m ->
+            if (m.recipeId.isBlank()) invalid("Wochenplan ${m.id}: Rezept")
+            try {
+                LocalDate.parse(m.date)
+            } catch (_: DateTimeParseException) {
+                invalid("Wochenplan ${m.id}: Datum")
+            }
+        }
+        if (d.staples.map { it.key }.toSet().size != d.staples.size) invalid("doppelte Einträge bei Immer zuhause")
+        d.staples.forEach { s ->
+            if (!RemoteMapper.isValidStapleKey(s.key) || s.label.isBlank()) invalid("Immer zuhause ${s.key}")
         }
 
         if (d.locations.any { it.name.isBlank() }) invalid("Ort ohne Namen")

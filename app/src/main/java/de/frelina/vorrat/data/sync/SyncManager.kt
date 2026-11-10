@@ -6,6 +6,7 @@ import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.household.Household
 import de.frelina.vorrat.data.household.HouseholdStore
 import de.frelina.vorrat.data.image.ImageStore
+import de.frelina.vorrat.data.repo.DepartmentRepository
 import de.frelina.vorrat.di.ApplicationScope
 import de.frelina.vorrat.reminder.HouseholdNotices
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,7 @@ class SyncManager @Inject constructor(
     private val writer: RemoteWriter,
     private val imageStore: ImageStore,
     private val notices: HouseholdNotices,
+    private val departments: DepartmentRepository,
     @param:ApplicationScope private val scope: CoroutineScope,
 ) {
     private val applier = SyncApplier(db)
@@ -99,6 +101,8 @@ class SyncManager @Inject constructor(
             )
             fetchMissingImages(e.hid, applied.products)
             notices.onIncoming(applied.history)
+            // Hat der Haushalt noch keine Abteilungen (z. B. nach dem Update), die Standard-Abteilungen anlegen.
+            if (e.full && e.collection == RemoteCollection.DEPARTMENTS) departments.ensureDefaults()
             if (e.full) serverSynced.value = serverSynced.value + e.collection
         } catch (ex: Exception) {
             Log.w(TAG, "Übernahme von ${e.collection.path} fehlgeschlagen", ex)

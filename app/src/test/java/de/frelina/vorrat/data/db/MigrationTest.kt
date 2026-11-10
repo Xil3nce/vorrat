@@ -268,6 +268,48 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 7 nach 8 ergaenzt Abteilungen, Zuordnungen, Wochenplan und Immer zuhause`() {
+        createAt(7) {
+            execSQL(
+                "INSERT INTO products (id, barcode, name, brand, category, packageSize, unitId, imagePath, source, " +
+                    "createdAt, updatedAt, minStock, openedDays, ingredientGroup) VALUES " +
+                    "('p1', NULL, 'Sahne', NULL, NULL, NULL, NULL, NULL, 'MANUAL', 1, 2, NULL, NULL, 'cream')",
+            )
+            execSQL(
+                "INSERT INTO recipes (id, title, minutes, servings, ingredients, steps, vegetarian, createdAt, updatedAt) " +
+                    "VALUES ('r1', 'Suppe', NULL, 2, '[]', 'Kochen', 0, 1, 2)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                // bestehende Daten bleiben
+                assertEquals("Sahne", db.productDao().getById("p1")!!.name)
+                assertEquals("Suppe", db.recipeDao().getById("r1")!!.title)
+                // neue Tabellen sind da und leer (Standard-Abteilungen legt die App idempotent selbst an)
+                assertTrue(db.departmentDao().getAll().isEmpty())
+                assertTrue(db.departmentAssignmentDao().getAll().isEmpty())
+                assertTrue(db.mealPlanDao().getAll().isEmpty())
+                assertTrue(db.stapleDao().getAll().isEmpty())
+
+                db.departmentDao().upsert(DepartmentEntity("dept_x", "Bio", 0))
+                db.departmentAssignmentDao().upsert(DepartmentAssignmentEntity("product:p1", "dept_x", 5))
+                val day = LocalDate.of(2026, 11, 12)
+                db.mealPlanDao().upsert(MealPlanEntity("m1", day, "r1", 3, 6))
+                db.stapleDao().upsert(StapleEntity("salz", "Salz", 7))
+                assertEquals(listOf("Bio"), db.departmentDao().getAll().map { it.name })
+                assertEquals("dept_x", db.departmentAssignmentDao().getByKey("product:p1")!!.departmentId)
+                assertEquals(day, db.mealPlanDao().getBetween(day, day).single().date)
+                assertEquals(listOf("Salz"), db.stapleDao().getAll().map { it.label })
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

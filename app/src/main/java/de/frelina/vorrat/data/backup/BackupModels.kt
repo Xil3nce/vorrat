@@ -23,7 +23,32 @@ data class BackupData(
     val shoppingItems: List<ShoppingItemDto> = emptyList(),
     /** Eigene Rezepte (seit Schema 7). */
     val recipes: List<RecipeDto> = emptyList(),
+    /** Abteilungen der Einkaufsliste und gemerkte Zuordnungen (seit Schema 8). */
+    val departments: List<DepartmentDto> = emptyList(),
+    val departmentAssignments: List<DepartmentAssignmentDto> = emptyList(),
+    /** Wochenplan und "Immer zuhause" (seit Schema 8). */
+    val mealPlan: List<MealPlanDto> = emptyList(),
+    val staples: List<StapleDto> = emptyList(),
 )
+
+@Serializable
+data class DepartmentDto(val id: String, val name: String, val position: Int = 0)
+
+@Serializable
+data class DepartmentAssignmentDto(val key: String, val departmentId: String, val updatedAt: Long = 0)
+
+@Serializable
+data class MealPlanDto(
+    val id: String,
+    /** ISO-8601, z. B. "2026-12-31" */
+    val date: String,
+    val recipeId: String,
+    val persons: Int = 1,
+    val createdAt: Long = 0,
+)
+
+@Serializable
+data class StapleDto(val key: String, val label: String, val createdAt: Long = 0)
 
 @Serializable
 data class RecipeDto(

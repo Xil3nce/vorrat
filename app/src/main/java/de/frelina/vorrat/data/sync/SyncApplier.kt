@@ -1,12 +1,16 @@
 package de.frelina.vorrat.data.sync
 
 import androidx.room.withTransaction
+import de.frelina.vorrat.data.db.DepartmentAssignmentEntity
+import de.frelina.vorrat.data.db.DepartmentEntity
 import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
+import de.frelina.vorrat.data.db.MealPlanEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.QuantityTypeEntity
 import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.ShoppingItemEntity
+import de.frelina.vorrat.data.db.StapleEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import de.frelina.vorrat.data.db.VorratDatabase
@@ -82,6 +86,10 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.ENTRIES -> RemoteMapper.entry(id, data)
         RemoteCollection.SHOPPING -> RemoteMapper.shopping(id, data)
         RemoteCollection.RECIPES -> RemoteMapper.recipe(id, data)
+        RemoteCollection.DEPARTMENTS -> RemoteMapper.department(id, data)
+        RemoteCollection.DEPARTMENT_ASSIGNMENTS -> RemoteMapper.departmentAssignment(id, data)
+        RemoteCollection.MEAL_PLAN -> RemoteMapper.mealPlan(id, data)
+        RemoteCollection.STAPLES -> RemoteMapper.staple(id, data)
         RemoteCollection.HISTORY -> RemoteMapper.history(id, data)
         RemoteCollection.IMAGES -> null
     }
@@ -94,6 +102,10 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.ENTRIES -> db.stockEntryDao().getIds()
         RemoteCollection.SHOPPING -> db.shoppingDao().getIds()
         RemoteCollection.RECIPES -> db.recipeDao().getIds()
+        RemoteCollection.DEPARTMENTS -> db.departmentDao().getIds()
+        RemoteCollection.DEPARTMENT_ASSIGNMENTS -> db.departmentAssignmentDao().getIds()
+        RemoteCollection.MEAL_PLAN -> db.mealPlanDao().getIds()
+        RemoteCollection.STAPLES -> db.stapleDao().getIds()
         RemoteCollection.HISTORY -> db.historyDao().getIds()
         RemoteCollection.IMAGES -> emptyList()
     }
@@ -143,6 +155,10 @@ class SyncApplier(private val db: VorratDatabase) {
         }
         is ShoppingItemEntity -> db.shoppingDao().upsert(entity).let { true }
         is RecipeEntity -> db.recipeDao().upsert(entity).let { true }
+        is DepartmentEntity -> db.departmentDao().upsert(entity).let { true }
+        is DepartmentAssignmentEntity -> db.departmentAssignmentDao().upsert(entity).let { true }
+        is MealPlanEntity -> db.mealPlanDao().upsert(entity).let { true }
+        is StapleEntity -> db.stapleDao().upsert(entity).let { true }
         is HistoryEventEntity -> db.historyDao().upsert(entity).let { true }
         else -> true
     }
@@ -151,6 +167,10 @@ class SyncApplier(private val db: VorratDatabase) {
         RemoteCollection.ENTRIES -> db.stockEntryDao().deleteById(id).let { true }
         RemoteCollection.SHOPPING -> db.shoppingDao().deleteById(id).let { true }
         RemoteCollection.RECIPES -> db.recipeDao().deleteById(id).let { true }
+        RemoteCollection.DEPARTMENTS -> db.departmentDao().deleteById(id).let { true }
+        RemoteCollection.DEPARTMENT_ASSIGNMENTS -> db.departmentAssignmentDao().deleteByKey(id).let { true }
+        RemoteCollection.MEAL_PLAN -> db.mealPlanDao().deleteById(id).let { true }
+        RemoteCollection.STAPLES -> db.stapleDao().deleteByKey(id).let { true }
         RemoteCollection.HISTORY -> db.historyDao().deleteById(id).let { true }
         // Bestandseinträge des Produkts entfernt der Fremdschlüssel (CASCADE).
         RemoteCollection.PRODUCTS -> db.productDao().deleteById(id).let { true }

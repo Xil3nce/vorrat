@@ -259,3 +259,51 @@ data class LookupCacheEntity(
     /** Haltbarkeit nach dem Öffnen laut OFF-Lagerhinweis (Tage), falls erkennbar. Seit Schema 5. */
     val openedDays: Int? = null,
 )
+
+/**
+ * Abteilung der Einkaufsliste (z. B. "Obst & Gemüse"); gemeinsam im Haushalt, [position] ist die Standardreihenfolge.
+ * Die Standard-Abteilungen haben feste IDs (siehe DepartmentDefaults), damit zwei Handys beim gleichzeitigen
+ * Anlegen keine Dubletten erzeugen. Seit Schema 8.
+ */
+@Entity(tableName = "departments")
+data class DepartmentEntity(
+    @PrimaryKey val id: String = newId(),
+    val name: String,
+    val position: Int,
+)
+
+/**
+ * Gemerkte Zuordnung "Artikel → Abteilung" (gemeinsam im Haushalt). [key] ist "product:<productId>" oder
+ * "name:<normalisierter Name>" (siehe DepartmentResolver); ohne Fremdschlüssel (Abteilung kann gelöscht sein –
+ * dann gilt der Standard). Seit Schema 8.
+ */
+@Entity(tableName = "department_assignments")
+data class DepartmentAssignmentEntity(
+    @PrimaryKey val key: String,
+    val departmentId: String,
+    val updatedAt: Long,
+)
+
+/** Geplante Mahlzeit im Wochenplan (gemeinsam im Haushalt). [recipeId] kann ein eingebautes ("builtin:…") Rezept sein. Seit Schema 8. */
+@Entity(
+    tableName = "meal_plan",
+    indices = [Index(value = ["date"])],
+)
+data class MealPlanEntity(
+    @PrimaryKey val id: String = newId(),
+    val date: LocalDate,
+    val recipeId: String,
+    val persons: Int,
+    val createdAt: Long,
+)
+
+/**
+ * "Immer zuhause": Zutat, die nicht im Bestand geführt wird, aber immer da ist (gemeinsam im Haushalt).
+ * [key] ist der normalisierte Name oder "group:<id>" (siehe MealPlanShopping). Seit Schema 8.
+ */
+@Entity(tableName = "staples")
+data class StapleEntity(
+    @PrimaryKey val key: String,
+    val label: String,
+    val createdAt: Long,
+)

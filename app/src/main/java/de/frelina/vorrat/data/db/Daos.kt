@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface LocationDao {
@@ -355,5 +356,122 @@ interface RecipeDao {
     suspend fun getIds(): List<String>
 
     @Query("DELETE FROM recipes")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface DepartmentDao {
+    @Query("SELECT * FROM departments ORDER BY position, name COLLATE NOCASE, id")
+    fun observeAll(): Flow<List<DepartmentEntity>>
+
+    @Query("SELECT * FROM departments ORDER BY position, name COLLATE NOCASE, id")
+    suspend fun getAll(): List<DepartmentEntity>
+
+    @Query("SELECT * FROM departments WHERE id = :id")
+    suspend fun getById(id: String): DepartmentEntity?
+
+    @Query("SELECT COUNT(*) FROM departments")
+    suspend fun count(): Int
+
+    @Upsert
+    suspend fun upsert(department: DepartmentEntity)
+
+    @Upsert
+    suspend fun upsertAll(departments: List<DepartmentEntity>)
+
+    @Insert
+    suspend fun insertAll(departments: List<DepartmentEntity>)
+
+    @Query("DELETE FROM departments WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT id FROM departments")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM departments")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface DepartmentAssignmentDao {
+    @Query("SELECT * FROM department_assignments")
+    fun observeAll(): Flow<List<DepartmentAssignmentEntity>>
+
+    @Query("SELECT * FROM department_assignments ORDER BY `key`")
+    suspend fun getAll(): List<DepartmentAssignmentEntity>
+
+    @Query("SELECT * FROM department_assignments WHERE `key` = :key")
+    suspend fun getByKey(key: String): DepartmentAssignmentEntity?
+
+    @Query("SELECT * FROM department_assignments WHERE departmentId = :departmentId")
+    suspend fun getForDepartment(departmentId: String): List<DepartmentAssignmentEntity>
+
+    @Upsert
+    suspend fun upsert(assignment: DepartmentAssignmentEntity)
+
+    @Insert
+    suspend fun insertAll(assignments: List<DepartmentAssignmentEntity>)
+
+    @Query("DELETE FROM department_assignments WHERE `key` = :key")
+    suspend fun deleteByKey(key: String)
+
+    @Query("SELECT `key` FROM department_assignments")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM department_assignments")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface MealPlanDao {
+    @Query("SELECT * FROM meal_plan WHERE date BETWEEN :from AND :to ORDER BY date, createdAt, id")
+    fun observeBetween(from: LocalDate, to: LocalDate): Flow<List<MealPlanEntity>>
+
+    @Query("SELECT * FROM meal_plan WHERE date BETWEEN :from AND :to ORDER BY date, createdAt, id")
+    suspend fun getBetween(from: LocalDate, to: LocalDate): List<MealPlanEntity>
+
+    @Query("SELECT * FROM meal_plan ORDER BY date, createdAt, id")
+    suspend fun getAll(): List<MealPlanEntity>
+
+    @Query("SELECT * FROM meal_plan WHERE id = :id")
+    suspend fun getById(id: String): MealPlanEntity?
+
+    @Upsert
+    suspend fun upsert(entry: MealPlanEntity)
+
+    @Insert
+    suspend fun insertAll(entries: List<MealPlanEntity>)
+
+    @Query("DELETE FROM meal_plan WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("SELECT id FROM meal_plan")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM meal_plan")
+    suspend fun deleteAll()
+}
+
+@Dao
+interface StapleDao {
+    @Query("SELECT * FROM staples ORDER BY label COLLATE NOCASE, `key`")
+    fun observeAll(): Flow<List<StapleEntity>>
+
+    @Query("SELECT * FROM staples ORDER BY label COLLATE NOCASE, `key`")
+    suspend fun getAll(): List<StapleEntity>
+
+    @Upsert
+    suspend fun upsert(staple: StapleEntity)
+
+    @Insert
+    suspend fun insertAll(staples: List<StapleEntity>)
+
+    @Query("DELETE FROM staples WHERE `key` = :key")
+    suspend fun deleteByKey(key: String)
+
+    @Query("SELECT `key` FROM staples")
+    suspend fun getIds(): List<String>
+
+    @Query("DELETE FROM staples")
     suspend fun deleteAll()
 }

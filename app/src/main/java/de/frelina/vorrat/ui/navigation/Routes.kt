@@ -18,8 +18,15 @@ import kotlinx.serialization.Serializable
 
 // Rezepte ("Was koche ich heute?"): Liste, Details, Editor (id = null → neues Rezept; "builtin:…" → Kopie davon)
 @Serializable data object RecipesRoute
-@Serializable data class RecipeDetailRoute(val id: String)
+@Serializable data class RecipeDetailRoute(val id: String, val persons: Int? = null)
 @Serializable data class EditRecipeRoute(val id: String? = null)
+
+// Einkaufsliste nach Abteilungen: Abteilungen verwalten
+@Serializable data object DepartmentsRoute
+
+// Wochenplan und Prüfseite "Zutaten auf die Einkaufsliste" (from/to als ISO-Datum, beide inklusive)
+@Serializable data object MealPlanRoute
+@Serializable data class PlanShoppingRoute(val from: String, val to: String)
 
 /**
  * Erfassen:

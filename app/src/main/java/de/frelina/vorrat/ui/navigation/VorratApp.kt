@@ -42,6 +42,8 @@ import androidx.navigation.compose.rememberNavController
 import de.frelina.vorrat.R
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.locations.LocationsScreen
+import de.frelina.vorrat.ui.mealplan.MealPlanScreen
+import de.frelina.vorrat.ui.mealplan.PlanShoppingScreen
 import de.frelina.vorrat.ui.product.StockFormScreen
 import de.frelina.vorrat.ui.recipes.EditRecipeScreen
 import de.frelina.vorrat.ui.recipes.RecipeDetailScreen
@@ -51,6 +53,7 @@ import de.frelina.vorrat.ui.search.SearchScreen
 import de.frelina.vorrat.ui.settings.AboutScreen
 import de.frelina.vorrat.ui.settings.CatalogScreen
 import de.frelina.vorrat.ui.settings.SettingsScreen
+import de.frelina.vorrat.ui.shopping.DepartmentsScreen
 import de.frelina.vorrat.ui.shopping.ShoppingScreen
 import de.frelina.vorrat.ui.stock.EntryDetailScreen
 import de.frelina.vorrat.ui.stock.StockScreen
@@ -101,12 +104,17 @@ fun VorratRoot(
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
     // Screens mit FAB bzw. unterer Bedienleiste: Snackbar darüber anzeigen, damit sie nichts verdeckt.
-    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class, RecipesRoute::class)
+    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class, RecipesRoute::class,
+        DepartmentsRoute::class, MealPlanRoute::class, PlanShoppingRoute::class)
         .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
 
     LaunchedEffect(Unit) {
         messages.messages.collect { msg ->
-            val text = resources.getString(msg.text, *msg.args.toTypedArray())
+            val text = if (msg.pluralCount != null) {
+                resources.getQuantityString(msg.text, msg.pluralCount, msg.pluralCount, *msg.args.toTypedArray())
+            } else {
+                resources.getString(msg.text, *msg.args.toTypedArray())
+            }
             val result = snackbar.showSnackbar(
                 message = text,
                 actionLabel = msg.actionLabel?.let(resources::getString),
@@ -206,6 +214,8 @@ fun VorratRoot(
                     onBought = { productId, itemId ->
                         navController.navigate(AddStockRoute(productId = productId, shoppingItemId = itemId))
                     },
+                    onOpenDepartments = { navController.navigate(DepartmentsRoute) },
+                    onOpenMealPlan = { navController.navigate(MealPlanRoute) },
                 )
             }
             composable<LocationsRoute> { LocationsScreen(onBack = { navController.popBackStack() }) }
@@ -217,6 +227,8 @@ fun VorratRoot(
                     onOpenAbout = { navController.navigate(AboutRoute) },
                     onOpenHistory = { navController.navigate(HistoryRoute) },
                     onOpenRecipes = { navController.navigate(RecipesRoute) },
+                    onOpenMealPlan = { navController.navigate(MealPlanRoute) },
+                    onOpenDepartments = { navController.navigate(DepartmentsRoute) },
                 )
             }
             composable<EntryDetailRoute> {
@@ -242,6 +254,7 @@ fun VorratRoot(
                     onBack = { navController.popBackStack() },
                     onOpenRecipe = { navController.navigate(RecipeDetailRoute(it)) },
                     onAddRecipe = { navController.navigate(EditRecipeRoute()) },
+                    onOpenMealPlan = { navController.navigate(MealPlanRoute) },
                 )
             }
             composable<RecipeDetailRoute> {
@@ -251,6 +264,15 @@ fun VorratRoot(
                     onCopy = { navController.navigate(EditRecipeRoute(it)) },
                 )
             }
+            composable<DepartmentsRoute> { DepartmentsScreen(onBack = { navController.popBackStack() }) }
+            composable<MealPlanRoute> {
+                MealPlanScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenRecipe = { id, persons -> navController.navigate(RecipeDetailRoute(id, persons)) },
+                    onOpenShopping = { from, to -> navController.navigate(PlanShoppingRoute(from.toString(), to.toString())) },
+                )
+            }
+            composable<PlanShoppingRoute> { PlanShoppingScreen(onBack = { navController.popBackStack() }) }
             composable<EditRecipeRoute> { EditRecipeScreen(onDone = { navController.popBackStack() }) }
             composable<HistoryRoute> {
                 de.frelina.vorrat.ui.history.HistoryScreen(onBack = { navController.popBackStack() })

@@ -56,6 +56,11 @@ class SettingsRepository @Inject constructor(
 
     suspend fun currentHousehold(): HouseholdSettings = householdSettings.first()
 
+    /** Einkaufsliste nach Abteilungen gruppieren (pro Gerät, Standard: an). */
+    val groupShoppingByDepartment: Flow<Boolean> = dataStore.data.map { p -> p[SHOPPING_BY_DEPARTMENT] ?: true }
+
+    suspend fun setGroupShoppingByDepartment(enabled: Boolean) = dataStore.edit { it[SHOPPING_BY_DEPARTMENT] = enabled }
+
     suspend fun setMyName(name: String) = dataStore.edit { it[MY_NAME] = name.trim().take(40) }
 
     suspend fun setNotifyWhenEmpty(enabled: Boolean) = dataStore.edit { it[NOTIFY_EMPTY] = enabled }
@@ -92,5 +97,6 @@ class SettingsRepository @Inject constructor(
         val NOTIFY_EMPTY = booleanPreferencesKey("household_notify_empty")
         val RECEIVE_NOTICES = booleanPreferencesKey("household_receive_notices")
         val NOTICES_SEEN_UNTIL = longPreferencesKey("household_notices_seen_until")
+        val SHOPPING_BY_DEPARTMENT = booleanPreferencesKey("shopping_by_department")
     }
 }

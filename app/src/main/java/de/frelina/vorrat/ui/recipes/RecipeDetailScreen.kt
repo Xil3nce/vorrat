@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -30,6 +31,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -52,11 +55,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
 import de.frelina.vorrat.domain.AmountScaler
+import de.frelina.vorrat.domain.PlanWeek
 import de.frelina.vorrat.domain.HaveIngredient
 import de.frelina.vorrat.domain.RecipeIngredient
 import de.frelina.vorrat.domain.RecipeMatch
 import de.frelina.vorrat.domain.Validation
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,8 +77,9 @@ fun RecipeDetailScreen(
     val match = state.match
     var cookDialog by remember { mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
+    var planDialog by remember { mutableStateOf(false) }
     // Gewählte Personenzahl (null = wie im Rezept); bleibt beim Drehen erhalten
-    var chosenPersons by rememberSaveable(match?.recipe?.id) { mutableStateOf<Int?>(null) }
+    var chosenPersons by rememberSaveable(match?.recipe?.id) { mutableStateOf(viewModel.initialPersons) }
 
     Scaffold(
         topBar = {
@@ -148,6 +155,10 @@ fun RecipeDetailScreen(
                         Text(stringResource(R.string.recipe_cooked), modifier = Modifier.padding(start = 8.dp))
                     }
                 }
+                OutlinedButton(onClick = { planDialog = true }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Outlined.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text(stringResource(R.string.mealplan_to_plan), modifier = Modifier.padding(start = 8.dp))
+                }
                 if (match.recipe.steps.isNotEmpty()) {
                     HorizontalDivider()
                     SectionTitle(R.string.recipe_steps)
@@ -176,6 +187,17 @@ fun RecipeDetailScreen(
             onConfirm = { amounts ->
                 cookDialog = false
                 viewModel.cooked(amounts)
+            },
+        )
+    }
+    if (planDialog && match != null) {
+        AddToPlanDialog(
+            today = state.today,
+            initialPersons = chosenPersons ?: match.recipe.servings ?: 2,
+            onDismiss = { planDialog = false },
+            onConfirm = { date, persons ->
+                planDialog = false
+                viewModel.addToPlan(date, persons)
             },
         )
     }
@@ -342,6 +364,58 @@ private fun CookedDialog(
             TextButton(onClick = { onConfirm(selected.toMap()) }, enabled = selected.isNotEmpty()) {
                 Text(stringResource(R.string.recipe_cooked_confirm))
             }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
+}
+
+/** Tag (heute und die nächsten 13 Tage) und Personenzahl wählen. */
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun AddToPlanDialog(
+    today: LocalDate,
+    initialPersons: Int,
+    onDismiss: () -> Unit,
+    onConfirm: (LocalDate, Int) -> Unit,
+) {
+    var date by rememberSaveable { mutableStateOf(today.toString()) }
+    var persons by rememberSaveable { mutableIntStateOf(initialPersons.coerceIn(1, MAX_PERSONS)) }
+    val format = DateTimeFormatter.ofPattern("EEE d.M.", Locale.GERMANY)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.mealplan_add_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(R.string.mealplan_day_label), style = MaterialTheme.typography.titleSmall)
+                androidx.compose.foundation.layout.FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    PlanWeek.offerDays(today).forEach { day ->
+                        FilterChip(
+                            selected = date == day.toString(),
+                            onClick = { date = day.toString() },
+                            label = { Text(if (day == today) stringResource(R.string.mealplan_today) else day.format(format)) },
+                        )
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        pluralStringResource(R.plurals.recipe_for_persons, persons, persons),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(onClick = { persons-- }, enabled = persons > 1) {
+                        Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.recipe_persons_less))
+                    }
+                    Text(persons.toString(), style = MaterialTheme.typography.titleLarge)
+                    IconButton(onClick = { persons++ }, enabled = persons < MAX_PERSONS) {
+                        Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.recipe_persons_more))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(LocalDate.parse(date), persons) }) { Text(stringResource(R.string.mealplan_add_confirm)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )

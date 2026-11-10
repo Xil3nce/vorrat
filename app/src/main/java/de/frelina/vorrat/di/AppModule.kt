@@ -81,6 +81,11 @@ object AppModule {
     @Provides fun shoppingDao(db: VorratDatabase): ShoppingDao = db.shoppingDao()
     @Provides fun historyDao(db: VorratDatabase): HistoryDao = db.historyDao()
     @Provides fun recipeDao(db: VorratDatabase): de.frelina.vorrat.data.db.RecipeDao = db.recipeDao()
+    @Provides fun departmentDao(db: VorratDatabase): de.frelina.vorrat.data.db.DepartmentDao = db.departmentDao()
+    @Provides fun departmentAssignmentDao(db: VorratDatabase): de.frelina.vorrat.data.db.DepartmentAssignmentDao =
+        db.departmentAssignmentDao()
+    @Provides fun mealPlanDao(db: VorratDatabase): de.frelina.vorrat.data.db.MealPlanDao = db.mealPlanDao()
+    @Provides fun stapleDao(db: VorratDatabase): de.frelina.vorrat.data.db.StapleDao = db.stapleDao()
 
     @Provides
     @Singleton

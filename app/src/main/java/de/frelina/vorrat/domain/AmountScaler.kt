@@ -106,7 +106,7 @@ object AmountScaler {
     }
 
     /** Passt Singular/Plural der Einheit an ("1 Zehe" → "2 Zehen", "2 Dosen" → "1 Dose"). */
-    private fun adjustUnit(rest: String, many: Boolean): String {
+    internal fun adjustUnit(rest: String, many: Boolean): String {
         val words = rest.split(' ')
         val index = words.indexOfFirst { it.isNotEmpty() }
         if (index < 0) return rest

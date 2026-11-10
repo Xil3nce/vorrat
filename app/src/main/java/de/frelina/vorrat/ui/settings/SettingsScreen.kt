@@ -22,6 +22,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Category
@@ -94,6 +96,8 @@ fun SettingsScreen(
     onOpenAbout: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenRecipes: () -> Unit,
+    onOpenMealPlan: () -> Unit,
+    onOpenDepartments: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     updates: UpdateViewModel = hiltViewModel(),
 ) {
@@ -221,6 +225,8 @@ fun SettingsScreen(
 
             // ---------------- Rezepte
             NavItem(Icons.Outlined.Restaurant, R.string.recipes_title, R.string.settings_recipes_summary, onOpenRecipes)
+            NavItem(Icons.Outlined.CalendarMonth, R.string.mealplan_title, R.string.settings_mealplan_summary, onOpenMealPlan)
+            NavItem(Icons.AutoMirrored.Outlined.ViewList, R.string.departments_title, R.string.settings_departments_summary, onOpenDepartments)
             HorizontalDivider()
 
             // ---------------- Stammdaten

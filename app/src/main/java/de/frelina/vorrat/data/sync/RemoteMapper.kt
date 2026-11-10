@@ -1,14 +1,18 @@
 package de.frelina.vorrat.data.sync
 
+import de.frelina.vorrat.data.db.DepartmentAssignmentEntity
+import de.frelina.vorrat.data.db.DepartmentEntity
 import de.frelina.vorrat.data.db.HistoryAction
 import de.frelina.vorrat.data.db.HistoryEventEntity
 import de.frelina.vorrat.data.db.LocationEntity
+import de.frelina.vorrat.data.db.MealPlanEntity
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.domain.OpenedLogic
 import de.frelina.vorrat.data.db.QuantityTypeEntity
 import de.frelina.vorrat.data.db.RecipeEntity
+import de.frelina.vorrat.data.db.StapleEntity
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.db.UnitEntity
 import java.time.LocalDate
@@ -94,6 +98,28 @@ object RemoteMapper {
         "vegetarian" to r.vegetarian,
         "createdAt" to r.createdAt,
         "updatedAt" to r.updatedAt,
+    )
+
+    fun toMap(d: DepartmentEntity): Map<String, Any?> = mapOf(
+        "name" to d.name,
+        "position" to d.position.toLong(),
+    )
+
+    fun toMap(a: DepartmentAssignmentEntity): Map<String, Any?> = mapOf(
+        "departmentId" to a.departmentId,
+        "updatedAt" to a.updatedAt,
+    )
+
+    fun toMap(e: MealPlanEntity): Map<String, Any?> = mapOf(
+        "date" to e.date.toString(),
+        "recipeId" to e.recipeId,
+        "persons" to e.persons.toLong(),
+        "createdAt" to e.createdAt,
+    )
+
+    fun toMap(s: StapleEntity): Map<String, Any?> = mapOf(
+        "label" to s.label,
+        "createdAt" to s.createdAt,
     )
 
     fun location(id: String, m: Map<String, Any?>): LocationEntity? {
@@ -213,6 +239,52 @@ object RemoteMapper {
             updatedAt = m.long("updatedAt") ?: 0,
         )
     }
+
+    fun department(id: String, m: Map<String, Any?>): DepartmentEntity? {
+        val name = m.str("name")?.trim()?.take(MAX_DEPARTMENT_NAME)?.takeIf(String::isNotBlank) ?: return null
+        return DepartmentEntity(id = id, name = name, position = m.long("position")?.toInt() ?: Int.MAX_VALUE)
+    }
+
+    /** Die ID ist der Zuordnungsschlüssel ("product:…" oder "name:…"); andere Schlüssel werden ignoriert. */
+    fun departmentAssignment(key: String, m: Map<String, Any?>): DepartmentAssignmentEntity? {
+        if (!isValidAssignmentKey(key)) return null
+        val departmentId = m.str("departmentId")?.takeIf(String::isNotBlank) ?: return null
+        return DepartmentAssignmentEntity(key = key, departmentId = departmentId, updatedAt = m.long("updatedAt") ?: 0)
+    }
+
+    fun mealPlan(id: String, m: Map<String, Any?>): MealPlanEntity? {
+        val date = m.str("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return null
+        val recipeId = m.str("recipeId")?.takeIf { it.isNotBlank() && it.length <= MAX_ID_LENGTH } ?: return null
+        return MealPlanEntity(
+            id = id,
+            date = date,
+            recipeId = recipeId,
+            persons = m.long("persons")?.toInt()?.takeIf { it in 1..MAX_PLAN_PERSONS } ?: 1,
+            createdAt = m.long("createdAt") ?: 0,
+        )
+    }
+
+    /** Die ID ist der Schlüssel der "Immer zuhause"-Zutat (normalisierter Name oder "group:<id>"). */
+    fun staple(key: String, m: Map<String, Any?>): StapleEntity? {
+        if (!isValidStapleKey(key)) return null
+        val label = m.str("label")?.trim()?.take(MAX_STAPLE_LABEL)?.takeIf(String::isNotBlank) ?: return null
+        return StapleEntity(key = key, label = label, createdAt = m.long("createdAt") ?: 0)
+    }
+
+    /** Obergrenzen für Abteilungen, Wochenplan und "Immer zuhause". */
+    const val MAX_DEPARTMENT_NAME = 40
+    const val MAX_PLAN_PERSONS = 99
+    const val MAX_STAPLE_LABEL = 60
+    const val MAX_PLAN_NOTE = 300
+    private const val MAX_ID_LENGTH = 200
+    private const val MAX_KEY_LENGTH = 160
+
+    /** Dokument-IDs dürfen kein "/" enthalten; Schlüssel haben ein festes Präfix. */
+    fun isValidAssignmentKey(key: String): Boolean =
+        key.length in 6..MAX_KEY_LENGTH && '/' !in key && (key.startsWith("product:") || key.startsWith("name:"))
+
+    fun isValidStapleKey(key: String): Boolean =
+        key.isNotBlank() && key.length <= MAX_KEY_LENGTH && '/' !in key && key.trim() == key
 
     /** Obergrenzen für Rezepte (Firestore-Dokument ≤ 1 MiB, Anzeige bleibt handhabbar). */
     const val MAX_TITLE = 100

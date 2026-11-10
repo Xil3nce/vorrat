@@ -13,17 +13,27 @@ enum class RemoteCollection(val path: String) {
     SHOPPING("shopping"),
     RECIPES("recipes"),
     HISTORY("history"),
+    DEPARTMENTS("departments"),
+    DEPARTMENT_ASSIGNMENTS("departmentAssignments"),
+    MEAL_PLAN("mealPlan"),
+    STAPLES("staples"),
     ;
 
     companion object {
         /** Datensammlungen, die in Room gespiegelt werden – in Abhängigkeitsreihenfolge (Eltern zuerst). */
-        val DATA = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES, SHOPPING, RECIPES, HISTORY)
+        val DATA = listOf(
+            UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES, SHOPPING, RECIPES,
+            DEPARTMENTS, DEPARTMENT_ASSIGNMENTS, MEAL_PLAN, STAPLES, HISTORY,
+        )
 
         /**
          * Sammlungen, die beim Anlegen eines Haushalts bzw. beim Backup-Import komplett übertragen werden.
          * Der Verlauf gehört nicht dazu (er steht nicht im Backup und bleibt beim Import erhalten).
          */
-        val BULK = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES, SHOPPING, RECIPES)
+        val BULK = listOf(
+            UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES, SHOPPING, RECIPES,
+            DEPARTMENTS, DEPARTMENT_ASSIGNMENTS, MEAL_PLAN, STAPLES,
+        )
 
         /** Für den Bestand nötige Sammlungen (Erinnerungen warten nur auf diese). */
         val STOCK = listOf(UNITS, QUANTITY_TYPES, LOCATIONS, PRODUCTS, ENTRIES)
