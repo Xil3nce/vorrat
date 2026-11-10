@@ -39,16 +39,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
+import de.frelina.vorrat.domain.AmountScaler
 import de.frelina.vorrat.domain.HaveIngredient
 import de.frelina.vorrat.domain.RecipeIngredient
 import de.frelina.vorrat.domain.RecipeMatch
@@ -68,6 +71,8 @@ fun RecipeDetailScreen(
     val match = state.match
     var cookDialog by remember { mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
+    // Gewählte Personenzahl (null = wie im Rezept); bleibt beim Drehen erhalten
+    var chosenPersons by rememberSaveable(match?.recipe?.id) { mutableStateOf<Int?>(null) }
 
     Scaffold(
         topBar = {
@@ -113,8 +118,18 @@ fun RecipeDetailScreen(
                 if (meta.isNotEmpty()) {
                     Text(meta, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
+                val base = match.recipe.servings
+                val persons = chosenPersons ?: base
+                val factor = AmountScaler.factor(base, persons ?: 0)
+                if (base != null && persons != null) {
+                    PersonsStepper(
+                        persons = persons,
+                        base = base,
+                        onChange = { chosenPersons = it.takeIf { n -> n != base } },
+                    )
+                }
                 SectionTitle(R.string.recipe_ingredients)
-                IngredientList(match, state.today)
+                IngredientList(match, state.today, factor)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
                         onClick = viewModel::addMissingToShopping,
@@ -136,6 +151,13 @@ fun RecipeDetailScreen(
                 if (match.recipe.steps.isNotEmpty()) {
                     HorizontalDivider()
                     SectionTitle(R.string.recipe_steps)
+                    if (base != null && persons != null && persons != base) {
+                        Text(
+                            pluralStringResource(R.plurals.recipe_steps_for_persons, base, base),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     match.recipe.steps.forEachIndexed { i, step ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text("${i + 1}.", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
@@ -181,19 +203,51 @@ private fun SectionTitle(text: Int) {
 }
 
 @Composable
-private fun IngredientList(match: RecipeMatch, today: LocalDate) {
+private fun PersonsStepper(persons: Int, base: Int, onChange: (Int) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(
+            pluralStringResource(R.plurals.recipe_for_persons, persons, persons),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = { onChange(persons - 1) }, enabled = persons > 1) {
+            Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.recipe_persons_less))
+        }
+        Text(persons.toString(), style = MaterialTheme.typography.titleLarge)
+        IconButton(onClick = { onChange(persons + 1) }, enabled = persons < MAX_PERSONS) {
+            Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.recipe_persons_more))
+        }
+    }
+    if (persons != base) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                pluralStringResource(R.plurals.recipe_original_persons, base, base),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            TextButton(onClick = { onChange(base) }) { Text(stringResource(R.string.recipe_persons_reset)) }
+        }
+    }
+}
+
+/** Obergrenze für die Personenzahl beim Umrechnen. */
+private const val MAX_PERSONS = 20
+
+@Composable
+private fun IngredientList(match: RecipeMatch, today: LocalDate, factor: Double) {
     val haveBy = match.have.associateBy { it.ingredient }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         match.recipe.ingredients.forEach { ingredient ->
             val have = haveBy[ingredient]
             val missing = ingredient in match.missing
-            IngredientRow(ingredient, have, missing, today)
+            IngredientRow(ingredient, have, missing, today, factor)
         }
     }
 }
 
 @Composable
-private fun IngredientRow(ingredient: RecipeIngredient, have: HaveIngredient?, missing: Boolean, today: LocalDate) {
+private fun IngredientRow(ingredient: RecipeIngredient, have: HaveIngredient?, missing: Boolean, today: LocalDate, factor: Double) {
     val colors = MaterialTheme.colorScheme
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
         when {
@@ -213,7 +267,7 @@ private fun IngredientRow(ingredient: RecipeIngredient, have: HaveIngredient?, m
         }
         Column(Modifier.weight(1f)) {
             val optional = if (ingredient.optional) " (" + stringResource(R.string.optional) + ")" else ""
-            val amount = ingredient.amount?.takeIf(String::isNotBlank)?.let { "$it " }.orEmpty()
+            val amount = AmountScaler.scale(ingredient.amount, factor)?.takeIf(String::isNotBlank)?.let { "$it " }.orEmpty()
             Text(amount + ingredient.name + optional, style = MaterialTheme.typography.bodyLarge)
             if (have != null) {
                 val date = have.expiry?.let { Validation.formatDate(it) }

@@ -40,7 +40,7 @@ data class EditRecipeState(
     val editingExisting: Boolean = false,
     val title: String = "",
     val minutes: String = "",
-    val servings: String = "",
+    val servings: String = "2",
     val vegetarian: Boolean = false,
     val rows: List<IngredientRowState> = emptyList(),
     val steps: String = "",

@@ -515,9 +515,24 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     </plurals>
     <string name="recipe_minutes" tools:ignore="PluralsCandidate">%d Min.</string>
     <plurals name="recipe_servings">
-        <item quantity="one">%d Portion</item>
-        <item quantity="other">%d Portionen</item>
+        <item quantity="one">für %d Person</item>
+        <item quantity="other">für %d Personen</item>
     </plurals>
+    <plurals name="recipe_for_persons">
+        <item quantity="one">Für %d Person</item>
+        <item quantity="other">Für %d Personen</item>
+    </plurals>
+    <plurals name="recipe_original_persons">
+        <item quantity="one">Mengen umgerechnet, Rezept ist für %d Person</item>
+        <item quantity="other">Mengen umgerechnet, Rezept ist für %d Personen</item>
+    </plurals>
+    <plurals name="recipe_steps_for_persons">
+        <item quantity="one">Mengen in der Zubereitung gelten für %d Person.</item>
+        <item quantity="other">Mengen in der Zubereitung gelten für %d Personen.</item>
+    </plurals>
+    <string name="recipe_persons_less">Weniger Personen</string>
+    <string name="recipe_persons_more">Mehr Personen</string>
+    <string name="recipe_persons_reset">Zurücksetzen</string>
     <string name="recipe_vegetarian">vegetarisch</string>
     <string name="recipe_own">eigenes Rezept</string>
     <string name="recipe_not_found">Dieses Rezept gibt es nicht mehr.</string>
@@ -543,7 +558,7 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="recipe_edit_title">Rezept bearbeiten</string>
     <string name="recipe_field_title">Titel</string>
     <string name="recipe_field_minutes">Minuten (optional)</string>
-    <string name="recipe_field_servings">Portionen (optional)</string>
+    <string name="recipe_field_servings">Für wie viele Personen?</string>
     <string name="recipe_field_vegetarian">Vegetarisch</string>
     <string name="recipe_field_ingredient">Zutat</string>
     <string name="recipe_field_amount">Menge</string>
