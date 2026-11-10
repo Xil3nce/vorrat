@@ -15,6 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -33,6 +36,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -54,6 +61,13 @@ fun EditRecipeScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.saved) { if (state.saved) onDone() }
+    var importDialog by rememberSaveable { mutableStateOf(false) }
+    if (importDialog) {
+        ChefkochImportDialog(
+            onDismiss = { importDialog = false },
+            onImport = { importDialog = false; viewModel.importFrom(it) },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -82,6 +96,16 @@ fun EditRecipeScreen(
             Modifier.padding(padding).fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (!state.editingExisting) {
+                OutlinedButton(onClick = { importDialog = true }, enabled = !state.importing) {
+                    Icon(Icons.Outlined.Download, contentDescription = null)
+                    Text(stringResource(R.string.recipe_import_action), modifier = Modifier.padding(start = 8.dp))
+                }
+                if (state.importing) {
+                    Text(stringResource(R.string.recipe_import_loading), style = MaterialTheme.typography.bodyMedium)
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                }
+            }
             OutlinedTextField(
                 value = state.title,
                 onValueChange = viewModel::setTitle,
@@ -173,4 +197,33 @@ fun EditRecipeScreen(
             )
         }
     }
+}
+
+/** Dialog zum Einfügen eines Chefkoch-Links. */
+@Composable
+private fun ChefkochImportDialog(onDismiss: () -> Unit, onImport: (String) -> Unit) {
+    var link by rememberSaveable { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.recipe_import_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.recipe_import_text))
+                OutlinedTextField(
+                    value = link,
+                    onValueChange = { link = it.take(2000) },
+                    label = { Text(stringResource(R.string.recipe_import_link)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onImport(link) }, enabled = link.isNotBlank()) {
+                Text(stringResource(R.string.recipe_import_confirm))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }

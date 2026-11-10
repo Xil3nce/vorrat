@@ -16,10 +16,11 @@ import kotlinx.serialization.Serializable
 @Serializable data class EntryDetailRoute(val entryId: String)
 @Serializable data object HistoryRoute
 
-// Rezepte ("Was koche ich heute?"): Liste, Details, Editor (id = null → neues Rezept; "builtin:…" → Kopie davon)
+// Rezepte ("Was koche ich heute?"): Liste, Details, Editor (id = null → neues Rezept; "builtin:…" → Kopie davon;
+// importText = geteilter Text/Link → Rezept von Chefkoch laden und vorbelegen)
 @Serializable data object RecipesRoute
 @Serializable data class RecipeDetailRoute(val id: String, val persons: Int? = null)
-@Serializable data class EditRecipeRoute(val id: String? = null)
+@Serializable data class EditRecipeRoute(val id: String? = null, val importText: String? = null)
 
 // Einkaufsliste nach Abteilungen: Abteilungen verwalten
 @Serializable data object DepartmentsRoute

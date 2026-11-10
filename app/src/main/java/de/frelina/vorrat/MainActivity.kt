@@ -33,6 +33,9 @@ class MainActivity : ComponentActivity() {
     /** NFC-Chip (vorrat://entry/…) gescannt, während die App nicht im Lese-Dialog war. */
     private val nfcTags = Channel<de.frelina.vorrat.nfc.NfcTagRead>(Channel.CONFLATED)
 
+    /** Per "Teilen" empfangener Text (z. B. Chefkoch-Link) → Rezept-Import. */
+    private val sharedRecipes = Channel<String>(Channel.CONFLATED)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class MainActivity : ComponentActivity() {
                         openSoonFilter = openSoonFilter.receiveAsFlow(),
                         openHistory = openHistory.receiveAsFlow(),
                         nfcTags = nfcTags.receiveAsFlow(),
+                        sharedRecipes = sharedRecipes.receiveAsFlow(),
                     )
                 }
             }
@@ -72,6 +76,10 @@ class MainActivity : ComponentActivity() {
             }
         }
         de.frelina.vorrat.nfc.NfcTags.fromIntent(intent)?.let { nfcTags.trySend(it) }
+        if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
+            intent.getStringExtra(Intent.EXTRA_TEXT)?.takeIf { it.isNotBlank() }?.let { sharedRecipes.trySend(it.take(2000)) }
+            intent.removeExtra(Intent.EXTRA_TEXT)
+        }
     }
 
     companion object {

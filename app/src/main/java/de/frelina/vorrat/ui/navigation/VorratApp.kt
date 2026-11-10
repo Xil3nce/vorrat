@@ -83,6 +83,7 @@ fun VorratRoot(
     openSoonFilter: Flow<Unit>,
     openHistory: Flow<Unit>,
     nfcTags: Flow<de.frelina.vorrat.nfc.NfcTagRead>,
+    sharedRecipes: Flow<String>,
     updates: UpdateViewModel = hiltViewModel(),
     nfc: NfcViewModel = hiltViewModel(),
 ) {
@@ -138,6 +139,15 @@ fun VorratRoot(
         openHistory.collect { navController.navigate(HistoryRoute) { launchSingleTop = true } }
     }
     LaunchedEffect(Unit) { nfcTags.collect { onChip(it) } }
+    LaunchedEffect(Unit) {
+        sharedRecipes.collect { text ->
+            if (de.frelina.vorrat.domain.ChefkochLink.recipeId(text) != null) {
+                navController.navigate(EditRecipeRoute(importText = text))
+            } else {
+                messages.show(de.frelina.vorrat.ui.components.UiMessage(de.frelina.vorrat.R.string.recipe_import_invalid_link))
+            }
+        }
+    }
     if (nfcReadDialog) {
         de.frelina.vorrat.nfc.NfcDialog(
             mode = de.frelina.vorrat.nfc.NfcMode.Read,

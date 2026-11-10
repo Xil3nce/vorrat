@@ -6,7 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.frelina.vorrat.R
+import de.frelina.vorrat.data.chefkoch.ChefkochResult
+import de.frelina.vorrat.data.chefkoch.ChefkochSource
 import de.frelina.vorrat.data.repo.RecipeRepository
+import de.frelina.vorrat.domain.ChefkochLink
 import de.frelina.vorrat.domain.IngredientMatcher
 import de.frelina.vorrat.domain.Recipe
 import de.frelina.vorrat.domain.RecipeIngredient
@@ -48,6 +51,8 @@ data class EditRecipeState(
     val minutesError: ValidationError? = null,
     val servingsError: ValidationError? = null,
     val saved: Boolean = false,
+    /** Rezept wird gerade von Chefkoch geladen. */
+    val importing: Boolean = false,
 )
 
 @HiltViewModel
@@ -55,16 +60,47 @@ class EditRecipeViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: RecipeRepository,
     private val messages: UiMessages,
+    private val chefkoch: ChefkochSource,
 ) : ViewModel() {
 
-    private val sourceId: String? = savedStateHandle.toRoute<EditRecipeRoute>().id
+    private val route = savedStateHandle.toRoute<EditRecipeRoute>()
+    private val sourceId: String? = route.id
     private var nextKey = 0L
 
     private val _state = MutableStateFlow(EditRecipeState())
     val state: StateFlow<EditRecipeState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch { load() }
+        viewModelScope.launch {
+            load()
+            route.importText?.let { importFrom(it) }
+        }
+    }
+
+    /**
+     * Lädt ein Rezept von Chefkoch (Link oder geteilter Text mit Link) und füllt das Formular damit.
+     * Gespeichert wird erst mit "Speichern" – vorher kann alles angepasst werden.
+     */
+    fun importFrom(text: String) {
+        val id = ChefkochLink.recipeId(text)
+        if (id == null) {
+            messages.show(UiMessage(R.string.recipe_import_invalid_link))
+            return
+        }
+        if (_state.value.importing) return
+        _state.update { it.copy(importing = true) }
+        viewModelScope.launch {
+            when (val result = chefkoch.load(id)) {
+                is ChefkochResult.Ok -> {
+                    fill(result.recipe, editingExisting = false)
+                    messages.show(UiMessage(R.string.recipe_import_done))
+                }
+                ChefkochResult.NotFound -> messages.show(UiMessage(R.string.recipe_import_not_found))
+                ChefkochResult.NoNetwork -> messages.show(UiMessage(R.string.recipe_import_no_network))
+                ChefkochResult.Failed -> messages.show(UiMessage(R.string.recipe_import_failed))
+            }
+            _state.update { it.copy(importing = false) }
+        }
     }
 
     private suspend fun load() {
@@ -73,9 +109,13 @@ class EditRecipeViewModel @Inject constructor(
             _state.value = EditRecipeState(loading = false, rows = listOf(newRow()))
             return
         }
+        fill(recipe, editingExisting = !recipe.builtin)
+    }
+
+    private fun fill(recipe: Recipe, editingExisting: Boolean) {
         _state.value = EditRecipeState(
             loading = false,
-            editingExisting = !recipe.builtin,
+            editingExisting = editingExisting,
             title = recipe.title,
             minutes = recipe.minutes?.toString().orEmpty(),
             servings = recipe.servings?.toString().orEmpty(),

@@ -53,6 +53,12 @@
                     android:host="entry"
                     android:scheme="vorrat" />
             </intent-filter>
+            <!-- Rezept aus der Chefkoch-App/dem Browser teilen → Import in den Rezept-Editor. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
         <!-- Erinnerungen nach Neustart/App-Update sicherstellen (WorkManager plant zusätzlich selbst neu). -->
