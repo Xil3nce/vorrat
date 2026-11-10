@@ -41,9 +41,9 @@ object IngredientGroups {
     val all: List<IngredientGroup> = listOf(
         g("pasta", "Nudeln",
             "nudel, nudeln, spaghetti, penne, fusilli, farfalle, tagliatelle, makkaroni, maccheroni, rigatoni, " +
-                "spirelli, tortellini, ravioli, lasagne, pasta, linguine, fettuccine, bandnudel, hörnchennudel, " +
+                "spirelli, lasagne, pasta, linguine, fettuccine, bandnudel, hörnchennudel, " +
                 "eiernudel, cannelloni, orecchiette, spiralen, gabelspaghetti, suppennudel, hartweizengrieß",
-            "pasta, spaghetti, penne, macaroni, tortellini, ravioli, fusilli, tagliatelle, lasagne, egg noodle, egg pasta"),
+            "pasta, spaghetti, penne, macaroni, fusilli, tagliatelle, lasagne, egg noodle, egg pasta"),
         g("rice", "Reis", "reis, basmati, risotto, jasmin, parboiled, milchreis, langkornreis, rundkornreis",
             "rice"),
         g("potatoes", "Kartoffeln",
@@ -128,6 +128,8 @@ object IngredientGroups {
         g("pizza_dough", "Pizzateig", "pizzateig, pizzaboden, hefeteig, flammkuchenteig, flammkuchen, pizza teig",
             "pizza dough, pizza base, pizza crust"),
         g("gnocchi", "Gnocchi", "gnocchi", "gnocchi"),
+        g("filled_pasta", "Tortellini / Ravioli", "tortellini, tortelloni, ravioli, cappelletti, agnolotti, girasoli, " +
+            "mezzelune, gefüllte pasta, gefüllte nudel", "stuffed pasta, filled pasta, tortellini, ravioli"),
         g("noodles_asian", "Asia-Nudeln", "glasnudel, reisnudel, mienudel, mie nudel, ramen, udon, soba, " +
             "instantnudel, asia nudel, wok nudel, chinesische nudel", "rice noodle, instant noodle, ramen, udon, soba, noodle"),
         g("spaetzle", "Spätzle", "spätzle, spatzle, knöpfle", "spaetzle, spatzle"),

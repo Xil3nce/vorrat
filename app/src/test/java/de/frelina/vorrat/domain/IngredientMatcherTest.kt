@@ -24,6 +24,8 @@ class IngredientMatcherTest {
     @Test fun `einfache Namen`() {
         assertEquals("pasta", m("Spaghetti"))
         assertEquals("pasta", m("Penne Rigate"))
+        assertEquals("filled_pasta", m("Frische Tortellini mit Ricotta"))
+        assertEquals("filled_pasta", m("Ravioli"))
         assertEquals("eggs", m("Eier"))
         assertEquals("milk", m("Vollmilch"))
         assertEquals("butter", m("Butter"))
@@ -42,6 +44,7 @@ class IngredientMatcherTest {
     @Test fun `Kategorie hat Vorrang vor dem Namen`() {
         assertEquals("pasta", m("Barilla Nr. 5", "en:pastas"))
         assertEquals("milk", m("Irgendwas", "en:milks"))
+        assertEquals("filled_pasta", m("Irgendwas", "en:stuffed-pastas"))
     }
 
     @Test fun `Fehltreffer werden vermieden`() {

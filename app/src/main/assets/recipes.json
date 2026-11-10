@@ -344,7 +344,7 @@
     "servings": 3,
     "ingredients": [
       {
-        "group": "pasta",
+        "group": "filled_pasta",
         "name": "Tortellini",
         "amount": "500 g",
         "optional": false
@@ -7664,6 +7664,6982 @@
       "Bei kleiner Hitze 25 Minuten quellen lassen.",
       "Bananenscheiben unterheben.",
       "Mit Zimt und Zucker abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:risotto-tomate-basilikum",
+    "title": "Tomaten-Basilikum-Risotto",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": "1 Topf",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch fein würfeln und in Olivenöl glasig dünsten.",
+      "Reis zugeben und 1 Minute mitrösten.",
+      "Dosentomaten und nach und nach die heiße Brühe zugeben, dabei oft rühren.",
+      "Nach ca. 20 Minuten ist der Reis cremig und gar.",
+      "Parmesan und gezupftes Basilikum unterrühren, mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:risotto-zitrone-erbsen",
+    "title": "Zitronen-Erbsen-Risotto",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel würfeln und in Butter und Öl glasig dünsten.",
+      "Reis zugeben, kurz anrösten und mit heißer Brühe nach und nach aufgießen.",
+      "Nach 15 Minuten die Erbsen zugeben und weitergaren, bis der Reis cremig ist.",
+      "Zitronenabrieb und Saft sowie Parmesan unterrühren.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:risotto-kuerbis",
+    "title": "Kürbisrisotto",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "750 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Salbei",
+        "amount": "4 Blätter",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kürbis in kleine Würfel schneiden, Zwiebel fein hacken.",
+      "Beides in Butter anbraten, Reis zugeben und kurz mitrösten.",
+      "Heiße Brühe schöpfkellenweise zugeben und unter Rühren ca. 20 Minuten garen.",
+      "Parmesan unterrühren und mit Salz, Pfeffer und Muskat abschmecken.",
+      "Mit Salbei bestreut servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:risotto-spinat-frischkaese",
+    "title": "Spinat-Frischkäse-Risotto",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat (TK)",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten, Reis zugeben und kurz rösten.",
+      "Mit heißer Brühe nach und nach aufgießen und 15 Minuten garen.",
+      "Aufgetauten Spinat zugeben und weitere 5 Minuten köcheln.",
+      "Frischkäse und Parmesan einrühren, bis alles cremig ist.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:risotto-haehnchen-pilze",
+    "title": "Hähnchen-Pilz-Risotto",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Hühnerbrühe",
+        "amount": "900 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen in Würfel schneiden und in Öl rundum anbraten, herausnehmen.",
+      "Pilze und Zwiebel anbraten, Reis zugeben und kurz mitrösten.",
+      "Heiße Brühe nach und nach zugießen und ca. 20 Minuten unter Rühren garen.",
+      "Hähnchen, Sahne und Parmesan unterrühren.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:risotto-schinken-erbsen",
+    "title": "Schinken-Erbsen-Risotto",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Risottoreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel in Butter glasig dünsten, Reis zugeben und kurz anrösten.",
+      "Heiße Brühe nach und nach zugeben und ca. 15 Minuten garen.",
+      "Erbsen und gewürfelten Schinken zugeben und 5 Minuten mitgaren.",
+      "Sahne und Parmesan einrühren.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:reispfanne-haehnchen-paprika",
+    "title": "Hähnchen-Reispfanne mit Paprika",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Langkornreis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Hühnerbrühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen würfeln und in Öl anbraten, herausnehmen.",
+      "Zwiebel, Knoblauch und Paprika anbraten, Paprikapulver unterrühren.",
+      "Reis zugeben, Brühe angießen und das Hähnchen zurückgeben.",
+      "Zugedeckt ca. 15 Minuten bei kleiner Hitze garen.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:curry-reispfanne-gemuese",
+    "title": "Gelbe Curry-Reispfanne mit Gemüse",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Basmatireis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "frozen_vegetables",
+        "name": "TK-Gemüsemischung",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Currypulver",
+        "amount": "2 TL",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis nach Packungsangabe kochen und abkühlen lassen.",
+      "Zwiebel in Öl anbraten, Gemüse zugeben und garen.",
+      "Reis und Currypulver zugeben und kräftig anbraten.",
+      "Reis zur Seite schieben, Eier in der Pfanne verrühren und stocken lassen.",
+      "Alles vermengen und mit Sojasoße, Salz und Pfeffer würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reisbowl-lachs-gurke",
+    "title": "Reis-Bowl mit Lachs und Gurke",
+    "minutes": 25,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "salmon",
+        "name": "Lachsfilet",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Limette",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "honey",
+        "name": "Honig",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Frühlingszwiebel",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Lachs in Öl von beiden Seiten braten, mit Sojasoße und Honig glasieren.",
+      "Gurke in Scheiben schneiden, Karotte raspeln.",
+      "Reis, Gemüse und zerteilten Lachs in Schalen anrichten.",
+      "Mit Limettensaft beträufeln."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:burrito-bowl-hack",
+    "title": "Burrito-Bowl mit Hack",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Kidneybohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "2 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Kreuzkümmel",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": "sour_cream",
+        "name": "Schmand",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis nach Packungsangabe kochen.",
+      "Zwiebel und Hack in Öl krümelig braten, mit Paprika, Kreuzkümmel, Salz und Pfeffer würzen.",
+      "Abgetropfte Bohnen und Mais zugeben und erhitzen.",
+      "Tomaten würfeln.",
+      "Reis, Hackmischung und Tomaten in Schalen anrichten, mit Käse und Schmand toppen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:burrito-bowl-bohnen-mais",
+    "title": "Vegetarische Burrito-Bowl mit Bohnen und Mais",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Schwarze Bohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Limette",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Koriander",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": "sour_cream",
+        "name": "Schmand",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Kreuzkümmel",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Bohnen und Mais abtropfen, mit Paprikapulver und Kreuzkümmel kurz erwärmen.",
+      "Paprika und Tomaten würfeln und mit Limettensaft, Salz und Pfeffer mischen.",
+      "Alles in Schalen anrichten.",
+      "Mit Schmand und Koriander servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:paella-pfanne-haehnchen-chorizo",
+    "title": "Paella-Pfanne mit Hähnchen und Chorizo",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Rundkornreis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenschenkel ohne Knochen",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Chorizo",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Hühnerbrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "2 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen würfeln und in Olivenöl anbraten, Chorizo in Scheiben zugeben.",
+      "Zwiebel, Knoblauch und Paprika mitbraten, Paprikapulver unterrühren.",
+      "Reis zugeben, mit heißer Brühe aufgießen und nicht mehr rühren.",
+      "Zugedeckt 20 Minuten garen, Erbsen in den letzten 5 Minuten zugeben.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:paella-gemuese",
+    "title": "Gemüse-Paella",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Rundkornreis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "2 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse in Stücke schneiden, Zwiebel und Knoblauch hacken.",
+      "Alles in Olivenöl anbraten und Paprikapulver unterrühren.",
+      "Reis zugeben, mit heißer Brühe aufgießen.",
+      "Bei kleiner Hitze 20 Minuten garen, ohne zu rühren, Erbsen kurz vor Schluss zugeben.",
+      "Mit Salz und Pfeffer abschmecken und 5 Minuten ruhen lassen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reissuppe-haehnchen",
+    "title": "Hähnchen-Reissuppe",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Hühnerbrühe",
+        "amount": "1,2 l",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brühe aufkochen und das Hähnchen darin 15 Minuten gar ziehen lassen.",
+      "Hähnchen herausnehmen und klein zupfen.",
+      "Karotten und Lauch klein schneiden, mit dem Reis in die Brühe geben und 15 Minuten kochen.",
+      "Hähnchen zurückgeben und erhitzen.",
+      "Mit Salz, Pfeffer und Petersilie abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:reissuppe-tomate",
+    "title": "Tomaten-Reissuppe",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "50 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten.",
+      "Passierte Tomaten und Brühe zugeben und aufkochen.",
+      "Reis einrühren und ca. 15 Minuten köcheln lassen.",
+      "Sahne einrühren.",
+      "Mit Salz, Pfeffer und Basilikum abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gefuellte-tomaten-reis-feta",
+    "title": "Gefüllte Tomaten mit Reis und Feta",
+    "minutes": 45,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "tomatoes",
+        "name": "Große Tomaten",
+        "amount": "6",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis (gekocht)",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Von den Tomaten einen Deckel abschneiden und aushöhlen, das Fruchtfleisch hacken.",
+      "Zwiebel in Öl anbraten, Reis, Fruchtfleisch, zerbröselten Feta und Petersilie untermischen und würzen.",
+      "Tomaten füllen und Deckel aufsetzen.",
+      "Ca. 25 Minuten im Ofen backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gefuellte-auberginen-hack-reis",
+    "title": "Gefüllte Auberginen mit Hack und Reis",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "eggplant",
+        "name": "Auberginen",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "rice",
+        "name": "Reis (gekocht)",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Auberginen halbieren, aushöhlen und das Fruchtfleisch würfeln.",
+      "Zwiebel, Hack und Auberginenfleisch in Öl anbraten, würzen.",
+      "Tomaten und Reis untermischen.",
+      "Füllung in die Auberginenhälften geben und mit Käse bestreuen.",
+      "Bei 200 °C ca. 30 Minuten backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:reisauflauf-brokkoli-kaese",
+    "title": "Brokkoli-Käse-Reisauflauf",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen, Brokkoli in Röschen teilen und kurz blanchieren.",
+      "Reis und Brokkoli in eine gefettete Form geben.",
+      "Sahne, Milch, Eier und die Hälfte des Käses verrühren, mit Salz, Pfeffer und Muskat würzen.",
+      "Über den Reis gießen und mit restlichem Käse bestreuen.",
+      "Bei 190 °C ca. 25 Minuten goldbraun backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reisauflauf-hack-tomate",
+    "title": "Hackfleisch-Reisauflauf mit Tomaten",
+    "minutes": 50,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Zwiebel, Paprika und Hack in Öl anbraten, Tomaten zugeben und 10 Minuten köcheln, würzen.",
+      "Reis unterheben und alles in eine Auflaufform füllen.",
+      "Mit Mozzarellascheiben belegen.",
+      "Bei 200 °C ca. 20 Minuten überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:kuerbis-kokos-curry-reis",
+    "title": "Kürbis-Kokos-Curry mit Reis",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "curry_paste",
+        "name": "Rote Currypaste",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Zwiebel in Öl andünsten, Currypaste kurz mitrösten.",
+      "Kürbiswürfel und Kokosmilch zugeben und 15 Minuten köcheln.",
+      "Mit Sojasoße, Salz und Pfeffer abschmecken.",
+      "Mit dem Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kichererbsen-spinat-curry-reis",
+    "title": "Kichererbsen-Spinat-Curry mit Reis",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Basmatireis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "chickpeas",
+        "name": "Kichererbsen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat (TK)",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "coconut_milk",
+        "name": "Kokosmilch",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Currypulver",
+        "amount": "2 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Zwiebel und Knoblauch in Öl anbraten, Currypulver kurz mitrösten.",
+      "Tomaten, Kokosmilch und abgetropfte Kichererbsen zugeben, 10 Minuten köcheln.",
+      "Spinat unterrühren und erhitzen.",
+      "Mit Salz und Pfeffer abschmecken und zum Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reis-rahmchampignons",
+    "title": "Reis mit Rahmchampignons",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Pilze in Scheiben schneiden und in Butter kräftig anbraten.",
+      "Zwiebelwürfel zugeben und mitbraten.",
+      "Mit Sahne ablöschen und 5 Minuten einköcheln, würzen.",
+      "Mit Petersilie bestreut zum Reis servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:wurst-paprika-reispfanne",
+    "title": "Wurst-Paprika-Reispfanne",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Wiener Würstchen",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Paprika in Öl anbraten.",
+      "Würstchen in Scheiben zugeben und kurz mitbraten.",
+      "Reis, Mais, Paprikapulver und Brühe zugeben.",
+      "Zugedeckt ca. 15 Minuten garen.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:teriyaki-haehnchen-reis-bowl",
+    "title": "Teriyaki-Hähnchen-Reis-Bowl",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Teriyakisoße",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Frühlingszwiebel",
+        "amount": "1",
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis kochen.",
+      "Hähnchen in Streifen in Öl anbraten.",
+      "Brokkoliröschen, Karottenstreifen und Knoblauch zugeben und 5 Minuten braten.",
+      "Teriyakisoße zugeben und einköcheln lassen.",
+      "Auf dem Reis anrichten."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:thunfisch-mais-reispfanne",
+    "title": "Thunfisch-Mais-Reispfanne",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis (gekocht)",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "2 Dosen",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "soy_sauce",
+        "name": "Sojasoße",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Paprika in Öl anbraten.",
+      "Reis zugeben und kräftig mitbraten.",
+      "Mais und abgetropften Thunfisch unterheben.",
+      "Eier verquirlen, zugeben und stocken lassen.",
+      "Mit Sojasoße, Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:zucchini-feta-reis-ofen",
+    "title": "Zucchini-Feta-Reis aus dem Ofen",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "550 ml",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Reis, gewürfelte Zucchini und Zwiebel in eine Form geben.",
+      "Brühe, Öl, Oregano, Salz und Pfeffer zugeben und umrühren.",
+      "Tomaten und zerbröckelten Feta darauflegen.",
+      "Abgedeckt 20 Minuten, dann offen 15 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:linsen-reis-roestzwiebeln",
+    "title": "Linsen-Reis-Pfanne mit Röstzwiebeln",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "lentils",
+        "name": "Braune Linsen",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebeln",
+        "amount": "3",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Kreuzkümmel",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebeln in Ringe schneiden und in reichlich Öl goldbraun rösten, herausnehmen.",
+      "Linsen mit Kreuzkümmel in Wasser 15 Minuten vorgaren.",
+      "Reis zugeben und alles gar kochen, bis das Wasser aufgenommen ist.",
+      "Mit Salz und Pfeffer würzen und die Hälfte der Zwiebeln unterheben.",
+      "Mit restlichen Röstzwiebeln und Joghurt servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reisbratlinge-kaese-kraeuter",
+    "title": "Reisbratlinge mit Käse und Kräutern",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Reis (gekocht)",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Eier",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Schnittlauch",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "flour",
+        "name": "Mehl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis, Eier, Käse, Mehl und gehackte Kräuter vermengen und würzen.",
+      "Aus der Masse flache Bratlinge formen.",
+      "In Öl von beiden Seiten goldbraun braten.",
+      "Joghurt mit Salz verrühren.",
+      "Bratlinge mit dem Joghurtdip servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:vanille-milchreis-beeren",
+    "title": "Vanille-Milchreis mit Beeren",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Milchreis",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "750 ml",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Vanillezucker",
+        "amount": "1 Pck.",
+        "optional": false
+      },
+      {
+        "group": "berries",
+        "name": "TK-Beeren",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": "1 Prise",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Milch mit Zucker, Vanillezucker und Salz aufkochen.",
+      "Milchreis einrühren und bei kleiner Hitze 30 Minuten quellen lassen, oft rühren.",
+      "Beeren mit etwas Zucker kurz erhitzen.",
+      "Milchreis in Schalen füllen.",
+      "Mit den warmen Beeren servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:reispudding-zimt-aepfel",
+    "title": "Reispudding mit Zimt-Äpfeln",
+    "minutes": 40,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "rice",
+        "name": "Rundkornreis",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "apples",
+        "name": "Äpfel",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "sugar",
+        "name": "Zucker",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Zimt",
+        "amount": "1 TL",
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Reis mit Milch und der Hälfte des Zuckers aufkochen und 30 Minuten bei kleiner Hitze quellen lassen.",
+      "Äpfel würfeln und in Butter anbraten.",
+      "Restlichen Zucker und Zimt zugeben und karamellisieren lassen.",
+      "Reispudding in Schalen füllen.",
+      "Mit den Zimt-Äpfeln toppen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudeln-zucchini-frischkaese",
+    "title": "Nudeln mit Zucchini-Frischkäse-Soße",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln in Salzwasser bissfest kochen.",
+      "Zucchini würfeln und mit Knoblauch in Öl anbraten.",
+      "Frischkäse und einen Schuss Nudelwasser einrühren.",
+      "Mit Zitronensaft, Salz und Pfeffer abschmecken.",
+      "Nudeln unterheben, nach Wunsch mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudeln-hack-sahne",
+    "title": "Hack-Sahne-Nudeln",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spiralnudeln",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen.",
+      "Zwiebel und Hack in Öl krümelig anbraten.",
+      "Tomatenmark und Paprikapulver mitrösten.",
+      "Sahne zugießen und 5 Minuten einköcheln, würzen.",
+      "Nudeln mit der Soße vermengen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:penne-paprika-frischkaese",
+    "title": "Penne mit Paprika-Frischkäse-Soße",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen.",
+      "Zwiebel, Knoblauch und Paprika in Öl weich braten.",
+      "Mit etwas Nudelwasser und Frischkäse pürieren oder zerdrücken.",
+      "Mit Paprikapulver, Salz und Pfeffer würzen.",
+      "Soße mit den Nudeln mischen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:one-pot-pasta-tomate-spinat",
+    "title": "One-Pot-Pasta mit Tomaten und Spinat",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in einem großen Topf in Öl andünsten.",
+      "Tomaten, Brühe und Spaghetti zugeben, aufkochen.",
+      "Bei mittlerer Hitze ca. 10 Minuten garen, gelegentlich rühren.",
+      "Spinat unterheben und zusammenfallen lassen.",
+      "Mit Salz und Pfeffer würzen, mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:one-pot-pasta-hack",
+    "title": "One-Pot-Hack-Pasta",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Fusilli",
+        "amount": "350 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "500 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Hack in einem großen Topf in Öl anbraten.",
+      "Passierte Tomaten, Brühe, Oregano, Salz und Pfeffer zugeben.",
+      "Nudeln einrühren und ca. 12 Minuten köcheln, dabei öfter umrühren.",
+      "Käse unterrühren und schmelzen lassen.",
+      "Sofort servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:one-pot-pasta-pilze",
+    "title": "One-Pot-Pilz-Pasta",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Tagliatelle",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "600 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Thymian",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Pilze und Zwiebel in einem Topf in Öl anbraten.",
+      "Brühe und Nudeln zugeben und aufkochen.",
+      "Ca. 10 Minuten garen, bis die Flüssigkeit fast aufgenommen ist.",
+      "Sahne und Thymian einrühren.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ofenpasta-tomate-mozzarella",
+    "title": "Ofenpasta mit Tomaten und Mozzarella",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "2 Kugeln",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "250 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Rohe Nudeln mit Tomaten, Brühe, gewürfelter Zwiebel, Knoblauch und Gewürzen in einer Form mischen.",
+      "Fest mit Alufolie abdecken und 25 Minuten backen.",
+      "Mozzarella zerzupfen und darauf verteilen.",
+      "Offen 10 Minuten überbacken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ofennudeln-haehnchen-sahne",
+    "title": "Ofennudeln mit Hähnchen und Sahne",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Hühnerbrühe",
+        "amount": "400 ml",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Gewürfeltes Hähnchen, rohe Nudeln und Brokkoliröschen in eine Form geben.",
+      "Sahne und Brühe mit Gewürzen verrühren und darübergießen.",
+      "Abgedeckt 25 Minuten backen.",
+      "Mit Käse bestreuen und offen 10 Minuten überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:zitronen-pasta-cremig",
+    "title": "Cremige Zitronen-Pasta",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spaghetti kochen.",
+      "Knoblauch in Butter kurz andünsten.",
+      "Sahne, Zitronenabrieb und Saft zugeben und leicht einköcheln.",
+      "Parmesan einrühren und würzen.",
+      "Spaghetti in der Soße schwenken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudeln-brokkoli-kaesesosse",
+    "title": "Nudeln mit Brokkoli-Käse-Soße",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Fusilli",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen, Brokkoliröschen in den letzten 4 Minuten mitgaren.",
+      "Sahne mit Knoblauch erwärmen.",
+      "Käse darin schmelzen und mit Salz, Pfeffer und Muskat würzen.",
+      "Nudeln und Brokkoli abgießen.",
+      "Mit der Soße vermengen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:kuerbis-pasta-salbei",
+    "title": "Kürbis-Pasta mit Salbei",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Rigatoni",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Salbei",
+        "amount": "6 Blätter",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kürbis in kleine Würfel schneiden und in Butter mit Zwiebel anbraten.",
+      "Mit etwas Wasser ca. 10 Minuten weich dünsten und leicht zerdrücken.",
+      "Sahne und Salbei zugeben, würzen.",
+      "Nudeln kochen und untermischen.",
+      "Mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spaghetti-thunfisch-zitrone",
+    "title": "Spaghetti mit Thunfisch und Zitrone",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "2 Dosen",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Chili",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spaghetti kochen.",
+      "Knoblauch und Chili in Olivenöl kurz andünsten.",
+      "Abgetropften Thunfisch zugeben und erwärmen.",
+      "Zitronenabrieb, Saft und Petersilie zugeben.",
+      "Mit den Spaghetti und etwas Nudelwasser schwenken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudeln-erbsen-pesto",
+    "title": "Nudeln mit Erbsen-Pesto",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Farfalle",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Minze",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen, Erbsen in den letzten 3 Minuten mitgaren.",
+      "Die Hälfte der Erbsen mit Knoblauch, Öl, Parmesan, Zitronensaft und Minze pürieren.",
+      "Würzen.",
+      "Nudeln mit den restlichen Erbsen abgießen.",
+      "Mit dem Pesto vermengen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudelsalat-feta-gurke",
+    "title": "Nudelsalat mit Feta und Gurke",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Fusilli",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Rote Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen, abschrecken und abkühlen lassen.",
+      "Gurke, Tomaten und Zwiebel klein schneiden.",
+      "Aus Öl, Essig, Oregano, Salz und Pfeffer ein Dressing rühren.",
+      "Alles mit den Nudeln mischen.",
+      "Feta darüberbröseln und kurz durchziehen lassen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudelsalat-salami",
+    "title": "Italienischer Nudelsalat mit Salami",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Farfalle",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Salami",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "salad",
+        "name": "Rucola",
+        "amount": "1 Handvoll",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Balsamico",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen und abkühlen lassen.",
+      "Salami, Mozzarella und Tomaten klein schneiden.",
+      "Öl, Balsamico, Salz und Pfeffer verrühren.",
+      "Alles mit den Nudeln vermischen.",
+      "Rucola kurz vor dem Servieren unterheben."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudelsalat-thunfisch-mais",
+    "title": "Nudelsalat mit Thunfisch und Mais",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spirelli",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "tuna",
+        "name": "Thunfisch",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "corn",
+        "name": "Mais",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Essig",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen und abkühlen lassen.",
+      "Paprika und Zwiebel fein würfeln.",
+      "Joghurt mit Essig, Salz und Pfeffer verrühren.",
+      "Thunfisch und Mais abtropfen und mit allem mischen.",
+      "Mindestens 15 Minuten durchziehen lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudelsalat-haehnchen-joghurt",
+    "title": "Nudelsalat mit Hähnchen und Joghurtdressing",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "cucumber",
+        "name": "Gurke",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "yogurt",
+        "name": "Joghurt",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Schnittlauch",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kochen und abkühlen lassen.",
+      "Hähnchen würzen und in Öl durchbraten, in Streifen schneiden.",
+      "Gurke und Tomaten würfeln.",
+      "Joghurt mit Zitronensaft, Salz und Pfeffer verrühren.",
+      "Alles vermengen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:tomaten-nudelsuppe",
+    "title": "Tomaten-Nudelsuppe",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Suppennudeln",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "600 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "50 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten.",
+      "Tomaten und Brühe zugeben und aufkochen.",
+      "Nudeln einrühren und nach Packungsangabe garen.",
+      "Sahne zugeben.",
+      "Mit Salz, Pfeffer und Basilikum abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudelsuppe-hackbaellchen",
+    "title": "Nudel-Gemüse-Suppe mit Hackbällchen",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Suppennudeln",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "1,2 l",
+        "optional": false
+      },
+      {
+        "group": "eggs",
+        "name": "Ei",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hack mit Ei, Salz und Pfeffer verkneten und kleine Bällchen formen.",
+      "Brühe aufkochen, Karotten und Lauch klein geschnitten zugeben.",
+      "Hackbällchen einlegen und 10 Minuten gar ziehen lassen.",
+      "Nudeln zugeben und weitere 8 Minuten kochen.",
+      "Mit Petersilie abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:pasta-e-fagioli",
+    "title": "Bohnen-Nudel-Suppe (Pasta e Fagioli)",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Kleine Nudeln",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Weiße Bohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotte und Knoblauch in Öl andünsten.",
+      "Tomaten und Brühe zugeben und aufkochen.",
+      "Nudeln und abgetropfte Bohnen einrühren.",
+      "Ca. 10 Minuten köcheln, bis die Nudeln gar sind.",
+      "Würzen und mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:cannelloni-spinat-frischkaese",
+    "title": "Cannelloni mit Spinat-Frischkäse-Füllung",
+    "minutes": 55,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Cannelloni",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat (TK)",
+        "amount": "450 g",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spinat auftauen, ausdrücken und mit Frischkäse, Knoblauch, Salz, Pfeffer und Muskat mischen.",
+      "Cannelloni damit füllen.",
+      "Die Hälfte der Tomaten in eine Form geben, Cannelloni darauflegen und mit dem Rest bedecken.",
+      "Mozzarella zerzupfen und darauf verteilen.",
+      "Bei 190 °C ca. 35 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:cannelloni-hack",
+    "title": "Cannelloni mit Hackfüllung",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Cannelloni",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Hack in Öl anbraten und würzen.",
+      "Cannelloni mit der Hackmasse füllen.",
+      "Tomaten mit Oregano in eine Form geben, Cannelloni einlegen.",
+      "Sahne darübergießen und mit Käse bestreuen.",
+      "Bei 190 °C ca. 35 Minuten backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:lasagne-spinat-schinken",
+    "title": "Lasagne mit Spinat und Schinken",
+    "minutes": 60,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Lasagneplatten",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat (TK)",
+        "amount": "450 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "300 ml",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spinat auftauen und ausdrücken, Schinken würfeln.",
+      "Sahne und Milch mit Muskat, Salz und Pfeffer verrühren.",
+      "Lasagneplatten, Spinat, Schinken, Soße und Käse abwechselnd in eine Form schichten.",
+      "Mit Soße und Käse abschließen.",
+      "Bei 190 °C ca. 35 Minuten backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:pfannen-lasagne-hack",
+    "title": "Schnelle Pfannen-Lasagne mit Hack",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Lasagneplatten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Hack in einer großen Pfanne anbraten.",
+      "Tomaten, 100 ml Wasser, Salz und Pfeffer zugeben.",
+      "Lasagneplatten in Stücke brechen und unterheben.",
+      "Zugedeckt 15 Minuten garen.",
+      "Frischkäse und Mozzarella darauf verteilen und kurz schmelzen lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:nudel-gemuese-auflauf-frischkaese",
+    "title": "Nudel-Gemüse-Auflauf mit Frischkäse",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Nudeln",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "milk",
+        "name": "Milch",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kurz vorkochen.",
+      "Gemüse klein würfeln und mit den Nudeln in eine Form geben.",
+      "Frischkäse mit Milch, Salz und Pfeffer glatt rühren und darübergießen.",
+      "Mit Käse bestreuen.",
+      "Bei 200 °C ca. 25 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:nudelauflauf-haehnchen-brokkoli",
+    "title": "Nudelauflauf mit Hähnchen und Brokkoli",
+    "minutes": 45,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Penne",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "250 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Nudeln kurz vorkochen, Brokkoli blanchieren.",
+      "Hähnchenwürfel mit Knoblauch in Öl anbraten.",
+      "Alles in einer Form mischen.",
+      "Sahne würzen, darübergießen und mit Käse bestreuen.",
+      "Bei 200 °C ca. 25 Minuten backen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:spaghetti-lachs-spinat",
+    "title": "Spaghetti mit Lachs und Spinat",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "salmon",
+        "name": "Lachsfilet",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spaghetti kochen.",
+      "Lachs in Würfeln mit Knoblauch in Öl 3 Minuten anbraten.",
+      "Sahne zugeben, Spinat unterheben und zusammenfallen lassen.",
+      "Mit Zitronensaft, Salz und Pfeffer abschmecken.",
+      "Spaghetti in der Soße schwenken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:linguine-champignons-knoblauch",
+    "title": "Linguine mit Champignons und Knoblauch",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Linguine",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "3 Zehen",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Linguine kochen.",
+      "Pilze in Scheiben in Öl und Butter scharf anbraten.",
+      "Knoblauch zugeben und kurz mitbraten.",
+      "Mit etwas Nudelwasser und Zitronensaft ablöschen.",
+      "Nudeln und gehackte Petersilie unterheben."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spaghetti-alla-norma",
+    "title": "Spaghetti alla Norma",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "eggplant",
+        "name": "Aubergine",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "1 Kugel",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "4 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Auberginen würfeln und in Olivenöl goldbraun braten.",
+      "Knoblauch zugeben, Tomaten einrühren und 10 Minuten köcheln.",
+      "Würzen.",
+      "Spaghetti kochen und mit der Soße mischen.",
+      "Mit Mozzarellawürfeln und Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:spaghetti-pfanne-wurst-paprika",
+    "title": "Spaghetti-Pfanne mit Wurst und Paprika",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "pasta",
+        "name": "Spaghetti",
+        "amount": "350 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Wiener Würstchen",
+        "amount": "4",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Spaghetti kochen.",
+      "Zwiebel, Paprika und Würstchenscheiben in Öl anbraten.",
+      "Tomatenmark und Paprikapulver zugeben und kurz rösten.",
+      "Tomaten zugeben und 8 Minuten köcheln.",
+      "Spaghetti in der Pfanne mit der Soße vermengen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-salbeibutter",
+    "title": "Gnocchi mit Salbeibutter",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Salbei",
+        "amount": "8 Blätter",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "40 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen, bis sie oben schwimmen.",
+      "Butter in einer Pfanne schmelzen und Salbei darin knusprig braten.",
+      "Abgetropfte Gnocchi in der Salbeibutter schwenken.",
+      "Mit Salz und Pfeffer würzen.",
+      "Mit Parmesan bestreut servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-pesto-tomaten",
+    "title": "Gnocchi mit Pesto und Tomaten",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen und abtropfen.",
+      "Tomaten halbieren und in Öl kurz anbraten.",
+      "Gnocchi zugeben und leicht anbraten.",
+      "Pesto unterrühren und würzen.",
+      "Mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-kaese-sahne",
+    "title": "Gnocchi in Käse-Sahne-Soße",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen und abtropfen.",
+      "Sahne mit Knoblauch aufkochen.",
+      "Käse einrühren und schmelzen lassen, mit Muskat, Salz und Pfeffer würzen.",
+      "Gnocchi in der Soße schwenken.",
+      "Sofort servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-hack-pfanne",
+    "title": "Gnocchi-Hack-Pfanne",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Hack in Öl krümelig anbraten.",
+      "Mit Paprikapulver, Salz und Pfeffer würzen.",
+      "Tomaten zugeben und 5 Minuten köcheln.",
+      "Gnocchi unterheben und 5 Minuten mitgaren.",
+      "Mit Käse bestreuen und zugedeckt schmelzen lassen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-kuerbis-pfanne",
+    "title": "Kürbis-Gnocchi-Pfanne",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Salbei",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Kürbis würfeln und mit Zwiebel in Öl 8 Minuten braten.",
+      "Gnocchi zugeben und goldbraun mitbraten.",
+      "Sahne und Salbei zugeben, kurz einköcheln.",
+      "Mit Salz und Pfeffer abschmecken.",
+      "Mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ofen-gnocchi-tomaten-feta",
+    "title": "Ofen-Gnocchi mit Cherrytomaten und Feta",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "feta",
+        "name": "Feta",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Gnocchi, Tomaten, Knoblauch, Öl, Oregano, Salz und Pfeffer in einer Form mischen.",
+      "Feta in die Mitte legen.",
+      "25 Minuten backen, bis die Gnocchi knusprig sind.",
+      "Mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-spinat-frischkaese",
+    "title": "Gnocchi mit Spinat und Frischkäse",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cream_cheese",
+        "name": "Frischkäse",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen, abtropfen.",
+      "Knoblauch in Öl andünsten und Spinat zusammenfallen lassen.",
+      "Frischkäse und 4 EL Nudelwasser einrühren.",
+      "Würzen.",
+      "Gnocchi unterheben und mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-schinken-erbsen",
+    "title": "Gnocchi mit Schinken und Erbsen",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen und abtropfen.",
+      "Zwiebel in Butter andünsten, Schinkenwürfel kurz mitbraten.",
+      "Erbsen und Sahne zugeben und 4 Minuten köcheln.",
+      "Würzen.",
+      "Gnocchi in der Soße schwenken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-pilzrahm",
+    "title": "Gnocchi mit Pilzrahm",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Pilze in Scheiben in Butter kräftig anbraten.",
+      "Zwiebel zugeben und mitbraten.",
+      "Mit Sahne ablöschen und 4 Minuten köcheln.",
+      "Gekochte Gnocchi zugeben, würzen.",
+      "Mit Petersilie servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-auflauf-brokkoli",
+    "title": "Gnocchi-Auflauf mit Brokkoli",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Brokkoli in Röschen teilen und 3 Minuten blanchieren.",
+      "Gnocchi roh mit Brokkoli in eine Form geben.",
+      "Sahne mit Knoblauch, Muskat, Salz und Pfeffer verrühren und darübergießen.",
+      "Mit Käse bestreuen.",
+      "Bei 200 °C ca. 25 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-zucchini-zitrone",
+    "title": "Gnocchi mit Zucchini und Zitrone",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zucchini in Scheiben in Öl und Butter anbraten.",
+      "Gnocchi zugeben und goldbraun mitbraten.",
+      "Knoblauch zugeben.",
+      "Mit Zitronenabrieb und Saft, Salz und Pfeffer abschmecken.",
+      "Mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-wurst-paprika",
+    "title": "Gnocchi mit Wurst und Paprika",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "sausage",
+        "name": "Bratwurst oder Kabanos",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Paprikapulver",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Wurst in Scheiben schneiden und in Öl anbraten.",
+      "Zwiebel und Paprika zugeben und mitbraten.",
+      "Gnocchi zugeben und leicht bräunen.",
+      "Tomaten und Paprikapulver zugeben.",
+      "5 Minuten köcheln und würzen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-haehnchen-spinat",
+    "title": "Gnocchi-Hähnchen-Pfanne mit Spinat",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "chicken",
+        "name": "Hähnchenbrust",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Hähnchen in Würfeln in Öl durchbraten, herausnehmen.",
+      "Gnocchi in der Pfanne goldbraun braten.",
+      "Knoblauch, Sahne und Spinat zugeben.",
+      "Hähnchen zurückgeben und kurz erwärmen.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-speck-lauch",
+    "title": "Gnocchi mit Speck und Lauch",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "bacon",
+        "name": "Speckwürfel",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "50 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Speck in einer Pfanne auslassen.",
+      "Lauch in Ringen zugeben und weich braten.",
+      "Gnocchi zugeben und leicht anbraten.",
+      "Sahne zugießen und 4 Minuten köcheln, würzen.",
+      "Mit Käse bestreuen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-gemuesesuppe",
+    "title": "Gnocchi-Gemüse-Suppe",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Karotten in Öl andünsten.",
+      "Brühe und Tomaten zugeben, 10 Minuten köcheln.",
+      "Zucchiniwürfel zugeben, nach 5 Minuten die Gnocchi.",
+      "Weitere 3 Minuten garen, bis sie oben schwimmen.",
+      "Spinat unterheben und würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-tomaten-sahne",
+    "title": "Gnocchi mit Tomaten-Sahne-Soße",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten.",
+      "Tomaten zugeben und 8 Minuten einköcheln.",
+      "Sahne einrühren, würzen.",
+      "Gnocchi in Salzwasser garen.",
+      "Mit der Soße vermengen und mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-raeucherlachs-dill",
+    "title": "Gnocchi mit Räucherlachs und Dill-Sahne",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "salmon",
+        "name": "Räucherlachs",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Dill",
+        "amount": "1 Bund",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gnocchi in Salzwasser garen und abtropfen.",
+      "Sahne erwärmen und mit Zitronensaft, Salz und Pfeffer würzen.",
+      "Lachs in Streifen schneiden.",
+      "Gnocchi in der Sahne schwenken.",
+      "Lachs und Dill darübergeben."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:gnocchi-gratin-blumenkohl",
+    "title": "Gnocchi-Gratin mit Blumenkohl",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cauliflower",
+        "name": "Blumenkohl",
+        "amount": "1 kleiner",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Muskat",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Blumenkohl in Röschen teilen und 4 Minuten blanchieren.",
+      "Mit rohen Gnocchi in eine Form geben.",
+      "Sahne mit Muskat, Salz und Pfeffer würzen und darübergießen.",
+      "Mit Käse bestreuen.",
+      "Bei 200 °C ca. 25 Minuten gratinieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-alla-sorrentina",
+    "title": "Gnocchi alla Sorrentina",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "2 Kugeln",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Knoblauch in Öl andünsten, Tomaten zugeben und 10 Minuten einköcheln, würzen.",
+      "Gnocchi in Salzwasser 2 Minuten vorgaren.",
+      "Gnocchi mit der Soße in eine Form geben.",
+      "Mozzarella und Parmesan darauf verteilen.",
+      "Bei 220 °C 10 Minuten überbacken, mit Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:gnocchi-ratatouille",
+    "title": "Gnocchi mit Ratatouille-Gemüse",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "gnocchi",
+        "name": "Gnocchi",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "eggplant",
+        "name": "Aubergine",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Thymian",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse würfeln und in Olivenöl 10 Minuten anbraten.",
+      "Zwiebel, Knoblauch und Thymian zugeben.",
+      "Tomaten zugeben und 10 Minuten köcheln, würzen.",
+      "Gnocchi in Salzwasser garen.",
+      "Gnocchi unter das Gemüse heben."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-tomaten-sahne",
+    "title": "Tortellini in Tomaten-Sahne-Soße",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Käse-Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Knoblauch in Öl andünsten.",
+      "Tomaten zugeben und 8 Minuten köcheln.",
+      "Sahne einrühren, würzen.",
+      "Tortellini nach Packungsangabe kochen und abgießen.",
+      "Mit der Soße vermengen und mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-auflauf-schinken",
+    "title": "Tortellini-Auflauf mit Schinken",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini 3 Minuten vorkochen und abgießen.",
+      "Mit Schinkenwürfeln und Erbsen in eine Form geben.",
+      "Sahne mit Tomaten, Salz und Pfeffer verrühren und darübergießen.",
+      "Mit Käse bestreuen.",
+      "Bei 200 °C ca. 20 Minuten überbacken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:tortellini-brueh-suppe",
+    "title": "Tortellini-Suppe mit Gemüse",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "1 l",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Karotte klein schneiden und in Öl andünsten.",
+      "Brühe zugeben und 5 Minuten köcheln.",
+      "Tortellini zugeben und nach Packungsangabe garen.",
+      "Spinat unterheben.",
+      "Mit Salz und Pfeffer abschmecken, mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-salat-mozzarella",
+    "title": "Tortellini-Salat mit Tomaten und Mozzarella",
+    "minutes": 25,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "2 Kugeln",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Balsamico",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini kochen, abschrecken und abkühlen lassen.",
+      "Tomaten halbieren, Mozzarella würfeln.",
+      "Pesto mit Öl, Balsamico, Salz und Pfeffer verrühren.",
+      "Alles vermengen.",
+      "Mit Basilikum bestreuen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-pfanne-spinat-pilze",
+    "title": "Tortellini-Pfanne mit Spinat und Pilzen",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini kochen und abgießen.",
+      "Pilze in Butter kräftig anbraten, Knoblauch zugeben.",
+      "Sahne zugießen und 3 Minuten köcheln.",
+      "Spinat unterheben.",
+      "Tortellini zugeben, würzen und erwärmen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ravioli-salbeibutter",
+    "title": "Ravioli in Salbeibutter",
+    "minutes": 15,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Ravioli",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Salbei",
+        "amount": "8 Blätter",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ravioli nach Packungsangabe kochen.",
+      "Butter mit Salbei schmelzen, bis sie leicht nussig duftet.",
+      "Ravioli abtropfen und in der Butter schwenken.",
+      "Mit Salz und Pfeffer würzen.",
+      "Mit Parmesan servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:ravioli-auflauf-tomate-mozzarella",
+    "title": "Ravioli-Auflauf mit Tomaten und Mozzarella",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Ravioli",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mozzarella",
+        "name": "Mozzarella",
+        "amount": "2 Kugeln",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Oregano",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Tomaten mit gehackter Zwiebel, Knoblauch, Oregano, Salz und Pfeffer verrühren.",
+      "Ravioli mit der Soße in eine Form geben.",
+      "Mozzarella darauf verteilen.",
+      "Ca. 25 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-pesto-sahne",
+    "title": "Tortellini mit Pesto-Sahne",
+    "minutes": 15,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini kochen.",
+      "Sahne erwärmen, Pesto einrühren.",
+      "Tomaten halbieren und kurz mitwärmen.",
+      "Würzen.",
+      "Tortellini abgießen und in der Soße schwenken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-brokkoli-pfanne",
+    "title": "Tortellini-Brokkoli-Pfanne",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "broccoli",
+        "name": "Brokkoli",
+        "amount": "1 Kopf",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "60 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini mit den Brokkoliröschen im gleichen Topf kochen, nach 4 Minuten abgießen.",
+      "Knoblauch in Öl andünsten.",
+      "Sahne zugeben und erhitzen.",
+      "Tortellini und Brokkoli zugeben.",
+      "Käse unterrühren, würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-hack-tomate",
+    "title": "Tortellini mit Hack-Tomaten-Soße",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "minced_meat",
+        "name": "Hackfleisch",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "tomato_paste",
+        "name": "Tomatenmark",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Hack in Öl krümelig anbraten.",
+      "Tomatenmark kurz mitrösten.",
+      "Tomaten zugeben und 15 Minuten köcheln, würzen.",
+      "Tortellini kochen.",
+      "Mit der Soße mischen und mit Parmesan servieren."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:ravioli-gemuesepfanne",
+    "title": "Ravioli mit Gemüsepfanne",
+    "minutes": 30,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Ravioli",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "bell_pepper",
+        "name": "Paprika",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Tomaten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "1 Zehe",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Italienische Kräuter",
+        "amount": "1 TL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "2 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Gemüse würfeln und in Olivenöl 8 Minuten anbraten.",
+      "Knoblauch und Kräuter zugeben.",
+      "Ravioli kochen und abgießen.",
+      "Mit dem Gemüse und einem Schuss Kochwasser mischen.",
+      "Würzen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-kuerbissosse",
+    "title": "Tortellini mit Kürbissoße",
+    "minutes": 35,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "pumpkin",
+        "name": "Hokkaido-Kürbis",
+        "amount": "350 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "100 ml",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel und Kürbiswürfel in Öl anbraten.",
+      "Brühe zugeben und 12 Minuten weich kochen.",
+      "Pürieren und Sahne einrühren, würzen.",
+      "Tortellini kochen und abgießen.",
+      "Mit der Soße servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-suppe-schinken-sahne",
+    "title": "Cremige Tortellinisuppe mit Schinken",
+    "minutes": 30,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Brühe",
+        "amount": "700 ml",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "leek",
+        "name": "Lauch",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotte",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Lauch und Karotte klein schneiden und in der Brühe 8 Minuten kochen.",
+      "Sahne zugeben und aufkochen.",
+      "Tortellini einrühren und nach Packungsangabe garen.",
+      "Schinkenwürfel zugeben.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:tortellini-erbsen-schinkensosse",
+    "title": "Tortellini mit Erbsen und Schinken",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "ham",
+        "name": "Kochschinken",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "peas",
+        "name": "Erbsen (TK)",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel in Butter andünsten.",
+      "Schinkenwürfel und Erbsen zugeben.",
+      "Sahne zugießen und 5 Minuten köcheln.",
+      "Tortellini kochen und abgießen.",
+      "Mit der Soße vermengen und würzen."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:ravioli-lasagne",
+    "title": "Ravioli-Lasagne",
+    "minutes": 40,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Ravioli (gekocht oder frisch)",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Passierte Tomaten",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "cheese",
+        "name": "Geriebener Käse",
+        "amount": "120 g",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Blattspinat (TK)",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Ofen auf 200 °C vorheizen.",
+      "Tomaten mit Salz und Pfeffer würzen.",
+      "Eine Schicht Ravioli, etwas Soße, Spinat und Käse in eine Form schichten, wiederholen.",
+      "Zuletzt Sahne darübergießen und mit Käse bestreuen.",
+      "Ca. 25 Minuten backen."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-gebraten-knoblauch-tomaten",
+    "title": "Gebratene Tortellini mit Knoblauch und Tomaten",
+    "minutes": 20,
+    "servings": 2,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "200 g",
+        "optional": false
+      },
+      {
+        "group": "garlic",
+        "name": "Knoblauch",
+        "amount": "2 Zehen",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Basilikum",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini 2 Minuten vorkochen und gut abtropfen.",
+      "In Olivenöl in der Pfanne goldbraun braten.",
+      "Knoblauch und halbierte Tomaten zugeben und 3 Minuten mitbraten.",
+      "Würzen.",
+      "Mit Parmesan und Basilikum servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-lachs-sahne",
+    "title": "Tortellini mit Lachs-Sahne",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "salmon",
+        "name": "Lachsfilet",
+        "amount": "250 g",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "200 ml",
+        "optional": false
+      },
+      {
+        "group": "spinach",
+        "name": "Babyspinat",
+        "amount": "100 g",
+        "optional": false
+      },
+      {
+        "group": "lemons",
+        "name": "Zitrone",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Öl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini kochen.",
+      "Lachs in Würfeln in Öl 3 Minuten anbraten.",
+      "Sahne zugeben und kurz aufkochen.",
+      "Spinat unterheben, mit Zitronensaft, Salz und Pfeffer abschmecken.",
+      "Tortellini unterheben."
+    ],
+    "vegetarian": false
+  },
+  {
+    "id": "builtin:ravioli-pilz-rahm",
+    "title": "Ravioli mit Pilzrahm",
+    "minutes": 25,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Ravioli",
+        "amount": "500 g",
+        "optional": false
+      },
+      {
+        "group": "mushrooms",
+        "name": "Champignons",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "cream",
+        "name": "Sahne",
+        "amount": "150 ml",
+        "optional": false
+      },
+      {
+        "group": "herbs",
+        "name": "Petersilie",
+        "amount": null,
+        "optional": true
+      },
+      {
+        "group": "butter",
+        "name": "Butter",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Pilze in Butter kräftig anbraten.",
+      "Zwiebel zugeben und mitbraten.",
+      "Mit Sahne ablöschen und 4 Minuten köcheln, würzen.",
+      "Ravioli kochen und abgießen.",
+      "Mit dem Pilzrahm und Petersilie servieren."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-gemuese-eintopf",
+    "title": "Tortellini-Gemüse-Eintopf",
+    "minutes": 35,
+    "servings": 4,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "300 g",
+        "optional": false
+      },
+      {
+        "group": "canned_tomatoes",
+        "name": "Dosentomaten",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "zucchini",
+        "name": "Zucchini",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "carrots",
+        "name": "Karotten",
+        "amount": "2",
+        "optional": false
+      },
+      {
+        "group": "beans",
+        "name": "Weiße Bohnen",
+        "amount": "1 Dose",
+        "optional": false
+      },
+      {
+        "group": "onions",
+        "name": "Zwiebel",
+        "amount": "1",
+        "optional": false
+      },
+      {
+        "group": "stock",
+        "name": "Gemüsebrühe",
+        "amount": "800 ml",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Zwiebel, Karotten und Zucchini würfeln und in Öl andünsten.",
+      "Tomaten und Brühe zugeben, 12 Minuten köcheln.",
+      "Abgetropfte Bohnen zugeben.",
+      "Tortellini einrühren und nach Packungsangabe garen.",
+      "Mit Salz und Pfeffer abschmecken."
+    ],
+    "vegetarian": true
+  },
+  {
+    "id": "builtin:tortellini-salat-rucola-pesto",
+    "title": "Tortellini-Salat mit Rucola und Pesto",
+    "minutes": 20,
+    "servings": 3,
+    "ingredients": [
+      {
+        "group": "filled_pasta",
+        "name": "Tortellini",
+        "amount": "400 g",
+        "optional": false
+      },
+      {
+        "group": "salad",
+        "name": "Rucola",
+        "amount": "80 g",
+        "optional": false
+      },
+      {
+        "group": "pesto",
+        "name": "Pesto",
+        "amount": "3 EL",
+        "optional": false
+      },
+      {
+        "group": "tomatoes",
+        "name": "Cherrytomaten",
+        "amount": "150 g",
+        "optional": false
+      },
+      {
+        "group": "parmesan",
+        "name": "Parmesan",
+        "amount": "30 g",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Olivenöl",
+        "amount": "1 EL",
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Salz",
+        "amount": null,
+        "optional": false
+      },
+      {
+        "group": null,
+        "name": "Pfeffer",
+        "amount": null,
+        "optional": false
+      }
+    ],
+    "steps": [
+      "Tortellini kochen, abschrecken und abkühlen lassen.",
+      "Mit Pesto und Öl vermengen.",
+      "Tomaten halbieren und unterheben.",
+      "Würzen.",
+      "Rucola und Parmesanspäne darübergeben."
     ],
     "vegetarian": true
   }
