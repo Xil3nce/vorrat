@@ -12,6 +12,8 @@
     <string name="shopping_title">Einkaufsliste</string>
     <string name="shopping_add_hint">Artikel hinzufügen</string>
     <string name="shopping_add">Hinzufügen</string>
+    <string name="shopping_add_size_hint">Größe</string>
+    <string name="shopping_add_unit_none">Einh.</string>
     <string name="shopping_empty">Die Einkaufsliste ist leer.\n\nTipp: Mit einem Mindestbestand (Produkt bearbeiten) landen Produkte automatisch hier, sobald der Vorrat knapp wird.</string>
     <string name="shopping_section_shortage">Nachkaufen (unter Mindestbestand)</string>
     <string name="shopping_section_items">Auf der Liste</string>
@@ -24,8 +26,8 @@
     <string name="shopping_missing">fehlt %1$d</string>
     <string name="shopping_missing_package">fehlt %1$d× %2$s</string>
     <string name="shopping_quantity_package">%1$d× %2$s</string>
-    <string name="shopping_edit_action">Menge und Packung ändern</string>
-    <string name="shopping_edit_title">„%1$s“</string>
+    <string name="shopping_edit_title">Eintrag bearbeiten</string>
+    <string name="shopping_edit_name">Name</string>
     <string name="shopping_edit_quantity">Anzahl</string>
     <string name="shopping_edit_package">Packungsgröße</string>
     <string name="shopping_edit_unit">Einheit</string>

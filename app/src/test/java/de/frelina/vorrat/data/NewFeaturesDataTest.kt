@@ -108,6 +108,30 @@ class NewFeaturesDataTest : DbTestBase() {
         assertEquals(2, shopping.observe().first().items.size)
     }
 
+    @Test fun `Umbenennen und Packung aendern wird gespeichert und synchronisiert`() = runBlocking {
+        val item = shopping.addText("Mehl")!!
+        shopping.updateDetails(item.id, "  Dinkelmehl ", 3, "1.5".toBigDecimal(), "kg")
+        val saved = db.shoppingDao().getById(item.id)!!
+        assertEquals("Dinkelmehl", saved.name)
+        assertEquals(3, saved.quantity)
+        assertEquals("kg", saved.unitSymbol)
+        assertEquals("Dinkelmehl", remote.doc(RemoteCollection.SHOPPING, item.id)!!["name"])
+        assertEquals("Dinkelmehl", shopping.observe().first().items.single().item.name)
+        // Leerer Name wird nicht übernommen
+        shopping.updateDetails(item.id, "   ", 1, null, null)
+        assertEquals(saved, db.shoppingDao().getById(item.id))
+    }
+
+    @Test fun `Hinzufuegen mit Packung - eigene Angabe gewinnt, sonst Produktpackung`() = runBlocking {
+        val own = shopping.addText("Reis", packageSize = "500".toBigDecimal(), unitSymbol = "g")!!
+        assertEquals(0, "500".toBigDecimal().compareTo(own.packageSize))
+        assertEquals("g", own.unitSymbol)
+        product(name = "Zucker")
+        val known = shopping.addText("zucker")!!
+        assertEquals(0, "400".toBigDecimal().compareTo(known.packageSize))
+        assertEquals("g", known.unitSymbol)
+    }
+
     @Test fun `Kauf entfernt Produkt- und gleichnamige Freitext-Eintraege`() = runBlocking {
         val p = product(name = "Milch")
         shopping.addProduct(db.productDao().getById(p)!!)

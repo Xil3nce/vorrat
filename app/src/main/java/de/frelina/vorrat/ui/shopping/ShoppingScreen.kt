@@ -1,6 +1,7 @@
 package de.frelina.vorrat.ui.shopping
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -119,8 +120,9 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 /**
  * Einkaufsliste: oben Eingabe, darunter die Einträge – standardmäßig nach Abteilungen gruppiert (Reihenfolge wie
  * im Laden, im Haushalt gespeichert), sonst "Nachkaufen" (unter Mindestbestand, automatisch) und die manuell
- * hinzugefügten Einträge. Karten im Stil der Bestandsliste mit Produktbild. Antippen bzw. nach rechts wischen
- * ("Gekauft") öffnet das Erfassen (ein Ort ist dabei nicht nötig), nach links wischen hakt ab. Gruppiert lassen
+ * hinzugefügten Einträge. Karten im Stil der Bestandsliste mit Produktbild. Antippen öffnet das Bearbeiten
+ * (Name, Anzahl, Packung), nach rechts wischen ("Gekauft") das Erfassen (ein Ort ist dabei nicht nötig), nach
+ * links wischen hakt ab. Gruppiert lassen
  * sich Einträge per langem Drücken in eine andere Abteilung ziehen und Abteilungen am Griff verschieben.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -154,7 +156,11 @@ fun ShoppingScreen(
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             if (!state.loading && !state.list.isEmpty) ShoppingSummary(state.list)
-            AddRow(suggestions = suggestions, onAdd = viewModel::add)
+            AddRow(
+                suggestions = suggestions,
+                unitSymbols = state.units.values.distinct().sorted(),
+                onAdd = viewModel::add,
+            )
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -212,9 +218,9 @@ fun ShoppingScreen(
             item = entry.item,
             unitSymbols = state.units.values.distinct().sorted(),
             onDismiss = { editTarget = null },
-            onSave = { quantity, size, unit ->
+            onSave = { name, quantity, size, unit ->
                 editTarget = null
-                viewModel.updateDetails(entry.item.id, quantity, size, unit)
+                viewModel.updateDetails(entry.item.id, name, quantity, size, unit)
             },
         )
     }
@@ -464,24 +470,48 @@ private fun SectionLabel(text: Int) {
     de.frelina.vorrat.ui.components.SectionLabel(stringResource(text), Modifier.padding(top = 8.dp, start = 4.dp))
 }
 
-/** Freitext-Eingabe mit Vorschlägen aus den bekannten Produkten. */
+/**
+ * Freitext-Eingabe mit Vorschlägen aus den bekannten Produkten, optional mit Packungsgröße und Einheit.
+ * Ohne eigene Angabe kommt die Packung eines gewählten bekannten Produkts aus dem Produkt.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
+private fun AddRow(
+    suggestions: List<String>,
+    unitSymbols: List<String>,
+    onAdd: (name: String, packageSize: BigDecimal?, unit: String?) -> Unit,
+) {
     var text by rememberSaveable { mutableStateOf("") }
+    var size by rememberSaveable { mutableStateOf("") }
+    var unit by rememberSaveable { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var unitOpen by remember { mutableStateOf(false) }
+    val sizeResult = Validation.optionalPositiveDecimal(size)
+    val sizeInvalid = sizeResult is Validated.Error
     val filtered = remember(text, suggestions) {
         val q = text.trim()
         if (q.length < 2) emptyList() else suggestions.filter { it.contains(q, ignoreCase = true) }.take(6)
     }
     fun submit(value: String = text) {
-        if (value.isNotBlank()) onAdd(value)
+        if (sizeInvalid) return
+        if (value.isNotBlank()) {
+            val packageSize = (sizeResult as? Validated.Ok)?.value
+            onAdd(value, packageSize, if (packageSize != null) unit.ifEmpty { null } else null)
+        }
         text = ""
+        size = ""
+        unit = ""
         expanded = false
     }
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        unfocusedContainerColor = VorratTheme.colors.glass,
+        focusedContainerColor = VorratTheme.colors.glassStrong,
+        unfocusedBorderColor = VorratTheme.colors.glassBorder,
+    )
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         ExposedDropdownMenuBox(
             expanded = expanded && filtered.isNotEmpty(),
@@ -491,13 +521,11 @@ private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it; expanded = true },
-                placeholder = { Text(stringResource(R.string.shopping_add_hint)) },
+                placeholder = {
+                    Text(stringResource(R.string.shopping_add_hint), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                },
                 shape = RoundedCornerShape(24.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedContainerColor = VorratTheme.colors.glass,
-                    focusedContainerColor = VorratTheme.colors.glassStrong,
-                    unfocusedBorderColor = VorratTheme.colors.glassBorder,
-                ),
+                colors = fieldColors,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { submit() }),
@@ -510,10 +538,52 @@ private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
                 filtered.forEach { s -> DropdownMenuItem(text = { Text(s) }, onClick = { submit(s) }) }
             }
         }
+        OutlinedTextField(
+            value = size,
+            onValueChange = { size = it },
+            placeholder = {
+                Text(stringResource(R.string.shopping_add_size_hint), style = MaterialTheme.typography.bodySmall, maxLines = 1)
+            },
+            isError = sizeInvalid,
+            shape = RoundedCornerShape(24.dp),
+            colors = fieldColors,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { submit() }),
+            modifier = Modifier.width(72.dp),
+        )
+        Box {
+            val unitLabel = stringResource(R.string.shopping_edit_unit)
+            Box(
+                Modifier.size(width = 48.dp, height = 56.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(VorratTheme.colors.glass)
+                    .border(1.dp, VorratTheme.colors.glassBorder, RoundedCornerShape(24.dp))
+                    .clickable(onClickLabel = unitLabel, role = Role.DropdownList) { unitOpen = true },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    unit.ifEmpty { stringResource(R.string.shopping_add_unit_none) },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (unit.isEmpty()) VorratTheme.colors.textSecondary else MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            DropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
+                    onClick = { unit = ""; unitOpen = false },
+                )
+                unitSymbols.forEach { symbol ->
+                    DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
+                }
+            }
+        }
         FilledIconButton(
             onClick = { submit() },
-            enabled = text.isNotBlank(),
-            modifier = Modifier.padding(start = 8.dp).size(52.dp),
+            enabled = text.isNotBlank() && !sizeInvalid,
+            modifier = Modifier.size(48.dp),
         ) {
             Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.shopping_add))
         }
@@ -534,7 +604,6 @@ internal fun ShoppingCard(
     modifier: Modifier = Modifier,
     highlighted: Boolean = false,
     onChangeDepartment: (() -> Unit)? = null,
-    onEdit: (() -> Unit)? = null,
     trailing: @Composable () -> Unit,
 ) {
     // Hervorgehoben (unter Mindestbestand): gelblicher Rand statt farbiger Fläche.
@@ -556,7 +625,7 @@ internal fun ShoppingCard(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    if (onChangeDepartment != null || onEdit != null) ItemMenu(name, onChangeDepartment, onEdit)
+                    if (onChangeDepartment != null) ItemMenu(name, onChangeDepartment)
                 }
                 brand?.takeIf { it.isNotBlank() }?.let {
                     Text(
@@ -576,7 +645,7 @@ internal fun ShoppingCard(
 
 /** Kleines Menü am Eintrag: "Abteilung ändern …" (Alternative zum Ziehen). */
 @Composable
-private fun ItemMenu(name: String, onChangeDepartment: (() -> Unit)?, onEdit: (() -> Unit)?) {
+private fun ItemMenu(name: String, onChangeDepartment: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }, modifier = Modifier.size(36.dp)) {
@@ -587,18 +656,10 @@ private fun ItemMenu(name: String, onChangeDepartment: (() -> Unit)?, onEdit: ((
             )
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            if (onEdit != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.shopping_edit_action)) },
-                    onClick = { open = false; onEdit() },
-                )
-            }
-            if (onChangeDepartment != null) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.shopping_change_department)) },
-                    onClick = { open = false; onChangeDepartment() },
-                )
-            }
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.shopping_change_department)) },
+                onClick = { open = false; onChangeDepartment() },
+            )
         }
     }
 }
@@ -675,19 +736,11 @@ private fun ItemRow(
                     Text(stringResource(R.string.shopping_free_text), style = MaterialTheme.typography.bodySmall)
                 }
             },
-            onClick = onBought,
+            onClick = onEdit,
             onChangeDepartment = onChangeDepartment,
-            onEdit = onEdit,
         ) {
-            // Menge/Packung nur hier rechts; Antippen öffnet "Menge und Packung".
-            val editLabel = stringResource(R.string.shopping_edit_action)
-            AmountBadge(
-                shoppingAmountText(entry.item),
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable(onClickLabel = editLabel, role = Role.Button, onClick = onEdit),
-            )
+            // Menge/Packung nur hier rechts; Antippen der Karte öffnet das Bearbeiten.
+            AmountBadge(shoppingAmountText(entry.item), modifier = Modifier.padding(end = 8.dp))
         }
     }
 }
@@ -829,8 +882,9 @@ private fun ShoppingItemDialog(
     item: ShoppingItemEntity,
     unitSymbols: List<String>,
     onDismiss: () -> Unit,
-    onSave: (quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
+    onSave: (name: String, quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
 ) {
+    var name by rememberSaveable { mutableStateOf(item.name) }
     var quantity by rememberSaveable { mutableIntStateOf(item.quantity) }
     var size by rememberSaveable { mutableStateOf(item.packageSize?.toPlainString()?.replace('.', ',').orEmpty()) }
     var unit by rememberSaveable { mutableStateOf(item.unitSymbol.orEmpty()) }
@@ -840,9 +894,18 @@ private fun ShoppingItemDialog(
     val options = (unitSymbols + listOfNotNull(item.unitSymbol)).distinct()
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.shopping_edit_title, item.name)) },
+        title = { Text(stringResource(R.string.shopping_edit_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it.take(RemoteMapper.MAX_TEXT) },
+                    label = { Text(stringResource(R.string.shopping_edit_name)) },
+                    isError = name.isBlank(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                    modifier = Modifier.fillMaxWidth(),
+                )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
                     IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
@@ -899,9 +962,9 @@ private fun ShoppingItemDialog(
             TextButton(
                 onClick = {
                     val value = if (sizeResult is Validated.Ok) sizeResult.value else null
-                    onSave(quantity, value, unit.ifEmpty { null })
+                    onSave(name, quantity, value, unit.ifEmpty { null })
                 },
-                enabled = sizeError == null,
+                enabled = sizeError == null && name.isNotBlank(),
             ) { Text(stringResource(R.string.action_save)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },

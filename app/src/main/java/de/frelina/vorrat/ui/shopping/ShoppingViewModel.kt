@@ -112,11 +112,12 @@ class ShoppingViewModel @Inject constructor(
             )
         }
 
-    fun add(name: String) = viewModelScope.launch { repository.addText(name) }
+    fun add(name: String, packageSize: java.math.BigDecimal? = null, unitSymbol: String? = null) =
+        viewModelScope.launch { repository.addText(name, packageSize = packageSize, unitSymbol = unitSymbol) }
 
-    /** Anzahl und Packungsgröße aus dem Bearbeiten-Dialog. */
-    fun updateDetails(id: String, quantity: Int, packageSize: java.math.BigDecimal?, unitSymbol: String?) =
-        viewModelScope.launch { repository.updateDetails(id, quantity, packageSize, unitSymbol) }
+    /** Name, Anzahl und Packungsgröße aus dem Bearbeiten-Dialog. */
+    fun updateDetails(id: String, name: String, quantity: Int, packageSize: java.math.BigDecimal?, unitSymbol: String?) =
+        viewModelScope.launch { repository.updateDetails(id, name, quantity, packageSize, unitSymbol) }
 
     fun setQuantity(id: String, quantity: Int) = viewModelScope.launch {
         if (quantity >= 1) repository.setQuantity(id, quantity)

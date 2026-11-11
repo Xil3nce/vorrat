@@ -56,10 +56,16 @@ class ShoppingRepository @Inject constructor(
     }
 
     /** Freitext hinzufügen; passt der Name exakt zu einem Produkt, wird es verknüpft. */
-    suspend fun addText(name: String, quantity: Int = 1): ShoppingItemEntity? {
-        val trimmed = name.trim().takeIf { it.isNotEmpty() } ?: return null
+    suspend fun addText(
+        name: String,
+        quantity: Int = 1,
+        packageSize: BigDecimal? = null,
+        unitSymbol: String? = null,
+    ): ShoppingItemEntity? {
+        val trimmed = name.trim().take(RemoteMapper.MAX_TEXT).takeIf { it.isNotEmpty() } ?: return null
         val product = ShoppingLogic.matchProduct(trimmed, productDao.getAll())
-        return if (product != null) addProduct(product, quantity) else insert(null, trimmed, quantity)
+        return if (product != null) addProduct(product, quantity, packageSize, unitSymbol)
+        else insert(null, trimmed, quantity, packageSize, unitSymbol)
     }
 
     /**
@@ -136,14 +142,22 @@ class ShoppingRepository @Inject constructor(
     }
 
     /** Produkt hinzufügen; steht es schon (manuell) auf der Liste, wird die Menge erhöht. */
-    suspend fun addProduct(product: ProductEntity, quantity: Int = 1): ShoppingItemEntity {
+    suspend fun addProduct(
+        product: ProductEntity,
+        quantity: Int = 1,
+        packageSize: BigDecimal? = null,
+        unitSymbol: String? = null,
+    ): ShoppingItemEntity {
         val existing = shoppingDao.getForProduct(product.id).firstOrNull()
         if (existing != null) {
             val updated = existing.copy(quantity = (existing.quantity + quantity).coerceAtMost(RemoteMapper.MAX_COUNT))
             save(updated)
             return updated
         }
-        // Packungsgröße des Produkts übernehmen (änderbar über "Bearbeiten").
+        // Eingetragene Packungsgröße gilt, sonst die des Produkts (änderbar über "Bearbeiten").
+        if (packageSize != null && packageSize.signum() > 0) {
+            return insert(product.id, product.name, quantity, packageSize, unitSymbol)
+        }
         val unit = product.unitId?.let { unitDao.getById(it)?.symbol }
         return insert(product.id, product.name, quantity, product.packageSize, unit)
     }
@@ -173,11 +187,13 @@ class ShoppingRepository @Inject constructor(
         save(item.copy(quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT)))
     }
 
-    /** Anzahl und Packungsgröße eines Eintrags ändern ("2× 500 g"). */
-    suspend fun updateDetails(id: String, quantity: Int, packageSize: BigDecimal?, unitSymbol: String?) {
+    /** Name, Anzahl und Packungsgröße eines Eintrags ändern ("2× 500 g"); ein leerer Name wird nicht übernommen. */
+    suspend fun updateDetails(id: String, name: String, quantity: Int, packageSize: BigDecimal?, unitSymbol: String?) {
         val item = shoppingDao.getById(id) ?: return
+        val newName = name.trim().take(RemoteMapper.MAX_TEXT).takeIf { it.isNotEmpty() } ?: return
         save(
             item.copy(
+                name = newName,
                 quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT),
                 packageSize = packageSize?.takeIf { it.signum() > 0 },
                 unitSymbol = unitSymbol?.trim()?.take(RemoteMapper.MAX_UNIT)?.takeIf { it.isNotEmpty() },
