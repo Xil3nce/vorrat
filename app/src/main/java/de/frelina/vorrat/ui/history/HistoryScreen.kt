@@ -1,5 +1,18 @@
 package de.frelina.vorrat.ui.history
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.components.SectionLabel
+import de.frelina.vorrat.ui.components.initialsOf
+import de.frelina.vorrat.ui.components.pastelFor
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,11 +82,9 @@ fun HistoryScreen(onBack: () -> Unit, viewModel: HistoryViewModel = hiltViewMode
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.history_title)) },
+                title = { Text(stringResource(R.string.history_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -114,7 +125,10 @@ fun HistoryScreen(onBack: () -> Unit, viewModel: HistoryViewModel = hiltViewMode
                 }
                 else -> {
                     val days = remember(state.events) { HistoryLogic.groupByDay(state.events) }
-                    LazyColumn(contentPadding = PaddingValues(bottom = 96.dp)) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 96.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
                         days.forEach { (day, events) ->
                             item(key = "day-$day") { DayHeader(day) }
                             items(events, key = { it.id }) { e ->
@@ -144,12 +158,7 @@ private fun DayHeader(day: LocalDate) {
         today.minusDays(1) -> stringResource(R.string.history_yesterday)
         else -> Validation.formatDate(day)
     }
-    Text(
-        label,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
-    )
+    SectionLabel(label, Modifier.padding(start = 4.dp, end = 16.dp, top = 12.dp, bottom = 2.dp))
 }
 
 @Composable
@@ -167,15 +176,42 @@ private fun HistoryRow(e: HistoryEventEntity, myUid: String?, onNotify: () -> Un
         HistoryAction.OPENED -> stringResource(R.string.history_opened, who, e.productName)
         HistoryAction.MESSAGE -> stringResource(R.string.history_message, who, e.message.orEmpty())
     }
-    val icon = when (e.action) {
-        HistoryAction.ADDED -> Icons.Outlined.AddCircleOutline
-        HistoryAction.REMOVED -> Icons.Outlined.RemoveCircleOutline
-        HistoryAction.DELETED -> Icons.Outlined.DeleteOutline
-        HistoryAction.OPENED -> Icons.Outlined.LockOpen
-        HistoryAction.MESSAGE -> Icons.Outlined.ChatBubbleOutline
+    val dotColor = when (e.action) {
+        HistoryAction.ADDED -> VorratTheme.colors.accent
+        HistoryAction.REMOVED -> VorratTheme.colors.warning
+        HistoryAction.DELETED -> VorratTheme.colors.danger
+        HistoryAction.OPENED -> VorratTheme.colors.info
+        HistoryAction.MESSAGE -> VorratTheme.colors.info
     }
+    val avatarColor = pastelFor(who)
+    GlassCard(Modifier.fillMaxWidth()) {
     ListItem(
-        leadingContent = { Icon(icon, contentDescription = null) },
+        colors = ListItemDefaults.colors(
+            containerColor = Color.Transparent,
+            supportingColor = VorratTheme.colors.textSecondary,
+        ),
+        leadingContent = {
+            Box(Modifier.size(44.dp)) {
+                Box(
+                    Modifier.size(40.dp).clip(CircleShape).background(avatarColor),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        initialsOf(who),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = VorratTheme.colors.onAccent,
+                    )
+                }
+                Box(
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(14.dp)
+                        .clip(CircleShape)
+                        .background(dotColor),
+                )
+            }
+        },
         headlineContent = { Text(headline) },
         supportingContent = {
             val parts = buildList {
@@ -196,6 +232,7 @@ private fun HistoryRow(e: HistoryEventEntity, myUid: String?, onNotify: () -> Un
             null
         },
     )
+    }
 }
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
