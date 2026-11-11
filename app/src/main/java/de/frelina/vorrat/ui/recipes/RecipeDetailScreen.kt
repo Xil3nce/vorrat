@@ -1,5 +1,10 @@
 package de.frelina.vorrat.ui.recipes
 
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.components.SectionLabel
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -85,11 +90,9 @@ fun RecipeDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(match?.recipe?.title ?: stringResource(R.string.recipes_title), maxLines = 1) },
+                title = { Text(match?.recipe?.title ?: stringResource(R.string.recipes_title), maxLines = 1, fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     if (match != null) {
@@ -121,10 +124,10 @@ fun RecipeDetailScreen(
                 Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(match.recipe.title, style = MaterialTheme.typography.headlineSmall)
+                Text(match.recipe.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                 val meta = recipeMeta(match.recipe)
                 if (meta.isNotEmpty()) {
-                    Text(meta, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(meta, style = MaterialTheme.typography.bodyMedium, color = VorratTheme.colors.textSecondary)
                 }
                 val base = match.recipe.servings
                 val persons = chosenPersons ?: base
@@ -161,18 +164,17 @@ fun RecipeDetailScreen(
                     Text(stringResource(R.string.mealplan_to_plan), modifier = Modifier.padding(start = 8.dp))
                 }
                 if (match.recipe.steps.isNotEmpty()) {
-                    HorizontalDivider()
                     SectionTitle(R.string.recipe_steps)
                     if (base != null && persons != null && persons != base) {
                         Text(
                             pluralStringResource(R.plurals.recipe_steps_for_persons, base, base),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = VorratTheme.colors.textSecondary,
                         )
                     }
                     match.recipe.steps.forEachIndexed { i, step ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("${i + 1}.", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+                            Text("${i + 1}.", style = MaterialTheme.typography.titleSmall, color = VorratTheme.colors.accent)
                             Text(step, style = MaterialTheme.typography.bodyLarge)
                         }
                     }
@@ -244,7 +246,7 @@ private fun missingLines(match: RecipeMatch, factor: Double): List<MissingLine> 
 
 @Composable
 private fun SectionTitle(text: Int) {
-    Text(stringResource(text), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    SectionLabel(stringResource(text))
 }
 
 @Composable
@@ -282,30 +284,31 @@ private const val MAX_PERSONS = 20
 @Composable
 private fun IngredientList(match: RecipeMatch, today: LocalDate, factor: Double) {
     val haveBy = match.have.associateBy { it.ingredient }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        match.recipe.ingredients.forEach { ingredient ->
-            val have = haveBy[ingredient]
-            val missing = ingredient in match.missing
-            IngredientRow(ingredient, have, missing, today, factor)
+    GlassCard(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            match.recipe.ingredients.forEach { ingredient ->
+                val have = haveBy[ingredient]
+                val missing = ingredient in match.missing
+                IngredientRow(ingredient, have, missing, today, factor)
+            }
         }
     }
 }
 
 @Composable
 private fun IngredientRow(ingredient: RecipeIngredient, have: HaveIngredient?, missing: Boolean, today: LocalDate, factor: Double) {
-    val colors = MaterialTheme.colorScheme
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
         when {
             have != null -> Icon(
                 Icons.Outlined.Check,
                 contentDescription = stringResource(R.string.recipe_status_have),
-                tint = colors.primary,
+                tint = VorratTheme.colors.accent,
                 modifier = Modifier.size(20.dp),
             )
             missing -> Icon(
                 Icons.Outlined.Close,
                 contentDescription = stringResource(R.string.recipe_status_missing),
-                tint = colors.error,
+                tint = VorratTheme.colors.danger,
                 modifier = Modifier.size(20.dp),
             )
             else -> Box(Modifier.size(20.dp))
@@ -325,13 +328,13 @@ private fun IngredientRow(ingredient: RecipeIngredient, have: HaveIngredient?, m
                 Text(
                     detail,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (phrase != null) colors.tertiary else colors.onSurfaceVariant,
+                    color = if (phrase != null) VorratTheme.colors.warning else VorratTheme.colors.textSecondary,
                 )
             } else if (missing) {
                 Text(
                     stringResource(R.string.recipe_status_missing),
                     style = MaterialTheme.typography.bodySmall,
-                    color = colors.error,
+                    color = VorratTheme.colors.danger,
                 )
             }
         }

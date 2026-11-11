@@ -1,5 +1,8 @@
 package de.frelina.vorrat.ui.recipes
 
+import de.frelina.vorrat.ui.components.SectionLabel
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,12 +76,10 @@ fun EditRecipeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(stringResource(if (state.editingExisting) R.string.recipe_edit_title else R.string.recipe_new_title))
+                    Text(stringResource(if (state.editingExisting) R.string.recipe_edit_title else R.string.recipe_new_title), fontWeight = FontWeight.SemiBold)
                 },
                 navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onDone, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     TextButton(onClick = viewModel::save, enabled = !state.loading) {
@@ -137,14 +138,10 @@ fun EditRecipeScreen(
                 Switch(checked = state.vegetarian, onCheckedChange = viewModel::setVegetarian)
             }
 
-            Text(
-                stringResource(R.string.recipe_ingredients),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            SectionLabel(stringResource(R.string.recipe_ingredients))
             state.rows.forEach { row ->
                 androidx.compose.runtime.key(row.key) {
-                    GlassCard(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)) {
+                    GlassCard {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
                                 OutlinedTextField(

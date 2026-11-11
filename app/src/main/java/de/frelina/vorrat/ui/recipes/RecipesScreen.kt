@@ -1,5 +1,9 @@
 package de.frelina.vorrat.ui.recipes
 
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +24,9 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import de.frelina.vorrat.ui.components.GlassCard
-import androidx.compose.material3.CardDefaults
+import de.frelina.vorrat.ui.components.ProgressRing
+import de.frelina.vorrat.ui.components.SectionLabel
+import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -64,11 +70,9 @@ fun RecipesScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.recipes_title)) },
+                title = { Text(stringResource(R.string.recipes_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     IconButton(onClick = onOpenMealPlan) {
@@ -105,11 +109,7 @@ fun RecipesScreen(
                     )
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(
-                            stringResource(R.string.recipes_expiring_title),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        SectionLabel(stringResource(R.string.recipes_expiring_title))
                         Row(
                             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -133,6 +133,12 @@ fun RecipesScreen(
                     value = state.query,
                     onValueChange = viewModel::setQuery,
                     singleLine = true,
+                    shape = RoundedCornerShape(24.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedContainerColor = VorratTheme.colors.glass,
+                        focusedContainerColor = VorratTheme.colors.glassStrong,
+                        unfocusedBorderColor = VorratTheme.colors.glassBorder,
+                    ),
                     label = { Text(stringResource(R.string.recipes_search)) },
                     leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
                     trailingIcon = {
@@ -191,13 +197,13 @@ private fun RecipeCard(match: RecipeMatch, today: LocalDate, onClick: () -> Unit
     val recipe = match.recipe
     GlassCard(
         modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
     ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(recipe.title, style = MaterialTheme.typography.titleMedium)
+        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(recipe.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             val meta = recipeMeta(recipe)
             if (meta.isNotEmpty()) {
-                Text(meta, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(meta, style = MaterialTheme.typography.bodySmall, color = VorratTheme.colors.textSecondary)
             }
             // Zutaten, die bald ablaufen, zuerst.
             val have = match.have.sortedWith(compareBy({ it.expiry == null }, { it.expiry }))
@@ -208,23 +214,34 @@ private fun RecipeCard(match: RecipeMatch, today: LocalDate, onClick: () -> Unit
                     stringResource(R.string.recipe_have_line, h.ingredient.name) +
                         if (phrase != null) " ($phrase)" else "",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (rescue) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurface,
+                    color = if (rescue) VorratTheme.colors.warning else MaterialTheme.colorScheme.onSurface,
                 )
             }
             if (have.size > MAX_HAVE_LINES) {
                 Text(
                     pluralStringResource(R.plurals.recipe_have_more, have.size - MAX_HAVE_LINES, have.size - MAX_HAVE_LINES),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = VorratTheme.colors.textSecondary,
                 )
             }
             if (match.missing.isNotEmpty()) {
                 Text(
                     stringResource(R.string.recipe_missing_line, match.missing.joinToString { it.name }),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
+                    color = VorratTheme.colors.warning,
                 )
             }
+        }
+        val total = match.have.size + match.missing.size
+        if (total > 0) {
+            ProgressRing(
+                progress = match.have.size.toFloat() / total,
+                size = 44.dp,
+                color = if (match.missing.isEmpty()) VorratTheme.colors.accent else VorratTheme.colors.warning,
+            ) {
+                Text("${match.have.size}/$total", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+            }
+        }
         }
     }
 }
