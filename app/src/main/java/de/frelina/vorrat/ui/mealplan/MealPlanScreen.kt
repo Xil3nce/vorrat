@@ -1,5 +1,11 @@
 package de.frelina.vorrat.ui.mealplan
 
+import androidx.compose.foundation.BorderStroke
+import de.frelina.vorrat.ui.components.SectionLabel
+import de.frelina.vorrat.ui.components.glassBorder
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,11 +98,9 @@ fun MealPlanScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.mealplan_title)) },
+                title = { Text(stringResource(R.string.mealplan_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     IconButton(onClick = { menu = true }) {
@@ -283,15 +287,15 @@ private fun DayCard(
 ) {
     val label = day.date.format(DAY_FORMAT)
     GlassCard(
-        colors = CardDefaults.cardColors(
-            containerColor = if (isToday) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
-        ),
+        border = if (isToday) BorderStroke(1.dp, VorratTheme.colors.accent.copy(alpha = 0.6f)) else glassBorder(),
     ) {
         Column(Modifier.padding(vertical = 4.dp)) {
             Row(Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     if (isToday) "$label · ${stringResource(R.string.mealplan_today)}" else label,
                     style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isToday) VorratTheme.colors.accent else MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f).semantics { heading() },
                 )
                 IconButton(onClick = onAdd) {
@@ -302,12 +306,12 @@ private fun DayCard(
                 Text(
                     stringResource(R.string.mealplan_day_empty),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = VorratTheme.colors.textSecondary,
                     modifier = Modifier.padding(start = 16.dp, bottom = 12.dp),
                 )
             }
             day.entries.forEachIndexed { index, entry ->
-                if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp))
+                if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = VorratTheme.colors.glassBorder)
                 EntryRow(entry, onOpen = { onOpen(entry) }, onMove = { onMove(entry) }, onRemove = { onRemove(entry) })
             }
         }
@@ -335,7 +339,7 @@ private fun EntryRow(entry: PlanEntryUi, onOpen: () -> Unit, onMove: () -> Unit,
                 Icon(
                     Icons.Outlined.Close,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
+                    tint = VorratTheme.colors.danger,
                     modifier = Modifier.padding(end = 20.dp),
                 )
             }
@@ -358,13 +362,13 @@ private fun EntryRow(entry: PlanEntryUi, onOpen: () -> Unit, onMove: () -> Unit,
                 Text(
                     title,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (entry.recipe == null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                    color = if (entry.recipe == null) VorratTheme.colors.danger else MaterialTheme.colorScheme.onSurface,
                 )
                 if (entry.recipe != null) {
                     Text(
                         pluralStringResource(R.plurals.mealplan_for_persons, entry.entry.persons, entry.entry.persons),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = VorratTheme.colors.textSecondary,
                     )
                 }
             }
@@ -426,10 +430,8 @@ private fun RecipePickerSheet(
 
 @Composable
 private fun PickerHeader(text: Int) {
-    Text(
+    SectionLabel(
         stringResource(text),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 12.dp, bottom = 4.dp).semantics { heading() },
     )
 }

@@ -1,5 +1,9 @@
 package de.frelina.vorrat.ui.mealplan
 
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,11 +58,9 @@ fun PlanShoppingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.planshop_title)) },
+                title = { Text(stringResource(R.string.planshop_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     if (state.lines.isNotEmpty()) {
@@ -85,14 +87,17 @@ fun PlanShoppingScreen(
             state.lines.isEmpty() -> Box(Modifier.padding(padding).fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.planshop_empty), textAlign = TextAlign.Center)
             }
-            else -> LazyColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = PaddingValues(bottom = 8.dp)) {
+            else -> LazyColumn(
+                Modifier.padding(padding).fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 items(state.lines, key = { it.line.key }) { row ->
                     LineRow(
                         row = row,
                         onToggle = { viewModel.toggle(row.line.key, it) },
                         onStaple = { viewModel.addStaple(row.line) },
                     )
-                    HorizontalDivider()
                 }
             }
         }
@@ -110,6 +115,7 @@ private fun LineRow(row: PlanLineUi, onToggle: (Boolean) -> Unit, onStaple: () -
         null -> null
     }
     val title = listOfNotNull(line.amount?.takeIf(String::isNotBlank), line.name).joinToString(" ")
+    GlassCard(Modifier.fillMaxWidth()) {
     Row(
         Modifier.fillMaxWidth().clickable { onToggle(!row.checked) }.padding(start = 4.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -120,10 +126,10 @@ private fun LineRow(row: PlanLineUi, onToggle: (Boolean) -> Unit, onStaple: () -
             Text(
                 stringResource(R.string.planshop_for, line.recipes.joinToString(", ")),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = VorratTheme.colors.textSecondary,
             )
             if (hint != null) {
-                Text(hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                Text(hint, style = MaterialTheme.typography.bodySmall, color = VorratTheme.colors.accent)
             }
         }
         if (line.hint != LineHint.Staple) {
@@ -131,5 +137,6 @@ private fun LineRow(row: PlanLineUi, onToggle: (Boolean) -> Unit, onStaple: () -
                 Icon(Icons.Outlined.Home, contentDescription = stringResource(R.string.planshop_staple_action_for, line.name))
             }
         }
+    }
     }
 }
