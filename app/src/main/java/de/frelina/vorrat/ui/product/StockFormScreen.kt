@@ -1,5 +1,10 @@
 package de.frelina.vorrat.ui.product
 
+import de.frelina.vorrat.ui.theme.VorratTheme
+import de.frelina.vorrat.ui.components.SectionLabel
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -107,11 +112,9 @@ fun StockFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(title)) },
+                title = { Text(stringResource(title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onDone, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -220,7 +223,7 @@ fun StockFormScreen(
 
 @Composable
 private fun SectionTitle(text: Int) {
-    Text(stringResource(text), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    SectionLabel(stringResource(text))
 }
 
 @Composable
@@ -238,9 +241,9 @@ private fun LookupHints(state: StockFormState) {
         }
     }
     if (messages.isEmpty()) return
-    GlassCard(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+    GlassCard(border = BorderStroke(1.dp, VorratTheme.colors.info.copy(alpha = 0.5f))) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            messages.forEach { Text(stringResource(it), style = MaterialTheme.typography.bodyMedium) }
+            messages.forEach { Text(stringResource(it), style = MaterialTheme.typography.bodyMedium, color = VorratTheme.colors.info) }
         }
     }
 }
