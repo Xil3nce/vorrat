@@ -4,11 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import de.frelina.vorrat.ui.components.GlassCard
-import de.frelina.vorrat.ui.components.pastelFor
 import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.ui.text.font.FontWeight
 import de.frelina.vorrat.ui.components.GlassIconButton
@@ -28,19 +26,25 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.TableRows
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import de.frelina.vorrat.data.repo.StockRepository
+import de.frelina.vorrat.domain.StockQueries
+import kotlinx.coroutines.flow.combine
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,12 +79,33 @@ import javax.inject.Inject
 
 data class InUseInfo(val name: String, val usages: Int)
 
+/** Ort mit Anzahl Bestandseinträge; [location] null = Einträge ohne Ort. */
+data class LocationStat(val location: LocationEntity?, val count: Int)
+
+data class LocationsUiState(
+    val loading: Boolean = true,
+    val stats: List<LocationStat> = emptyList(),
+    val total: Int = 0,
+)
+
 @HiltViewModel
 class LocationsViewModel @Inject constructor(
     private val repository: CatalogRepository,
+    stockRepository: StockRepository,
 ) : ViewModel() {
-    val locations: StateFlow<List<LocationEntity>?> =
-        repository.observeLocations().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val state: StateFlow<LocationsUiState> = combine(
+        repository.observeLocations(),
+        stockRepository.observeItems(),
+    ) { locations, items ->
+        val counts = items.groupingBy { it.locationId }.eachCount()
+        val unassigned = counts[null] ?: 0
+        LocationsUiState(
+            loading = false,
+            stats = locations.map { LocationStat(it, counts[it.id] ?: 0) } +
+                listOfNotNull(LocationStat(null, unassigned).takeIf { unassigned > 0 }),
+            total = items.size,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LocationsUiState())
 
     private val _inUse = MutableStateFlow<InUseInfo?>(null)
     val inUse: StateFlow<InUseInfo?> = _inUse.asStateFlow()
@@ -100,21 +125,43 @@ class LocationsViewModel @Inject constructor(
     }
 }
 
+/**
+ * Übersicht der Orte (Hauptbereich "Übersicht"; über die Einstellungen auch als Unterseite mit [onBack]):
+ * Verteilung des Bestands, je Ort Anzahl Einträge und Ebenen/Fächer. Antippen öffnet den Bestand gefiltert
+ * nach diesem Ort ([onOpenLocation]; [StockQueries.NO_LOCATION] für "Ohne Ort").
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltViewModel()) {
-    val locations by viewModel.locations.collectAsStateWithLifecycle()
+fun LocationsScreen(
+    onBack: (() -> Unit)?,
+    onOpenLocation: (String) -> Unit,
+    viewModel: LocationsViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val inUse by viewModel.inUse.collectAsStateWithLifecycle()
     var addDialog by remember { mutableStateOf(false) }
-    var renameTarget by remember { mutableStateOf<LocationEntity?>(null) }
+    var editTarget by remember { mutableStateOf<LocationEntity?>(null) }
     var deleteTarget by remember { mutableStateOf<LocationEntity?>(null) }
+    val pastels = VorratTheme.colors.pastels
+    val unassignedColor = VorratTheme.colors.textSecondary
+    // Farbe je Ort nach Position in der Liste: benachbarte Orte bekommen nie dieselbe Farbe.
+    val colorFor: (LocationStat) -> Color = { stat ->
+        if (stat.location == null) unassignedColor else pastels[Math.floorMod(state.stats.indexOf(stat), pastels.size)]
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.locations_title), fontWeight = FontWeight.SemiBold) },
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        stringResource(if (onBack == null) R.string.overview_title else R.string.locations_title),
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
                 navigationIcon = {
-                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
+                    if (onBack != null) {
+                        GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
+                    }
                 },
             )
         },
@@ -126,8 +173,7 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
             )
         },
     ) { padding ->
-        val list = locations
-        if (list != null && list.isEmpty()) {
+        if (!state.loading && state.stats.isEmpty()) {
             Box(Modifier.fillMaxSize().padding(padding).padding(32.dp), contentAlignment = Alignment.Center) {
                 Text(stringResource(R.string.locations_empty), textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
             }
@@ -135,37 +181,18 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
             LazyColumn(
                 Modifier.padding(padding),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                items(list.orEmpty(), key = { it.id }) { loc ->
-                    GlassCard(Modifier.fillMaxWidth()) {
-                        ListItem(
-                            colors = ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                                supportingColor = VorratTheme.colors.textSecondary,
-                            ),
-                            headlineContent = { Text(loc.name, fontWeight = FontWeight.SemiBold) },
-                            supportingContent = slotSummary(loc)?.let { summary -> { Text(summary) } },
-                            leadingContent = {
-                                Box(
-                                    Modifier.size(44.dp).clip(RoundedCornerShape(16.dp)).background(pastelFor(loc.name)),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(Icons.Outlined.Place, contentDescription = null, tint = VorratTheme.colors.onAccent)
-                                }
-                            },
-                            trailingContent = {
-                                Row {
-                                    IconButton(onClick = { renameTarget = loc }) {
-                                        Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.action_edit))
-                                    }
-                                    IconButton(onClick = { deleteTarget = loc }) {
-                                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
-                                    }
-                                }
-                            },
-                        )
-                    }
+                if (state.total > 0) {
+                    item(key = "distribution") { DistributionCard(state, colorFor) }
+                }
+                items(state.stats, key = { it.location?.id ?: StockQueries.NO_LOCATION }) { stat ->
+                    LocationCard(
+                        stat = stat,
+                        color = colorFor(stat),
+                        onClick = { onOpenLocation(stat.location?.id ?: StockQueries.NO_LOCATION) },
+                        onEdit = stat.location?.let { loc -> { editTarget = loc } },
+                    )
                 }
             }
         }
@@ -179,12 +206,13 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
             onConfirm = viewModel::add,
         )
     }
-    renameTarget?.let { target ->
+    editTarget?.let { target ->
         LocationDialog(
             title = stringResource(R.string.locations_edit),
             initial = target,
-            onDismiss = { renameTarget = null },
+            onDismiss = { editTarget = null },
             onConfirm = { name, levels, shelves -> viewModel.update(target, name, levels, shelves) },
+            onDelete = { editTarget = null; deleteTarget = target },
         )
     }
     deleteTarget?.let { target ->
@@ -210,14 +238,110 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
     }
 }
 
-/** "3 Ebenen · 4 Fächer" (nur festgelegte Angaben); null, wenn nichts festgelegt ist. */
+/** "Verteilung im Bestand": Gesamtzahl und ein Balken mit einem Abschnitt je Ort. */
 @Composable
-private fun slotSummary(loc: LocationEntity): String? {
+private fun DistributionCard(state: LocationsUiState, colorFor: (LocationStat) -> Color) {
+    GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+        Column(Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.overview_distribution),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = VorratTheme.colors.textSecondary,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    pluralStringResource(R.plurals.overview_items, state.total, state.total),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            Row(
+                Modifier.padding(top = 12.dp).fillMaxWidth().height(10.dp).clip(RoundedCornerShape(5.dp)),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                state.stats.filter { it.count > 0 }.forEach { stat ->
+                    Box(Modifier.weight(stat.count.toFloat()).fillMaxHeight().background(colorFor(stat)))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LocationCard(stat: LocationStat, color: Color, onClick: () -> Unit, onEdit: (() -> Unit)?) {
+    val loc = stat.location
+    val name = loc?.name ?: stringResource(R.string.location_none)
+    GlassCard(Modifier.fillMaxWidth(), onClick = onClick, shape = MaterialTheme.shapes.large) {
+        Row(
+            Modifier.padding(start = 16.dp, top = 16.dp, bottom = 16.dp, end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier.size(50.dp).clip(RoundedCornerShape(16.dp)).background(color),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    if (loc == null) Icons.Outlined.Place else Icons.Outlined.TableRows,
+                    contentDescription = null,
+                    tint = VorratTheme.colors.onAccent,
+                )
+            }
+            Column(Modifier.weight(1f).padding(start = 14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                        name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
+                    )
+                    Text(
+                        pluralStringResource(R.plurals.overview_items, stat.count, stat.count),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = VorratTheme.colors.textTertiary,
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    slotChips(loc).forEach { SlotChip(it) }
+                }
+            }
+            if (onEdit != null) {
+                IconButton(onClick = onEdit) {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = stringResource(R.string.overview_edit, name),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            } else {
+                Spacer(Modifier.width(48.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SlotChip(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelMedium,
+        color = VorratTheme.colors.textTertiary,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(VorratTheme.colors.glassStrong)
+            .padding(horizontal = 10.dp, vertical = 4.dp),
+    )
+}
+
+/** Plaketten "3 Ebenen", "4 Fächer" bzw. "ohne Ebenen und Fächer"; "Ohne Ort" mit Hinweis. */
+@Composable
+private fun slotChips(loc: LocationEntity?): List<String> {
+    if (loc == null) return listOf(stringResource(R.string.overview_unassigned_hint))
     val parts = listOfNotNull(
         loc.levels?.let { pluralStringResource(R.plurals.locations_levels_count, it, it) },
         loc.shelves?.let { pluralStringResource(R.plurals.locations_shelves_count, it, it) },
     )
-    return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
+    return parts.ifEmpty { listOf(stringResource(R.string.overview_no_slots)) }
 }
 
 /** Leer = nicht festgelegt (null); sonst 1 … MAX_SLOTS, andernfalls ungültig (failure). */
@@ -238,6 +362,7 @@ private fun LocationDialog(
     initial: LocationEntity?,
     onDismiss: () -> Unit,
     onConfirm: suspend (name: String, levels: Int?, shelves: Int?) -> SaveResult,
+    onDelete: (() -> Unit)? = null,
 ) {
     var name by rememberSaveable { mutableStateOf(initial?.name.orEmpty()) }
     var levels by rememberSaveable { mutableStateOf(initial?.levels?.toString().orEmpty()) }
@@ -282,6 +407,16 @@ private fun LocationDialog(
                     style = MaterialTheme.typography.bodySmall,
                     color = if (slotError) MaterialTheme.colorScheme.error else VorratTheme.colors.textSecondary,
                 )
+                if (onDelete != null) {
+                    TextButton(onClick = onDelete) {
+                        Icon(Icons.Outlined.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                        Text(
+                            stringResource(R.string.locations_delete_action),
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = 8.dp),
+                        )
+                    }
+                }
             }
         },
         confirmButton = {

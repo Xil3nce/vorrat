@@ -28,7 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.QrCodeScanner
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -69,7 +69,6 @@ import de.frelina.vorrat.ui.recipes.EditRecipeScreen
 import de.frelina.vorrat.ui.recipes.RecipeDetailScreen
 import de.frelina.vorrat.ui.recipes.RecipesScreen
 import de.frelina.vorrat.ui.scan.ScanScreen
-import de.frelina.vorrat.ui.search.SearchScreen
 import de.frelina.vorrat.ui.settings.AboutScreen
 import de.frelina.vorrat.ui.settings.CatalogScreen
 import de.frelina.vorrat.ui.settings.SettingsScreen
@@ -87,7 +86,7 @@ private data class TopLevel(val route: Any, val routeClass: KClass<*>, val label
 
 private val TOP_LEVEL = listOf(
     TopLevel(StockRoute(), StockRoute::class, R.string.nav_stock, Icons.Outlined.Inventory2),
-    TopLevel(SearchRoute, SearchRoute::class, R.string.nav_search, Icons.Outlined.Search),
+    TopLevel(OverviewRoute, OverviewRoute::class, R.string.nav_overview, Icons.Outlined.Dashboard),
     TopLevel(ScanRoute, ScanRoute::class, R.string.nav_scan, Icons.Outlined.QrCodeScanner),
     TopLevel(ShoppingRoute, ShoppingRoute::class, R.string.nav_shopping, Icons.Outlined.ShoppingCart),
     TopLevel(SettingsRoute, SettingsRoute::class, R.string.nav_settings, Icons.Outlined.Settings),
@@ -127,7 +126,7 @@ fun VorratRoot(
     // Screens mit FAB: Snackbar darüber anzeigen, damit sie nichts verdeckt. Mit Leiste sitzt nur der kleine
     // Speed-Dial des Bestands knapp über ihr; ohne Leiste liegen die erweiterten FABs 16 dp über dem Rand.
     val liftSnackbar = if (showBottomBar) {
-        destination?.hierarchy?.any { it.hasRoute(StockRoute::class) } == true
+        listOf(StockRoute::class, OverviewRoute::class).any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
     } else {
         listOf(LocationsRoute::class, RecipesRoute::class, DepartmentsRoute::class, MealPlanRoute::class, PlanShoppingRoute::class)
             .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
@@ -226,8 +225,8 @@ fun VorratRoot(
                     onOpenRecipes = { navController.navigate(RecipesRoute) },
                 )
             }
-            composable<SearchRoute> {
-                SearchScreen(onOpenEntry = { navController.navigate(EntryDetailRoute(it)) })
+            composable<OverviewRoute> {
+                LocationsScreen(onBack = null, onOpenLocation = { navController.openStockAt(it) })
             }
             composable<ScanRoute> {
                 ScanScreen(
@@ -247,7 +246,9 @@ fun VorratRoot(
                     onOpenMealPlan = { navController.navigate(MealPlanRoute) },
                 )
             }
-            composable<LocationsRoute> { LocationsScreen(onBack = { navController.popBackStack() }) }
+            composable<LocationsRoute> {
+                LocationsScreen(onBack = { navController.popBackStack() }, onOpenLocation = { navController.openStockAt(it) })
+            }
             composable<SettingsRoute> {
                 SettingsScreen(
                     onOpenLocations = { navController.navigate(LocationsRoute) },
@@ -378,6 +379,14 @@ private fun FloatingNavBar(isSelected: (TopLevel) -> Boolean, onSelect: (TopLeve
                 }
             }
         }
+    }
+}
+
+/** Bestand nach einem Ort gefiltert öffnen (neuer Bestand-Eintrag, damit der Filter aus der Route greift). */
+private fun NavHostController.openStockAt(locationId: String) {
+    navigate(StockRoute(locationId = locationId)) {
+        popUpTo(graph.findStartDestination().id) { inclusive = true }
+        launchSingleTop = true
     }
 }
 

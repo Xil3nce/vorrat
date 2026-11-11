@@ -10,6 +10,8 @@ import de.frelina.vorrat.data.repo.MealPlanRepository
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.data.repo.StapleRepository
 import de.frelina.vorrat.data.repo.StockRepository
+import de.frelina.vorrat.domain.IngredientMatcher
+import de.frelina.vorrat.domain.MealPlanShopping
 import de.frelina.vorrat.domain.PlanWeek
 import de.frelina.vorrat.domain.Recipe
 import de.frelina.vorrat.domain.RecipeMatcher
@@ -27,8 +29,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
-/** Eintrag im Wochenplan; [recipe] ist null, wenn das Rezept nicht mehr vorhanden ist. */
-data class PlanEntryUi(val entry: MealPlanEntity, val recipe: Recipe?)
+/**
+ * Eintrag im Wochenplan; [recipe] ist null, wenn das Rezept nicht mehr vorhanden ist.
+ * [missing]: Pflichtzutaten, die weder im Bestand noch unter "Immer zuhause" sind (Grundzutaten zählen nicht).
+ */
+data class PlanEntryUi(val entry: MealPlanEntity, val recipe: Recipe?, val missing: List<String> = emptyList())
 
 data class PlanDayUi(val date: LocalDate, val entries: List<PlanEntryUi>)
 
@@ -67,12 +72,30 @@ class MealPlanViewModel @Inject constructor(
         val byId = recipes.associateBy { it.id }
         val byDay = entries.groupBy { it.date }
         val pantry = items.map { it.toPantryEntry() }
+        val byGroup = RecipeMatcher.pantryByGroup(pantry)
+        val stapleKeys = stapleList.map { it.key }.toSet()
+        val missingCache = mutableMapOf<String, List<String>>()
+        fun missingFor(recipe: Recipe): List<String> = missingCache.getOrPut(recipe.id) {
+            RecipeMatcher.evaluate(recipe, byGroup, today).missing
+                .filter { ing ->
+                    val key = MealPlanShopping.stapleKey(RecipeMatcher.groupOf(ing), ing.name.trim())
+                    key !in stapleKeys && IngredientMatcher.normalize(ing.name) !in stapleKeys
+                }
+                .map { it.name.trim() }
+                .distinct()
+        }
         MealPlanUiState(
             loading = false,
             weekStart = start,
             today = today,
             days = PlanWeek.days(start).map { day ->
-                PlanDayUi(day, byDay[day].orEmpty().map { PlanEntryUi(it, byId[it.recipeId]) })
+                PlanDayUi(
+                    day,
+                    byDay[day].orEmpty().map { e ->
+                        val recipe = byId[e.recipeId]
+                        PlanEntryUi(e, recipe, recipe?.let(::missingFor).orEmpty())
+                    },
+                )
             },
             recipes = recipes,
             suggestions = RecipeMatcher.rank(recipes, pantry, today).take(MAX_SUGGESTIONS).map { it.recipe },

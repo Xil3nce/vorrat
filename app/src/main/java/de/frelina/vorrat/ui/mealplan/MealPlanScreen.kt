@@ -7,6 +7,28 @@ import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.ui.text.font.FontWeight
 import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import java.time.format.TextStyle
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,30 +43,22 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.AlertDialog
 import de.frelina.vorrat.ui.components.GlassCard
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +85,6 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 private val DAY_FORMAT = DateTimeFormatter.ofPattern("EEEE, d. MMMM", Locale.GERMANY)
-private val SHORT_FORMAT = DateTimeFormatter.ofPattern("d.M.", Locale.GERMANY)
 private val CHIP_FORMAT = DateTimeFormatter.ofPattern("EEE d.M.", Locale.GERMANY)
 private const val DEFAULT_PERSONS = 2
 
@@ -91,33 +104,42 @@ fun MealPlanScreen(
     var moveEntry by remember { mutableStateOf<PlanEntryUi?>(null) }
     var rangeDialog by remember { mutableStateOf(false) }
     var staplesDialog by remember { mutableStateOf(false) }
+    var selected by rememberSaveable { mutableStateOf<String?>(null) }
 
     val hasEntries = state.days.any { it.entries.isNotEmpty() }
     val hasFromToday = PlanWeek.hasFromTodayChoice(state.weekStart, state.today)
 
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    // Hervorgehobener Tag: gewählter Tag dieser Woche, sonst heute (falls in der Woche), sonst Montag.
+    val weekDays = PlanWeek.days(state.weekStart)
+    val selectedDay = selected?.let(LocalDate::parse)?.takeIf { it in weekDays }
+        ?: state.today.takeIf { it in weekDays }
+        ?: state.weekStart
+
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.mealplan_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
-                    IconButton(onClick = { menu = true }) {
-                        Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.shopping_menu_more))
-                    }
-                    DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.mealplan_menu_staples)) },
-                            onClick = { menu = false; staplesDialog = true },
-                        )
+                    Box(Modifier.padding(end = 8.dp)) {
+                        GlassIconButton(Icons.Outlined.MoreVert, stringResource(R.string.shopping_menu_more), { menu = true })
+                        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.mealplan_menu_staples)) },
+                                onClick = { menu = false; staplesDialog = true },
+                            )
+                        }
                     }
                 },
             )
         },
-        floatingActionButton = {
+        bottomBar = {
             if (hasEntries) {
-                ExtendedFloatingActionButton(
+                Button(
                     onClick = {
                         if (hasFromToday) {
                             rangeDialog = true
@@ -126,9 +148,21 @@ fun MealPlanScreen(
                             onOpenShopping(from, to)
                         }
                     },
-                    icon = { Icon(Icons.Outlined.AddShoppingCart, contentDescription = null) },
-                    text = { Text(stringResource(R.string.mealplan_shopping)) },
-                )
+                    shape = RoundedCornerShape(28.dp),
+                    contentPadding = PaddingValues(horizontal = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 8.dp)
+                        .height(56.dp),
+                ) {
+                    Icon(Icons.Outlined.ShoppingCart, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Text(
+                        stringResource(R.string.mealplan_shopping),
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(start = 10.dp),
+                    )
+                }
             }
         },
     ) { padding ->
@@ -137,22 +171,30 @@ fun MealPlanScreen(
         } else {
             LazyColumn(
                 Modifier.padding(padding).fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(start = 16.dp, end = 16.dp, bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                state = listState,
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 item(key = "week") {
-                    WeekNavigation(
-                        weekStart = state.weekStart,
+                    WeekHeader(
+                        days = state.days,
+                        today = state.today,
+                        selected = selectedDay,
                         isThisWeek = state.weekStart == PlanWeek.monday(state.today),
-                        onPrevious = viewModel::previousWeek,
-                        onNext = viewModel::nextWeek,
-                        onThisWeek = viewModel::thisWeek,
+                        onSelect = { day ->
+                            selected = day.toString()
+                            val index = state.days.indexOfFirst { it.date == day }
+                            if (index >= 0) scope.launch { listState.animateScrollToItem(index + 1) }
+                        },
+                        onPrevious = { selected = null; viewModel.previousWeek() },
+                        onNext = { selected = null; viewModel.nextWeek() },
+                        onThisWeek = { selected = null; viewModel.thisWeek() },
                     )
                 }
                 items(state.days, key = { it.date.toString() }) { day ->
-                    DayCard(
+                    DayRow(
                         day = day,
-                        isToday = day.date == state.today,
+                        highlighted = day.date == selectedDay,
                         onAdd = { pickDay = day.date.toString() },
                         onOpen = { entry -> entry.recipe?.let { onOpenRecipe(it.id, entry.entry.persons) } },
                         onMove = { moveEntry = it },
@@ -245,41 +287,119 @@ fun MealPlanScreen(
     }
 }
 
+/** "Mo", "Di", … (erste zwei Buchstaben des Wochentags, ohne Punkt). */
+private fun weekdayShort(day: LocalDate): String =
+    day.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.GERMANY).take(2)
+
+/** Monat der Woche ("November", über den Monatswechsel "November / Dezember"); fremdes Jahr mit Jahreszahl. */
+private fun monthTitle(weekStart: LocalDate, today: LocalDate): String {
+    val end = weekStart.plusDays(6)
+    fun name(d: LocalDate) = d.month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.GERMANY)
+    val months = if (weekStart.month == end.month) name(weekStart) else "${name(weekStart)} / ${name(end)}"
+    return if (end.year != today.year) "$months ${end.year}" else months
+}
+
+/** Kopfkarte: Monat, Wochenwechsel und die sieben Tage als Leiste (Punkt = etwas geplant). */
 @Composable
-private fun WeekNavigation(
-    weekStart: LocalDate,
+private fun WeekHeader(
+    days: List<PlanDayUi>,
+    today: LocalDate,
+    selected: LocalDate,
     isThisWeek: Boolean,
+    onSelect: (LocalDate) -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onThisWeek: () -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onPrevious) {
-                Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, contentDescription = stringResource(R.string.mealplan_week_prev))
+    val weekStart = days.firstOrNull()?.date ?: PlanWeek.monday(today)
+    GlassCard(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+        Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    monthTitle(weekStart, today),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f).semantics { heading() },
+                )
+                if (!isThisWeek) {
+                    TextButton(onClick = onThisWeek) { Text(stringResource(R.string.mealplan_this_week)) }
+                }
+                GlassIconButton(
+                    Icons.AutoMirrored.Outlined.KeyboardArrowLeft,
+                    stringResource(R.string.mealplan_week_prev),
+                    onPrevious,
+                    Modifier.size(40.dp),
+                )
+                GlassIconButton(
+                    Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                    stringResource(R.string.mealplan_week_next),
+                    onNext,
+                    Modifier.padding(start = 8.dp).size(40.dp),
+                )
             }
-            Text(
-                stringResource(
-                    R.string.mealplan_week_range,
-                    weekStart.format(SHORT_FORMAT),
-                    weekStart.plusDays(6).format(SHORT_FORMAT),
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            IconButton(onClick = onNext) {
-                Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = stringResource(R.string.mealplan_week_next))
+            Row(Modifier.padding(top = 14.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                days.forEach { day ->
+                    DayPill(
+                        date = day.date,
+                        planned = day.entries.isNotEmpty(),
+                        selected = day.date == selected,
+                        onClick = { onSelect(day.date) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
-        if (!isThisWeek) TextButton(onClick = onThisWeek) { Text(stringResource(R.string.mealplan_this_week)) }
     }
 }
 
 @Composable
-private fun DayCard(
+private fun DayPill(date: LocalDate, planned: Boolean, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = VorratTheme.colors
+    val content = if (selected) colors.onAccent else MaterialTheme.colorScheme.onSurface
+    val shape = RoundedCornerShape(20.dp)
+    val label = stringResource(R.string.mealplan_select_day, date.format(DAY_FORMAT))
+    Column(
+        modifier
+            .clip(shape)
+            .background(if (selected) MaterialTheme.colorScheme.onSurface else colors.glass)
+            .border(1.dp, if (selected) Color.Transparent else colors.glassBorder, shape)
+            .selectable(selected = selected, role = Role.Tab, onClick = onClick)
+            .semantics { contentDescription = label }
+            .padding(vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            weekdayShort(date),
+            style = MaterialTheme.typography.labelMedium,
+            color = if (selected) content else colors.textSecondary,
+        )
+        Text(
+            date.dayOfMonth.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = content,
+        )
+        Box(
+            Modifier
+                .padding(top = 4.dp)
+                .size(5.dp)
+                .clip(CircleShape)
+                .background(
+                    when {
+                        !planned -> Color.Transparent
+                        selected -> colors.onAccent
+                        else -> colors.accent
+                    },
+                ),
+        )
+    }
+}
+
+/** Tageszeile: Wochentag + Datum links, geplante Rezepte mit Vorratsstand, Plus zum Hinzufügen. */
+@Composable
+private fun DayRow(
     day: PlanDayUi,
-    isToday: Boolean,
+    highlighted: Boolean,
     onAdd: () -> Unit,
     onOpen: (PlanEntryUi) -> Unit,
     onMove: (PlanEntryUi) -> Unit,
@@ -287,102 +407,98 @@ private fun DayCard(
 ) {
     val label = day.date.format(DAY_FORMAT)
     GlassCard(
-        border = if (isToday) BorderStroke(1.dp, VorratTheme.colors.accent.copy(alpha = 0.6f)) else glassBorder(),
+        Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        border = if (highlighted) BorderStroke(1.dp, VorratTheme.colors.accent.copy(alpha = 0.6f)) else glassBorder(),
     ) {
-        Column(Modifier.padding(vertical = 4.dp)) {
-            Row(Modifier.padding(start = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    if (isToday) "$label · ${stringResource(R.string.mealplan_today)}" else label,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = if (isToday) VorratTheme.colors.accent else MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f).semantics { heading() },
-                )
-                IconButton(onClick = onAdd) {
-                    Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.mealplan_add_for_day, label))
+        Row(
+            Modifier.padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                Modifier.width(48.dp).semantics(mergeDescendants = true) { heading() },
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(weekdayShort(day.date), style = MaterialTheme.typography.labelMedium, color = VorratTheme.colors.textSecondary)
+                Text(day.date.dayOfMonth.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            }
+            Column(Modifier.weight(1f).padding(start = 8.dp, end = 8.dp)) {
+                if (day.entries.isEmpty()) {
+                    Text(
+                        stringResource(R.string.mealplan_day_empty),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = VorratTheme.colors.textSecondary,
+                        modifier = Modifier.padding(vertical = 10.dp),
+                    )
+                }
+                day.entries.forEach { entry ->
+                    EntryLine(entry, onOpen = { onOpen(entry) }, onMove = { onMove(entry) }, onRemove = { onRemove(entry) })
                 }
             }
-            if (day.entries.isEmpty()) {
-                Text(
-                    stringResource(R.string.mealplan_day_empty),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = VorratTheme.colors.textSecondary,
-                    modifier = Modifier.padding(start = 16.dp, bottom = 12.dp),
-                )
-            }
-            day.entries.forEachIndexed { index, entry ->
-                if (index > 0) HorizontalDivider(Modifier.padding(horizontal = 16.dp), color = VorratTheme.colors.glassBorder)
-                EntryRow(entry, onOpen = { onOpen(entry) }, onMove = { onMove(entry) }, onRemove = { onRemove(entry) })
+            IconButton(
+                onClick = onAdd,
+                modifier = Modifier.size(40.dp).border(1.dp, VorratTheme.colors.glassBorder, CircleShape),
+            ) {
+                Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.mealplan_add_for_day, label))
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** Ein geplantes Rezept: Titel und "Alles vorrätig" bzw. "Fehlt: …". Lange drücken öffnet Verschieben/Entfernen. */
 @Composable
-private fun EntryRow(entry: PlanEntryUi, onOpen: () -> Unit, onMove: () -> Unit, onRemove: () -> Unit) {
+private fun EntryLine(entry: PlanEntryUi, onOpen: () -> Unit, onMove: () -> Unit, onRemove: () -> Unit) {
     val title = entry.recipe?.title ?: stringResource(R.string.mealplan_recipe_missing)
     var menu by remember { mutableStateOf(false) }
     val removeLabel = stringResource(R.string.mealplan_remove)
     val moveLabel = stringResource(R.string.mealplan_move)
-    val dismissState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            if (it == SwipeToDismissBoxValue.EndToStart) onRemove()
-            false
-        },
-    )
-    SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-                Icon(
-                    Icons.Outlined.Close,
-                    contentDescription = null,
-                    tint = VorratTheme.colors.danger,
-                    modifier = Modifier.padding(end = 20.dp),
-                )
-            }
-        },
-    ) {
-        Row(
+    val optionsLabel = stringResource(R.string.mealplan_entry_options, title)
+    Box {
+        Column(
             Modifier
                 .fillMaxWidth()
-                .clickable(enabled = entry.recipe != null, onClick = onOpen)
+                .clip(RoundedCornerShape(10.dp))
+                .combinedClickable(
+                    onClick = { if (entry.recipe != null) onOpen() else menu = true },
+                    onLongClick = { menu = true },
+                    onLongClickLabel = optionsLabel,
+                )
                 .semantics {
-                    customActions = listOf(
-                        CustomAccessibilityAction(moveLabel) { onMove(); true },
+                    customActions = listOfNotNull(
+                        CustomAccessibilityAction(moveLabel) { onMove(); true }.takeIf { entry.recipe != null },
                         CustomAccessibilityAction(removeLabel) { onRemove(); true },
                     )
                 }
-                .padding(start = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(vertical = 4.dp),
         ) {
-            Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (entry.recipe == null) VorratTheme.colors.danger else MaterialTheme.colorScheme.onSurface,
-                )
-                if (entry.recipe != null) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = if (entry.recipe == null) VorratTheme.colors.danger else MaterialTheme.colorScheme.onSurface,
+            )
+            if (entry.recipe != null) {
+                val persons = pluralStringResource(R.plurals.mealplan_for_persons, entry.entry.persons, entry.entry.persons)
+                if (entry.missing.isEmpty()) {
                     Text(
-                        pluralStringResource(R.plurals.mealplan_for_persons, entry.entry.persons, entry.entry.persons),
+                        "${stringResource(R.string.mealplan_all_in_stock)} · $persons",
                         style = MaterialTheme.typography.bodySmall,
                         color = VorratTheme.colors.textSecondary,
                     )
+                } else {
+                    Text(
+                        stringResource(R.string.mealplan_missing, entry.missing.joinToString(", ")),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = VorratTheme.colors.warning,
+                    )
                 }
             }
-            Box {
-                IconButton(onClick = { menu = true }) {
-                    Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.mealplan_entry_options, title))
-                }
-                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    if (entry.recipe != null) {
-                        DropdownMenuItem(text = { Text(moveLabel) }, onClick = { menu = false; onMove() })
-                    }
-                    DropdownMenuItem(text = { Text(removeLabel) }, onClick = { menu = false; onRemove() })
-                }
+        }
+        DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+            if (entry.recipe != null) {
+                DropdownMenuItem(text = { Text(moveLabel) }, onClick = { menu = false; onMove() })
             }
+            DropdownMenuItem(text = { Text(removeLabel) }, onClick = { menu = false; onRemove() })
         }
     }
 }

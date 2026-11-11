@@ -46,6 +46,8 @@ data class StockUiState(
     /** Auswählbare Ebenen/Fächer (am gewählten Ort bzw. im ganzen Bestand). */
     val levelOptions: List<Int> = emptyList(),
     val shelfOptions: List<Int> = emptyList(),
+    /** Suchbegriff (Lupe in der Kopfzeile); leer = keine Suche. */
+    val query: String = "",
     val today: LocalDate = LocalDate.now(),
     val leadDays: Int = ExpiryLogic.DEFAULT_LEAD_DAYS,
 )
@@ -56,6 +58,7 @@ private data class Controls(
     val locationId: String?,
     val level: Int? = null,
     val shelf: Int? = null,
+    val query: String = "",
 )
 
 @HiltViewModel
@@ -67,12 +70,15 @@ class StockViewModel @Inject constructor(
     private val messages: UiMessages,
 ) : ViewModel() {
 
-    private val initialFilter = when (savedStateHandle.toRoute<StockRoute>().filter) {
+    private val route = savedStateHandle.toRoute<StockRoute>()
+
+    private val initialFilter = when (route.filter) {
         MainActivity.FILTER_SOON -> StockFilter.SOON
         else -> StockFilter.ALL
     }
 
-    private val controls = MutableStateFlow(Controls(StockSort.EXPIRY, initialFilter, null))
+    /** Aus der Übersicht geöffnet: gleich nach diesem Ort filtern. */
+    private val controls = MutableStateFlow(Controls(StockSort.EXPIRY, initialFilter, route.locationId))
 
     val state: StateFlow<StockUiState> = combine(
         stockRepository.observeItems(),
@@ -93,10 +99,9 @@ class StockViewModel @Inject constructor(
         }
         StockUiState(
             loading = false,
-            items = StockQueries.sort(
-                StockQueries.filter(items, c.filter, locationFilter, today, lead, c.level, c.shelf),
-                c.sort,
-            ),
+            items = StockQueries.filter(items, c.filter, locationFilter, today, lead, c.level, c.shelf).let { filtered ->
+                if (c.query.isBlank()) StockQueries.sort(filtered, c.sort) else StockQueries.search(filtered, c.query)
+            },
             totalCount = items.size,
             expiredCount = statuses.count { it == ExpiryStatus.EXPIRED },
             soonCount = statuses.count { it == ExpiryStatus.SOON },
@@ -107,6 +112,7 @@ class StockViewModel @Inject constructor(
             locations = locations,
             level = c.level,
             shelf = c.shelf,
+            query = c.query,
             levelOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.level }, location?.levels),
             shelfOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.shelf }, location?.shelves),
             today = today,
@@ -122,6 +128,7 @@ class StockViewModel @Inject constructor(
     }
     fun setLevel(level: Int?) = controls.value.let { controls.value = it.copy(level = level) }
     fun setShelf(shelf: Int?) = controls.value.let { controls.value = it.copy(shelf = shelf) }
+    fun setQuery(query: String) = controls.value.let { controls.value = it.copy(query = query) }
 
     /** Wischen nach links: Eintrag löschen, mit Rückgängig. */
     fun delete(entryId: String) = viewModelScope.launch {

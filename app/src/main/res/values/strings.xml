@@ -4,7 +4,7 @@
 
     <!-- Navigation -->
     <string name="nav_stock">Bestand</string>
-    <string name="nav_search">Suche</string>
+    <string name="nav_overview">Übersicht</string>
     <string name="nav_scan">Scannen</string>
     <string name="nav_shopping">Einkauf</string>
     <string name="settings_locations">Orte</string>
@@ -94,9 +94,6 @@
 
     <!-- Bestand -->
     <string name="stock_title">Bestand</string>
-    <string name="stock_greeting_morning">Guten Morgen</string>
-    <string name="stock_greeting_day">Hallo</string>
-    <string name="stock_greeting_evening">Guten Abend</string>
     <plurals name="stock_overview_entries">
         <item quantity="one">Eintrag</item>
         <item quantity="other">Einträge</item>
@@ -187,7 +184,8 @@
 
     <!-- Suche -->
     <string name="search_hint">Name, Marke, Barcode, Ort oder Notiz</string>
-    <string name="search_empty_query">Suchbegriff eingeben, um den Bestand zu durchsuchen.</string>
+    <string name="stock_search">Bestand durchsuchen</string>
+    <string name="stock_search_close">Suche schließen</string>
     <string name="search_no_results">Keine Treffer für „%1$s“.</string>
 
     <!-- Scannen -->
@@ -293,6 +291,16 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
 
     <!-- Orte -->
     <string name="locations_title">Orte</string>
+    <string name="overview_title">Übersicht</string>
+    <string name="overview_distribution">Verteilung im Bestand</string>
+    <plurals name="overview_items">
+        <item quantity="one">%d Artikel</item>
+        <item quantity="other">%d Artikel</item>
+    </plurals>
+    <string name="overview_edit">„%1$s“ bearbeiten</string>
+    <string name="overview_no_slots">ohne Ebenen und Fächer</string>
+    <string name="overview_unassigned_hint">noch keinem Ort zugeordnet</string>
+    <string name="locations_delete_action">Ort löschen</string>
     <string name="locations_empty">Noch keine Orte. Lege z. B. „Keller“, „Kühlschrank“ oder „Vorratsschrank“ an.</string>
     <string name="locations_add">Ort hinzufügen</string>
     <string name="locations_new">Neuer Ort</string>
@@ -669,7 +677,6 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="mealplan_week_next">Nächste Woche</string>
     <string name="mealplan_this_week">Diese Woche</string>
     <string name="mealplan_today">Heute</string>
-    <string name="mealplan_week_range">%1$s – %2$s</string>
     <string name="mealplan_add_for_day">Rezept für %1$s hinzufügen</string>
     <string name="mealplan_day_empty">Noch nichts geplant</string>
     <plurals name="mealplan_for_persons">
@@ -692,7 +699,10 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="mealplan_day_label">Tag</string>
     <string name="mealplan_to_plan">Zum Wochenplan</string>
     <string name="mealplan_added">„%1$s“ steht jetzt im Wochenplan</string>
-    <string name="mealplan_shopping">Zutaten auf die Einkaufsliste</string>
+    <string name="mealplan_shopping">Fehlende Zutaten auf die Einkaufsliste</string>
+    <string name="mealplan_all_in_stock">Alles vorrätig</string>
+    <string name="mealplan_missing">Fehlt: %1$s</string>
+    <string name="mealplan_select_day">%1$s anzeigen</string>
     <string name="mealplan_range_title">Für welchen Zeitraum?</string>
     <string name="mealplan_range_week">Ganze Woche (Mo–So)</string>
     <string name="mealplan_range_from_today">Ab heute bis Sonntag</string>

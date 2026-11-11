@@ -2,13 +2,13 @@ package de.frelina.vorrat.ui.navigation
 
 import kotlinx.serialization.Serializable
 
-// Hauptbereiche (untere Navigationsleiste)
-@Serializable data class StockRoute(val filter: String? = null)
-@Serializable data object SearchRoute
+// Hauptbereiche (untere Navigationsleiste); locationId: Bestand gleich nach diesem Ort filtern (aus der Übersicht)
+@Serializable data class StockRoute(val filter: String? = null, val locationId: String? = null)
+@Serializable data object OverviewRoute
 @Serializable data object ScanRoute
 @Serializable data object ShoppingRoute
 
-// Unterseiten (Orte: über Einstellungen erreichbar)
+// Unterseiten (Orte: über Einstellungen erreichbar, gleiche Ansicht wie die Übersicht)
 @Serializable data object LocationsRoute
 @Serializable data object SettingsRoute
 

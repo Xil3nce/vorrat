@@ -18,7 +18,6 @@ import de.frelina.vorrat.ui.components.GlassCard
 import de.frelina.vorrat.ui.components.GlassIconButton
 import de.frelina.vorrat.ui.components.SegmentRing
 import de.frelina.vorrat.ui.theme.VorratTheme
-import java.time.LocalTime
 import de.frelina.vorrat.domain.StockQueries
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +41,13 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Nfc
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
@@ -104,28 +110,27 @@ fun StockScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var sortMenu by remember { mutableStateOf(false) }
     var dialOpen by rememberSaveable { mutableStateOf(false) }
+    var searchOpen by rememberSaveable { mutableStateOf(state.query.isNotEmpty()) }
     BackHandler(enabled = dialOpen) { dialOpen = false }
+    BackHandler(enabled = searchOpen && !dialOpen) { searchOpen = false; viewModel.setQuery("") }
 
     Scaffold(
         topBar = {
             Box {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            stringResource(greetingFor(LocalTime.now())),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = VorratTheme.colors.textSecondary,
-                        )
-                        Text(
-                            stringResource(R.string.stock_title),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
+                    Text(
+                        stringResource(R.string.stock_title),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
                 actions = {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(end = 8.dp)) {
+                    GlassIconButton(Icons.Outlined.Search, stringResource(R.string.stock_search), {
+                        if (searchOpen) viewModel.setQuery("")
+                        searchOpen = !searchOpen
+                    })
                     GlassIconButton(Icons.Outlined.Nfc, stringResource(R.string.nfc_read_title), onReadNfc)
                     GlassIconButton(Icons.Outlined.Restaurant, stringResource(R.string.recipes_title), onOpenRecipes)
                     GlassIconButton(Icons.Outlined.History, stringResource(R.string.history_title), onOpenHistory)
@@ -191,7 +196,12 @@ fun StockScreen(
                 contentPadding = PaddingValues(top = 4.dp, bottom = 64.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                if (state.totalCount > 0) {
+                if (searchOpen) {
+                    item(key = "search") {
+                        SearchField(state.query, viewModel::setQuery, onClose = { searchOpen = false; viewModel.setQuery("") })
+                    }
+                }
+                if (state.totalCount > 0 && state.query.isBlank()) {
                     item(key = "overview") {
                         OverviewCard(state, onFilter = viewModel::setFilter, modifier = Modifier.padding(horizontal = 16.dp))
                     }
@@ -208,7 +218,11 @@ fun StockScreen(
                 if (state.items.isEmpty()) {
                     item(key = "empty") {
                         Text(
-                            stringResource(if (state.totalCount == 0) R.string.stock_empty else R.string.stock_empty_filtered),
+                            when {
+                                state.totalCount == 0 -> stringResource(R.string.stock_empty)
+                                state.query.isNotBlank() -> stringResource(R.string.search_no_results, state.query.trim())
+                                else -> stringResource(R.string.stock_empty_filtered)
+                            },
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge,
                             color = VorratTheme.colors.textSecondary,
@@ -241,11 +255,30 @@ fun StockScreen(
     }
 }
 
-/** Begrüßung nach Tageszeit. */
-private fun greetingFor(time: LocalTime): Int = when (time.hour) {
-    in 4..10 -> R.string.stock_greeting_morning
-    in 11..17 -> R.string.stock_greeting_day
-    else -> R.string.stock_greeting_evening
+/** Suchfeld unter der Kopfzeile (Lupe); durchsucht den gefilterten Bestand. */
+@Composable
+private fun SearchField(query: String, onQuery: (String) -> Unit, onClose: () -> Unit) {
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { if (query.isEmpty()) focus.requestFocus() }
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQuery,
+        placeholder = { Text(stringResource(R.string.search_hint)) },
+        leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
+        trailingIcon = {
+            IconButton(onClick = onClose) {
+                Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.stock_search_close))
+            }
+        },
+        shape = RoundedCornerShape(24.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = VorratTheme.colors.glass,
+            focusedContainerColor = VorratTheme.colors.glassStrong,
+            unfocusedBorderColor = VorratTheme.colors.glassBorder,
+        ),
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).focusRequester(focus),
+    )
 }
 
 /**
