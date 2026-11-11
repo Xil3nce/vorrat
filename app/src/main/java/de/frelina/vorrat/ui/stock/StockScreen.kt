@@ -1,7 +1,15 @@
 package de.frelina.vorrat.ui.stock
 
 import androidx.compose.foundation.layout.size
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +37,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.AcUnit
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Nfc
@@ -42,7 +51,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -94,6 +103,8 @@ fun StockScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var sortMenu by remember { mutableStateOf(false) }
+    var dialOpen by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = dialOpen) { dialOpen = false }
 
     Scaffold(
         topBar = {
@@ -133,18 +144,29 @@ fun StockScreen(
             )
         },
         floatingActionButton = {
+            // Speed-Dial: Optionen-Button, darüber klappen "Manuell anlegen" und "Einfrieren" auf.
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                androidx.compose.material3.SmallFloatingActionButton(onClick = onAddFrozen) {
-                    Icon(Icons.Outlined.AcUnit, contentDescription = stringResource(R.string.frozen_add))
+                AnimatedVisibility(
+                    visible = dialOpen,
+                    enter = fadeIn() + slideInVertically { it / 2 },
+                    exit = fadeOut() + slideOutVertically { it / 2 },
+                ) {
+                    Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SmallFloatingActionButton(onClick = { dialOpen = false; onAddManual() }) {
+                            Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.stock_add_manual))
+                        }
+                        SmallFloatingActionButton(onClick = { dialOpen = false; onAddFrozen() }) {
+                            Icon(Icons.Outlined.AcUnit, contentDescription = stringResource(R.string.frozen_add))
+                        }
+                    }
                 }
-                ExtendedFloatingActionButton(
-                    onClick = onAddManual,
-                    icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
-                    text = { Text(stringResource(R.string.stock_add_manual)) },
-                )
+                SmallFloatingActionButton(onClick = { dialOpen = !dialOpen }) {
+                    Icon(Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.stock_more_actions))
+                }
             }
         },
     ) { padding ->
+        Box(Modifier.fillMaxSize()) {
         when {
             state.loading -> Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -189,6 +211,17 @@ fun StockScreen(
                     }
                 }
             }
+        }
+        if (dialOpen) {
+            // Unsichtbarer Vollflächen-Layer: Tippen irgendwo sonst klappt das Menü zu.
+            Box(
+                Modifier.fillMaxSize().clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = { dialOpen = false },
+                ),
+            )
+        }
         }
     }
 }
@@ -281,18 +314,11 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
             .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        listOf(
-            StockFilter.ALL to R.string.stock_filter_all,
-            StockFilter.SOON to R.string.stock_filter_soon,
-            StockFilter.EXPIRED to R.string.stock_filter_expired,
-            StockFilter.FROZEN to R.string.stock_filter_frozen,
-        ).forEach { (filter, label) ->
-            FilterChip(
-                selected = state.filter == filter,
-                onClick = { viewModel.setFilter(filter) },
-                label = { Text(stringResource(label)) },
-            )
-        }
+        FilterChip(
+            selected = state.filter == StockFilter.ALL,
+            onClick = { viewModel.setFilter(StockFilter.ALL) },
+            label = { Text(stringResource(R.string.stock_filter_all)) },
+        )
         Box {
             val selectedName = if (state.locationId == StockQueries.NO_LOCATION) {
                 stringResource(R.string.location_none)
@@ -342,6 +368,17 @@ private fun FilterRow(state: StockUiState, viewModel: StockViewModel) {
                 allLabel = R.string.stock_filter_all_shelves,
                 valueLabel = R.string.shelf_label,
                 onSelect = viewModel::setShelf,
+            )
+        }
+        listOf(
+            StockFilter.SOON to R.string.stock_filter_soon,
+            StockFilter.EXPIRED to R.string.stock_filter_expired,
+            StockFilter.FROZEN to R.string.stock_filter_frozen,
+        ).forEach { (filter, label) ->
+            FilterChip(
+                selected = state.filter == filter,
+                onClick = { viewModel.setFilter(filter) },
+                label = { Text(stringResource(label)) },
             )
         }
     }

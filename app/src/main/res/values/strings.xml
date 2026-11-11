@@ -128,6 +128,7 @@
     <string name="stock_filter_shelf">Fach</string>
     <string name="stock_filter_all_shelves">Alle Fächer</string>
     <string name="stock_add_manual">Produkt manuell anlegen</string>
+    <string name="stock_more_actions">Weitere Aktionen</string>
     <string name="expiry_label">Ablauf: %1$s</string>
     <string name="expiry_none">Kein Ablaufdatum</string>
     <string name="expiry_opened_label">Geöffnet – verbrauchen bis %1$s</string>
