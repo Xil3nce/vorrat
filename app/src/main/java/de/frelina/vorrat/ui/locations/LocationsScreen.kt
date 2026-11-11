@@ -1,5 +1,17 @@
 package de.frelina.vorrat.ui.locations
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.components.pastelFor
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,11 +112,9 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.locations_title)) },
+                title = { Text(stringResource(R.string.locations_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -122,24 +132,40 @@ fun LocationsScreen(onBack: () -> Unit, viewModel: LocationsViewModel = hiltView
                 Text(stringResource(R.string.locations_empty), textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
             }
         } else {
-            LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(bottom = 96.dp)) {
+            LazyColumn(
+                Modifier.padding(padding),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 items(list.orEmpty(), key = { it.id }) { loc ->
-                    ListItem(
-                        headlineContent = { Text(loc.name) },
-                        supportingContent = slotSummary(loc)?.let { summary -> { Text(summary) } },
-                        leadingContent = { Icon(Icons.Outlined.Place, contentDescription = null) },
-                        trailingContent = {
-                            Row {
-                                IconButton(onClick = { renameTarget = loc }) {
-                                    Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.action_edit))
+                    GlassCard(Modifier.fillMaxWidth()) {
+                        ListItem(
+                            colors = ListItemDefaults.colors(
+                                containerColor = Color.Transparent,
+                                supportingColor = VorratTheme.colors.textSecondary,
+                            ),
+                            headlineContent = { Text(loc.name, fontWeight = FontWeight.SemiBold) },
+                            supportingContent = slotSummary(loc)?.let { summary -> { Text(summary) } },
+                            leadingContent = {
+                                Box(
+                                    Modifier.size(44.dp).clip(RoundedCornerShape(16.dp)).background(pastelFor(loc.name)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(Icons.Outlined.Place, contentDescription = null, tint = VorratTheme.colors.onAccent)
                                 }
-                                IconButton(onClick = { deleteTarget = loc }) {
-                                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                            },
+                            trailingContent = {
+                                Row {
+                                    IconButton(onClick = { renameTarget = loc }) {
+                                        Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.action_edit))
+                                    }
+                                    IconButton(onClick = { deleteTarget = loc }) {
+                                        Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                                    }
                                 }
-                            }
-                        },
-                    )
-                    HorizontalDivider()
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -254,7 +280,7 @@ private fun LocationDialog(
                 Text(
                     stringResource(if (slotError) R.string.locations_slots_error else R.string.locations_slots_help),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (slotError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (slotError) MaterialTheme.colorScheme.error else VorratTheme.colors.textSecondary,
                 )
             }
         },

@@ -1,5 +1,8 @@
 package de.frelina.vorrat.ui.shopping
 
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,11 +103,9 @@ fun DepartmentsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.departments_title)) },
+                title = { Text(stringResource(R.string.departments_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
                 actions = {
                     Box {
@@ -137,7 +138,7 @@ fun DepartmentsScreen(
             Text(
                 stringResource(R.string.departments_hint),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = VorratTheme.colors.textSecondary,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
             if (shown.isEmpty()) {
@@ -160,7 +161,6 @@ fun DepartmentsScreen(
                         val downLabel = stringResource(R.string.departments_move_down)
                         val dragLabel = stringResource(R.string.departments_drag, department.name)
                         GlassCard(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .shadow(elevation, MaterialTheme.shapes.medium)
@@ -182,7 +182,7 @@ fun DepartmentsScreen(
                                 Icon(
                                     Icons.Outlined.DragHandle,
                                     contentDescription = dragLabel,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    tint = VorratTheme.colors.textSecondary,
                                     modifier = Modifier
                                         .draggableHandle(
                                             onDragStarted = { dragging = true },
@@ -200,7 +200,7 @@ fun DepartmentsScreen(
                                         Text(
                                             stringResource(R.string.departments_other_hint),
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            color = VorratTheme.colors.textSecondary,
                                         )
                                     }
                                 }
