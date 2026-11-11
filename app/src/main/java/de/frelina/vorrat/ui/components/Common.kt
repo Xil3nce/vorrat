@@ -23,6 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.theme.VorratTheme
 import coil3.compose.AsyncImage
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.image.ImageStore
@@ -32,14 +34,14 @@ import java.io.File
 
 /** Produktbild aus dem App-internen Speicher oder ein Platzhalter-Icon. */
 @Composable
-fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier) {
+fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier, name: String? = null) {
     val context = LocalContext.current
     // Fehlt die Datei noch (Sync lädt sie im Hintergrund), nach jedem abgelegten Bild erneut prüfen.
     val imagesVersion by ImageStore.changes.collectAsState()
     val file = remember(imagePath, imagesVersion) {
         imagePath?.let { File(File(context.filesDir, ImageStore.DIR_NAME), it) }?.takeIf { it.exists() }
     }
-    val shape = RoundedCornerShape(12.dp)
+    val shape = RoundedCornerShape(if (size >= 48.dp) 16.dp else 12.dp)
     if (file != null) {
         AsyncImage(
             model = file,
@@ -47,6 +49,19 @@ fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier) {
             contentScale = ContentScale.Crop,
             modifier = modifier.size(size).clip(shape),
         )
+    } else if (!name.isNullOrBlank()) {
+        // Kein Bild: Kürzel auf Pastellfläche.
+        Box(
+            modifier = modifier.size(size).clip(shape).background(pastelFor(name)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                initialsOf(name),
+                style = if (size >= 48.dp) MaterialTheme.typography.titleMedium else MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = VorratTheme.colors.onAccent,
+            )
+        }
     } else {
         Box(
             modifier = modifier
@@ -64,7 +79,7 @@ fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier) {
     }
 }
 
-/** Farbrollen für Ablauf-Hervorhebung (Dynamic-Color-tauglich, keine festen Hex-Werte). */
+/** Farbrollen für Ablauf-Hervorhebung (aus dem Theme, keine festen Hex-Werte). */
 data class ExpiryColors(val container: Color, val content: Color)
 
 @Composable

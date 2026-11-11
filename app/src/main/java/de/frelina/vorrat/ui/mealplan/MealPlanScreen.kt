@@ -19,7 +19,7 @@ import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -282,7 +282,7 @@ private fun DayCard(
     onRemove: (PlanEntryUi) -> Unit,
 ) {
     val label = day.date.format(DAY_FORMAT)
-    Card(
+    GlassCard(
         colors = CardDefaults.cardColors(
             containerColor = if (isToday) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer,
         ),

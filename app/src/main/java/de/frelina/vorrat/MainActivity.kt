@@ -37,7 +37,11 @@ class MainActivity : ComponentActivity() {
     private val sharedRecipes = Channel<String>(Channel.CONFLATED)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
+        // Immer dunkles Design → helle Symbole in Status- und Navigationsleiste.
+        enableEdgeToEdge(
+            statusBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = androidx.activity.SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+        )
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) handleIntent(intent)
         setContent {

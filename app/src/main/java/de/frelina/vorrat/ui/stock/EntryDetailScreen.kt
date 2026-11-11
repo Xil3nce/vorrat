@@ -30,7 +30,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
@@ -193,7 +193,7 @@ fun EntryDetailScreen(
                 }
 
                 // Anzahl +/- (große Touch-Ziele)
-                Card(Modifier.fillMaxWidth()) {
+                GlassCard(Modifier.fillMaxWidth()) {
                     Row(
                         Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,

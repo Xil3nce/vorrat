@@ -1,6 +1,31 @@
 package de.frelina.vorrat.ui.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Inventory2
@@ -9,8 +34,6 @@ import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -175,20 +198,14 @@ fun VorratRoot(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) 72.dp else 0.dp)) },
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
-                    TOP_LEVEL.forEach { item ->
-                        val selected = destination?.hierarchy?.any { it.hasRoute(item.routeClass) } == true
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = { navController.navigateTopLevel(item.route) },
-                            icon = { Icon(item.icon, contentDescription = null) },
-                            label = { Text(stringResource(item.label), maxLines = 1, softWrap = false, overflow = TextOverflow.Visible) },
-                        )
-                    }
-                }
+                FloatingNavBar(
+                    isSelected = { item -> destination?.hierarchy?.any { it.hasRoute(item.routeClass) } == true },
+                    onSelect = { item -> navController.navigateTopLevel(item.route) },
+                )
             }
         },
     ) { padding ->
@@ -287,6 +304,85 @@ fun VorratRoot(
             composable<HistoryRoute> {
                 de.frelina.vorrat.ui.history.HistoryScreen(onBack = { navController.popBackStack() })
             }
+        }
+    }
+}
+
+/**
+ * Schwebende Leiste (Abstand 12 dp seitlich, 14 dp unten) mit rundem Scan-Button in der Mitte,
+ * der nach oben herausragt.
+ */
+@Composable
+private fun FloatingNavBar(isSelected: (TopLevel) -> Boolean, onSelect: (TopLevel) -> Unit) {
+    val colors = VorratTheme.colors
+    val scan = TOP_LEVEL.first { it.routeClass == ScanRoute::class }
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = 12.dp, end = 12.dp, bottom = 14.dp, top = 34.dp),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(72.dp)
+                .clip(RoundedCornerShape(36.dp))
+                .background(colors.bar)
+                .border(1.dp, colors.glassBorder, RoundedCornerShape(36.dp))
+                .selectableGroup()
+                .padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TOP_LEVEL.forEach { item ->
+                if (item === scan) {
+                    Spacer(Modifier.width(72.dp))
+                } else {
+                    val selected = isSelected(item)
+                    val tint = if (selected) colors.accent else colors.textSecondary
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(24.dp))
+                            .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item) }),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(item.icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
+                        Text(
+                            stringResource(item.label),
+                            color = tint,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                            maxLines = 1,
+                            softWrap = false,
+                            overflow = TextOverflow.Visible,
+                        )
+                    }
+                }
+            }
+        }
+        val scanSelected = isSelected(scan)
+        Box(
+            Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = (-34).dp)
+                .size(76.dp)
+                .clip(CircleShape)
+                .background(colors.accent.copy(alpha = if (scanSelected) 0.24f else 0.12f))
+                .padding(6.dp)
+                .clip(CircleShape)
+                .background(if (scanSelected) colors.accent else colors.onAccent)
+                .border(2.dp, colors.accent.copy(alpha = 0.7f), CircleShape)
+                .selectable(selected = scanSelected, role = Role.Tab, onClick = { onSelect(scan) }),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                scan.icon,
+                contentDescription = stringResource(scan.label),
+                tint = if (scanSelected) colors.onAccent else colors.accent,
+                modifier = Modifier.size(28.dp),
+            )
         }
     }
 }

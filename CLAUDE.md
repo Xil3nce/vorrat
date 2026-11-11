@@ -34,7 +34,9 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
 
 ## Konventionen
 - UI-Texte ausschließlich Deutsch in `res/values/strings.xml` (Plurals für Zahlen + Wörter); keine Hardcodes.
-- Farben nur über Material-3-Farbrollen (Dynamic Color), keine Hex-Werte in Compose.
+- Design: nur dunkel, "Glas"-Look (Mockup/Spezifikation in `docs/redesign-notizen.md`). Feste Palette zentral in
+  `ui/theme/Theme.kt` (ColorScheme + `VorratTheme.colors` für Zusatzfarben); keine Hex-Werte in Screens.
+  Bausteine in `ui/components/Glass.kt` (`GlassCard` statt `Card`, Ringe, Plaketten, Ablaufbalken).
 - Fachlogik als reine Funktionen in `domain/` (testbar ohne Android); Repositories in `data/repo/`.
 - Room-Änderung: `VorratDatabase.VERSION` erhöhen, Migration in `MIGRATIONS`, neues Schema-JSON committen,
   Backup-`schemaVersion`-Prüfung beachten.

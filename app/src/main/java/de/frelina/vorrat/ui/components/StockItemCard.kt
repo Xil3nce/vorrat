@@ -12,7 +12,7 @@ import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Nfc
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -129,8 +129,8 @@ fun StockItemCard(
         }
     }
     if (onClick != null) {
-        Card(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
+        GlassCard(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
     } else {
-        Card(modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
+        GlassCard(modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
     }
 }

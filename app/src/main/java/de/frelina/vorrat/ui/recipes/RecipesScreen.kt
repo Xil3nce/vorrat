@@ -19,7 +19,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -189,7 +189,7 @@ fun RecipesScreen(
 @Composable
 private fun RecipeCard(match: RecipeMatch, today: LocalDate, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val recipe = match.recipe
-    Card(
+    GlassCard(
         modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
     ) {

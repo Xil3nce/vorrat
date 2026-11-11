@@ -22,7 +22,7 @@ import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -159,7 +159,7 @@ fun DepartmentsScreen(
                         val upLabel = stringResource(R.string.departments_move_up)
                         val downLabel = stringResource(R.string.departments_move_down)
                         val dragLabel = stringResource(R.string.departments_drag, department.name)
-                        Card(
+                        GlassCard(
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
                             modifier = Modifier
                                 .fillMaxWidth()

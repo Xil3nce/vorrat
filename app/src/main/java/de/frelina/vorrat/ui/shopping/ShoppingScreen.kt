@@ -31,7 +31,7 @@ import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
+import de.frelina.vorrat.ui.components.GlassCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -496,7 +496,7 @@ internal fun ShoppingCard(
     } else {
         CardDefaults.cardColors()
     }
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = colors) {
+    GlassCard(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = colors) {
         Row(
             Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
