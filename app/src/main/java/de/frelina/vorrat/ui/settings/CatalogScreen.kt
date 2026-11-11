@@ -1,5 +1,12 @@
 package de.frelina.vorrat.ui.settings
 
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.fillMaxWidth
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -110,11 +117,9 @@ fun CatalogScreen(onBack: () -> Unit, viewModel: CatalogViewModel = hiltViewMode
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(if (viewModel.isUnits) R.string.catalog_units_title else R.string.catalog_types_title)) },
+                title = { Text(stringResource(if (viewModel.isUnits) R.string.catalog_units_title else R.string.catalog_types_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -126,23 +131,32 @@ fun CatalogScreen(onBack: () -> Unit, viewModel: CatalogViewModel = hiltViewMode
             )
         },
     ) { padding ->
-        LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(bottom = 96.dp)) {
+        LazyColumn(
+            Modifier.padding(padding),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             items(items, key = { it.id }) { item ->
-                ListItem(
-                    headlineContent = { Text(item.symbol, style = MaterialTheme.typography.titleMedium) },
-                    supportingContent = { Text(item.name) },
-                    trailingContent = {
-                        Row {
-                            IconButton(onClick = { editTarget = item }) {
-                                Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.action_edit))
+                GlassCard(Modifier.fillMaxWidth()) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                            supportingColor = VorratTheme.colors.textSecondary,
+                        ),
+                        headlineContent = { Text(item.symbol, style = MaterialTheme.typography.titleMedium) },
+                        supportingContent = { Text(item.name) },
+                        trailingContent = {
+                            Row {
+                                IconButton(onClick = { editTarget = item }) {
+                                    Icon(Icons.Outlined.Edit, contentDescription = stringResource(R.string.action_edit))
+                                }
+                                IconButton(onClick = { deleteTarget = item }) {
+                                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
+                                }
                             }
-                            IconButton(onClick = { deleteTarget = item }) {
-                                Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.action_delete))
-                            }
-                        }
-                    },
-                )
-                HorizontalDivider()
+                        },
+                    )
+                }
             }
         }
     }

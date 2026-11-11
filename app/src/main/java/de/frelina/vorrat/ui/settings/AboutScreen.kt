@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.settings
 
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassIconButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.fillMaxWidth
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,11 +39,9 @@ fun AboutScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.about_title)) },
+                title = { Text(stringResource(R.string.about_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -47,14 +50,26 @@ fun AboutScreen(onBack: () -> Unit) {
             Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium)
-            Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME))
-            Text(stringResource(R.string.about_description))
-            Text(stringResource(R.string.about_off_title), style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(R.string.about_off_text))
-            Text(stringResource(R.string.about_privacy_title), style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(R.string.about_privacy_sync))
-            Text(stringResource(R.string.about_privacy), style = MaterialTheme.typography.bodySmall)
+            GlassCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME), color = VorratTheme.colors.textSecondary)
+                    Text(stringResource(R.string.about_description))
+                }
+            }
+            GlassCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.about_off_title), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.about_off_text))
+                }
+            }
+            GlassCard(Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.about_privacy_title), style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.about_privacy_sync))
+                    Text(stringResource(R.string.about_privacy), style = MaterialTheme.typography.bodySmall, color = VorratTheme.colors.textSecondary)
+                }
+            }
             OutlinedButton(onClick = { uriHandler.openUri(OFF_URL) }) { Text(stringResource(R.string.about_off_link)) }
             OutlinedButton(onClick = { uriHandler.openUri(ODBL_URL) }) { Text(stringResource(R.string.about_license_link)) }
         }
