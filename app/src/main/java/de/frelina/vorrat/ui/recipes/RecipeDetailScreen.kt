@@ -78,6 +78,7 @@ fun RecipeDetailScreen(
     var cookDialog by remember { mutableStateOf(false) }
     var deleteDialog by remember { mutableStateOf(false) }
     var planDialog by remember { mutableStateOf(false) }
+    var missingDialog by rememberSaveable { mutableStateOf(false) }
     // Gewählte Personenzahl (null = wie im Rezept); bleibt beim Drehen erhalten
     var chosenPersons by rememberSaveable(match?.recipe?.id) { mutableStateOf(viewModel.initialPersons) }
 
@@ -139,7 +140,7 @@ fun RecipeDetailScreen(
                 IngredientList(match, state.today, factor)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
-                        onClick = viewModel::addMissingToShopping,
+                        onClick = { missingDialog = true },
                         enabled = match.missing.isNotEmpty(),
                         modifier = Modifier.weight(1f),
                     ) {
@@ -190,6 +191,18 @@ fun RecipeDetailScreen(
             },
         )
     }
+    if (missingDialog && match != null) {
+        val base = match.recipe.servings
+        val factor = AmountScaler.factor(base, chosenPersons ?: base ?: 0)
+        MissingToShoppingDialog(
+            lines = missingLines(match, factor),
+            onDismiss = { missingDialog = false },
+            onConfirm = { lines ->
+                missingDialog = false
+                viewModel.addMissingToShopping(lines)
+            },
+        )
+    }
     if (planDialog && match != null) {
         AddToPlanDialog(
             today = state.today,
@@ -218,6 +231,16 @@ fun RecipeDetailScreen(
         )
     }
 }
+
+/** Fehlende Zutaten als Einträge der Einkaufsliste: Name, Notiz "Menge · Rezept" (Menge auf die Personenzahl umgerechnet). */
+private fun missingLines(match: RecipeMatch, factor: Double): List<MissingLine> =
+    match.missing
+        .filter { it.name.isNotBlank() }
+        .distinctBy { it.name.trim().lowercase() }
+        .map { ingredient ->
+            val amount = AmountScaler.scale(ingredient.amount, factor)?.takeIf(String::isNotBlank)
+            MissingLine(ingredient.name.trim(), listOfNotNull(amount, match.recipe.title).joinToString(" · "))
+        }
 
 @Composable
 private fun SectionTitle(text: Int) {

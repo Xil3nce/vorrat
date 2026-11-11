@@ -477,7 +477,7 @@ private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
  * Mit [onChangeDepartment] erscheint ein Menü "Abteilung ändern …".
  */
 @Composable
-private fun ShoppingCard(
+internal fun ShoppingCard(
     imagePath: String?,
     name: String,
     brand: String?,

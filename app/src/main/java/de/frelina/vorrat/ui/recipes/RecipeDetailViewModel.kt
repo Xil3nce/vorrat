@@ -56,10 +56,9 @@ class RecipeDetailViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipeDetailUiState())
 
-    /** Fehlende Pflichtzutaten auf die Einkaufsliste (ohne Duplikate gleichen Namens). */
-    fun addMissingToShopping() = viewModelScope.launch {
-        val missing = state.value.match?.missing?.map { it.name }.orEmpty()
-        val added = shopping.addMissing(missing)
+    /** Ausgewählte fehlende Zutaten (mit Notiz "Menge · Rezept") auf die Einkaufsliste – ohne Duplikate gleichen Namens. */
+    fun addMissingToShopping(lines: List<MissingLine>) = viewModelScope.launch {
+        val added = shopping.addPlanned(lines.map { it.name to it.note })
         messages.show(
             if (added > 0) UiMessage(R.string.recipe_missing_added) else UiMessage(R.string.recipe_missing_none_added),
         )
