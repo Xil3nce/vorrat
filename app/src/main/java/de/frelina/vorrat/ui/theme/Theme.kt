@@ -59,6 +59,8 @@ data class VorratColors(
     val track: Color,
     /** Schwebende Navigationsleiste. */
     val bar: Color,
+    /** Meldungen (Glas-Pille): fast deckend, damit Text darunter nicht durchscheint. */
+    val toast: Color,
     /** Pastellflächen für Produkt-Kacheln und Orte (ohne Bild). */
     val pastels: List<Color>,
 )
@@ -76,6 +78,7 @@ private val Colors = VorratColors(
     glassBorder = Color.White.copy(alpha = 0.12f),
     track = Color.White.copy(alpha = 0.12f),
     bar = Color(0xE6102233),
+    toast = Color(0xF51C3446),
     pastels = listOf(
         Color(0xFFF6E2B3), Color(0xFFCDE7FF), Color(0xFFC8B6FF), Color(0xFF9EE6E0),
         Color(0xFFFFC2B8), Color(0xFFD9F2B4), Color(0xFFF7C8E0),

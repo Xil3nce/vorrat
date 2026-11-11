@@ -15,6 +15,7 @@ import de.frelina.vorrat.data.household.HouseholdRepository
 import de.frelina.vorrat.data.settings.ReminderSettings
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.reminder.ReminderScheduler
+import de.frelina.vorrat.ui.components.MessageTone
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,7 +89,7 @@ class SettingsViewModel @Inject constructor(
             stream.use { backupManager.export(it) }
             messages.show(UiMessage(R.string.settings_backup_export_done))
         } catch (_: Exception) {
-            messages.show(UiMessage(R.string.settings_backup_export_failed))
+            messages.show(UiMessage(R.string.settings_backup_export_failed, tone = MessageTone.ERROR))
         } finally {
             _busy.value = false
         }
@@ -103,7 +104,7 @@ class SettingsViewModel @Inject constructor(
         } catch (e: BackupException) {
             messages.show(errorMessage(e))
         } catch (_: Exception) {
-            messages.show(UiMessage(R.string.settings_backup_error_unreadable))
+            messages.show(UiMessage(R.string.settings_backup_error_unreadable, tone = MessageTone.ERROR))
         } finally {
             _busy.value = false
         }
@@ -118,7 +119,7 @@ class SettingsViewModel @Inject constructor(
             scheduler.reschedule()
             messages.show(UiMessage(R.string.settings_backup_import_done))
         } catch (_: Exception) {
-            messages.show(UiMessage(R.string.settings_backup_import_failed))
+            messages.show(UiMessage(R.string.settings_backup_import_failed, tone = MessageTone.ERROR))
         } finally {
             _busy.value = false
         }
@@ -130,11 +131,11 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun errorMessage(e: BackupException): UiMessage = when (e.reason) {
-        BackupException.Reason.NOT_A_BACKUP -> UiMessage(R.string.settings_backup_error_not_backup)
-        BackupException.Reason.UNREADABLE -> UiMessage(R.string.settings_backup_error_unreadable)
-        BackupException.Reason.NEWER_SCHEMA -> UiMessage(R.string.settings_backup_error_newer)
-        BackupException.Reason.UNSUPPORTED_FORMAT -> UiMessage(R.string.settings_backup_error_format)
-        BackupException.Reason.INVALID_DATA -> UiMessage(R.string.settings_backup_error_invalid, listOf(e.detail.orEmpty()))
+        BackupException.Reason.NOT_A_BACKUP -> UiMessage(R.string.settings_backup_error_not_backup, tone = MessageTone.ERROR)
+        BackupException.Reason.UNREADABLE -> UiMessage(R.string.settings_backup_error_unreadable, tone = MessageTone.ERROR)
+        BackupException.Reason.NEWER_SCHEMA -> UiMessage(R.string.settings_backup_error_newer, tone = MessageTone.ERROR)
+        BackupException.Reason.UNSUPPORTED_FORMAT -> UiMessage(R.string.settings_backup_error_format, tone = MessageTone.ERROR)
+        BackupException.Reason.INVALID_DATA -> UiMessage(R.string.settings_backup_error_invalid, listOf(e.detail.orEmpty()), tone = MessageTone.ERROR)
     }
 
     override fun onCleared() {

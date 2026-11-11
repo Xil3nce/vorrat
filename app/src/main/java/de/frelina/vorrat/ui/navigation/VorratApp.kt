@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
+import de.frelina.vorrat.ui.components.MessagePill
+import de.frelina.vorrat.ui.components.ToneSnackbarVisuals
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
@@ -123,15 +127,6 @@ fun VorratRoot(
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
-    // Screens mit FAB: Snackbar darüber anzeigen, damit sie nichts verdeckt. Mit Leiste sitzt nur der kleine
-    // Speed-Dial des Bestands knapp über ihr; ohne Leiste liegen die erweiterten FABs 16 dp über dem Rand.
-    val liftSnackbar = if (showBottomBar) {
-        listOf(StockRoute::class, OverviewRoute::class).any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
-    } else {
-        listOf(LocationsRoute::class, RecipesRoute::class, DepartmentsRoute::class, MealPlanRoute::class, PlanShoppingRoute::class)
-            .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
-    }
-
     LaunchedEffect(Unit) {
         messages.messages.collect { msg ->
             val text = if (msg.pluralCount != null) {
@@ -140,9 +135,12 @@ fun VorratRoot(
                 resources.getString(msg.text, *msg.args.toTypedArray())
             }
             val result = snackbar.showSnackbar(
-                message = text,
-                actionLabel = msg.actionLabel?.let(resources::getString),
-                duration = if (msg.onAction != null) SnackbarDuration.Long else SnackbarDuration.Short,
+                ToneSnackbarVisuals(
+                    message = text,
+                    actionLabel = msg.actionLabel?.let(resources::getString),
+                    duration = if (msg.onAction != null) SnackbarDuration.Long else SnackbarDuration.Short,
+                    tone = msg.tone,
+                ),
             )
             if (result == SnackbarResult.ActionPerformed) msg.onAction?.invoke()
         }
@@ -167,7 +165,7 @@ fun VorratRoot(
             if (de.frelina.vorrat.domain.ChefkochLink.recipeId(text) != null) {
                 navController.navigate(EditRecipeRoute(importText = text))
             } else {
-                messages.show(de.frelina.vorrat.ui.components.UiMessage(de.frelina.vorrat.R.string.recipe_import_invalid_link))
+                messages.show(de.frelina.vorrat.ui.components.UiMessage(de.frelina.vorrat.R.string.recipe_import_invalid_link, tone = de.frelina.vorrat.ui.components.MessageTone.ERROR))
             }
         }
     }
@@ -197,9 +195,9 @@ fun VorratRoot(
         )
     }
 
+    Box(Modifier.fillMaxSize()) {
     Scaffold(
         containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) (if (showBottomBar) 56.dp else 72.dp) else 0.dp)) },
         bottomBar = {
             if (showBottomBar) {
                 FloatingNavBar(
@@ -308,6 +306,15 @@ fun VorratRoot(
                 de.frelina.vorrat.ui.history.HistoryScreen(onBack = { navController.popBackStack() })
             }
         }
+    }
+    // Meldungen als Glas-Pille oben, knapp unter der Kopfzeile (verdecken weder FABs noch die Navigationsleiste).
+    SnackbarHost(
+        snackbar,
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .statusBarsPadding()
+            .padding(top = 60.dp, start = 12.dp, end = 12.dp),
+    ) { data -> MessagePill(data) }
     }
 }
 

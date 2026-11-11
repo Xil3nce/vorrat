@@ -17,6 +17,7 @@ import de.frelina.vorrat.domain.RecipeJson
 import de.frelina.vorrat.domain.Validated
 import de.frelina.vorrat.domain.Validation
 import de.frelina.vorrat.domain.ValidationError
+import de.frelina.vorrat.ui.components.MessageTone
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.navigation.EditRecipeRoute
@@ -84,7 +85,7 @@ class EditRecipeViewModel @Inject constructor(
     fun importFrom(text: String) {
         val id = ChefkochLink.recipeId(text)
         if (id == null) {
-            messages.show(UiMessage(R.string.recipe_import_invalid_link))
+            messages.show(UiMessage(R.string.recipe_import_invalid_link, tone = MessageTone.ERROR))
             return
         }
         if (_state.value.importing) return
@@ -95,9 +96,9 @@ class EditRecipeViewModel @Inject constructor(
                     fill(result.recipe, editingExisting = false)
                     messages.show(UiMessage(R.string.recipe_import_done))
                 }
-                ChefkochResult.NotFound -> messages.show(UiMessage(R.string.recipe_import_not_found))
-                ChefkochResult.NoNetwork -> messages.show(UiMessage(R.string.recipe_import_no_network))
-                ChefkochResult.Failed -> messages.show(UiMessage(R.string.recipe_import_failed))
+                ChefkochResult.NotFound -> messages.show(UiMessage(R.string.recipe_import_not_found, tone = MessageTone.ERROR))
+                ChefkochResult.NoNetwork -> messages.show(UiMessage(R.string.recipe_import_no_network, tone = MessageTone.ERROR))
+                ChefkochResult.Failed -> messages.show(UiMessage(R.string.recipe_import_failed, tone = MessageTone.ERROR))
             }
             _state.update { it.copy(importing = false) }
         }

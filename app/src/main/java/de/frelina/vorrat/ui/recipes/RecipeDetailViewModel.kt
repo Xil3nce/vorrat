@@ -13,6 +13,7 @@ import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.domain.RecipeMatch
 import de.frelina.vorrat.domain.RecipeMatcher
 import de.frelina.vorrat.domain.toPantryEntry
+import de.frelina.vorrat.ui.components.MessageTone
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.navigation.RecipeDetailRoute
@@ -60,7 +61,7 @@ class RecipeDetailViewModel @Inject constructor(
     fun addMissingToShopping(lines: List<MissingLine>) = viewModelScope.launch {
         val added = shopping.addPlanned(lines.map { it.name to it.note })
         messages.show(
-            if (added > 0) UiMessage(R.string.recipe_missing_added) else UiMessage(R.string.recipe_missing_none_added),
+            if (added > 0) UiMessage(R.string.recipe_missing_added) else UiMessage(R.string.recipe_missing_none_added, tone = MessageTone.INFO),
         )
     }
 

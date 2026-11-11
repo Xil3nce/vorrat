@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/** Art der Meldung: bestimmt Farbe und Symbol der Glas-Pille. */
+enum class MessageTone { SUCCESS, INFO, ERROR }
+
 /**
  * Snackbar-Nachricht; Texte als Ressourcen (keine Hardcodes). Mit [pluralCount] ist [text] eine Plurals-Ressource
  * (die Anzahl steht dann auch als erstes Argument zur Verfügung: `%1$d`).
@@ -17,6 +20,7 @@ data class UiMessage(
     @StringRes val actionLabel: Int? = null,
     val onAction: (suspend () -> Unit)? = null,
     val pluralCount: Int? = null,
+    val tone: MessageTone = MessageTone.SUCCESS,
 )
 
 /**
