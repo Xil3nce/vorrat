@@ -126,15 +126,6 @@
     <string name="stock_filter_shelf">Fach</string>
     <string name="stock_filter_all_shelves">Alle Fächer</string>
     <string name="stock_add_manual">Produkt manuell anlegen</string>
-    <plurals name="banner_expired">
-        <item quantity="one">%d Eintrag ist abgelaufen</item>
-        <item quantity="other">%d Einträge sind abgelaufen</item>
-    </plurals>
-    <plurals name="banner_soon">
-        <item quantity="one">%d Eintrag läuft bald ab</item>
-        <item quantity="other">%d Einträge laufen bald ab</item>
-    </plurals>
-    <string name="banner_show">Anzeigen</string>
     <string name="expiry_label">Ablauf: %1$s</string>
     <string name="expiry_none">Kein Ablaufdatum</string>
     <string name="expiry_opened_label">Geöffnet – verbrauchen bis %1$s</string>
@@ -209,17 +200,18 @@
     <string name="scan_tile_type">Eingeben</string>
     <string name="scan_tile_new">Neu anlegen</string>
     <string name="scan_total_single">%1$d× im Bestand</string>
-    <string name="scan_total_places">%1$d× an %2$d Orten</string>
+    <plurals name="scan_total_places">
+        <item quantity="one">%1$d× an %2$d Ort</item>
+        <item quantity="other">%1$d× an %2$d Orten</item>
+    </plurals>
     <string name="scan_torch_on">Taschenlampe einschalten</string>
     <string name="scan_torch_off">Taschenlampe ausschalten</string>
     <string name="scan_enter_barcode">Barcode eingeben</string>
     <string name="scan_barcode_field">Barcode</string>
     <string name="scan_lookup">Suchen</string>
     <string name="scan_loading">Suche nach Barcode %1$s …</string>
-    <string name="scan_in_stock">Im Bestand</string>
     <string name="scan_not_in_stock">Nicht im Bestand</string>
     <string name="scan_alternatives_title">Alternativprodukte</string>
-    <string name="scan_alternative_badge">Alternativprodukt – nicht das gescannte Produkt</string>
     <string name="scan_nothing">Davon ist nichts vorrätig – auch keine Alternative aus derselben Kategorie.</string>
     <string name="scan_no_category">Für dieses Produkt ist keine Kategorie bekannt, daher können keine Alternativen gesucht werden.</string>
     <string name="scan_offline_no_alternatives">Ohne Internetverbindung ist die Kategorie unbekannter Produkte nicht ermittelbar – Alternativen können nicht angezeigt werden.</string>

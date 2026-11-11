@@ -87,6 +87,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -401,7 +402,7 @@ private fun ResultPanel(
                     val stock = when {
                         places == 0 -> null
                         places == 1 -> stringResource(R.string.scan_total_single, total)
-                        else -> stringResource(R.string.scan_total_places, total, places)
+                        else -> pluralStringResource(R.plurals.scan_total_places, places, total, places)
                     }
                     val brand = outcome.localProduct?.brand ?: outcome.remote?.brand
                     val sub = listOfNotNull(brand?.takeIf { it.isNotBlank() }, pack, stock).joinToString(" · ")
