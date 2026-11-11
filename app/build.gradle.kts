@@ -28,8 +28,8 @@ android {
         minSdk = 34
         targetSdk = 37
         // Für ein Update beide erhöhen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
-        versionCode = 18
-        versionName = "2.1.0"
+        versionCode = 19
+        versionName = "2.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
