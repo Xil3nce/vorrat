@@ -225,7 +225,7 @@
     <string name="scan_error_rate_limited">Zu viele Abfragen in kurzer Zeit. Bitte etwa eine Minute warten oder das Produkt manuell anlegen.</string>
     <string name="scan_error_server">Open Food Facts ist gerade nicht erreichbar. Bitte später erneut versuchen oder manuell anlegen.</string>
     <string name="scan_retry">Erneut versuchen</string>
-    <string name="scan_add_to_stock">Zum Bestand hinzufügen</string>
+    <string name="scan_add_stock_short">+ Bestand</string>
     <string name="scan_create_manual">Manuell anlegen</string>
     <string name="scan_existing_title">Produkt ist schon im Bestand</string>
     <string name="scan_existing_text">Soll die Anzahl eines vorhandenen Eintrags erhöht oder ein neuer Bestandseintrag angelegt werden?</string>

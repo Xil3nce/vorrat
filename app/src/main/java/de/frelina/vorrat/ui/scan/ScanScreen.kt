@@ -67,6 +67,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -477,37 +478,36 @@ private fun ResultPanel(
                         }
                     }
                 }
-
-                if (onShoppingList) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
-                        Icon(Icons.Outlined.ShoppingCart, contentDescription = null, tint = colors.info, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.size(8.dp))
-                        Text(stringResource(R.string.shopping_on_list), style = MaterialTheme.typography.bodyMedium, color = colors.info)
-                    }
-                } else if (outcome.displayName != null) {
-                    TextButton(onClick = onAddToShoppingList) {
-                        Icon(Icons.Outlined.AddShoppingCart, contentDescription = null)
-                        Spacer(Modifier.size(8.dp))
-                        Text(stringResource(R.string.shopping_add_product))
-                    }
-                }
             }
 
-            // Aktionen fest am unteren Kartenrand
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Aktionen fest am unteren Kartenrand: eine Zeile
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = onAdd, modifier = Modifier.weight(1f).height(48.dp)) {
                     Text(
                         stringResource(
                             if (outcome.localProduct == null && outcome.remote == null) R.string.scan_create_manual
-                            else R.string.scan_add_to_stock,
+                            else R.string.scan_add_stock_short,
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+                if (onShoppingList) {
+                    FilledTonalIconButton(onClick = {}, enabled = false, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            Icons.Outlined.ShoppingCart,
+                            contentDescription = stringResource(R.string.shopping_on_list),
+                            tint = colors.info,
+                        )
+                    }
+                } else if (outcome.displayName != null) {
+                    FilledTonalIconButton(onClick = onAddToShoppingList, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Outlined.AddShoppingCart, contentDescription = stringResource(R.string.shopping_add_product))
+                    }
+                }
                 if (outcome.exactMatches.isNotEmpty()) {
-                    OutlinedButton(onClick = onConsume, modifier = Modifier.height(48.dp)) {
-                        Text(stringResource(R.string.consume_action))
+                    FilledTonalIconButton(onClick = onConsume, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Outlined.RemoveCircleOutline, contentDescription = stringResource(R.string.consume_action))
                     }
                 }
             }
