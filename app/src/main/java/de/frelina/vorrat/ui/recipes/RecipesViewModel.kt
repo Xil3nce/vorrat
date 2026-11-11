@@ -3,13 +3,11 @@ package de.frelina.vorrat.ui.recipes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.frelina.vorrat.data.repo.MealPlanRepository
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.domain.ExpiringGroup
 import de.frelina.vorrat.domain.IngredientMatcher
-import de.frelina.vorrat.domain.PlanWeek
 import de.frelina.vorrat.domain.RecipeMatch
 import de.frelina.vorrat.domain.RecipeMatcher
 import de.frelina.vorrat.domain.toPantryEntry
@@ -21,30 +19,26 @@ import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import javax.inject.Inject
 
-enum class RecipeFilter { ALL, OWN, VEGETARIAN }
-
-/** Ein Tag der Wochenleiste; [planned], wenn im Essensplan etwas eingetragen ist. */
-data class WeekDayUi(val date: LocalDate, val planned: Boolean)
-
 data class RecipesUiState(
     val loading: Boolean = true,
     val matches: List<RecipeMatch> = emptyList(),
     val expiring: List<ExpiringGroup> = emptyList(),
     val query: String = "",
-    val filter: RecipeFilter = RecipeFilter.ALL,
+    /** Zusatzfilter, unabhängig kombinierbar (UND); "Alle" gilt, wenn keiner aktiv ist. */
+    val onlyOwn: Boolean = false,
+    val onlyVegetarian: Boolean = false,
+    /** Nur Rezepte, die mit dem Vorrat (fast) kochbar sind. */
+    val onlyPantry: Boolean = false,
     val selectedGroup: String? = null,
-    /** Alle Rezepte zeigen (auch ohne Treffer) statt nur der Vorschläge. */
-    val showAll: Boolean = false,
     val today: LocalDate = LocalDate.now(),
-    /** Aktuelle Woche (Mo–So) des Essensplans. */
-    val week: List<WeekDayUi> = emptyList(),
 )
 
 private data class Controls(
     val query: String = "",
-    val filter: RecipeFilter = RecipeFilter.ALL,
+    val onlyOwn: Boolean = false,
+    val onlyVegetarian: Boolean = false,
+    val onlyPantry: Boolean = false,
     val selectedGroup: String? = null,
-    val showAll: Boolean = false,
 )
 
 @HiltViewModel
@@ -52,39 +46,27 @@ class RecipesViewModel @Inject constructor(
     recipeRepository: RecipeRepository,
     stockRepository: StockRepository,
     settingsRepository: SettingsRepository,
-    mealPlanRepository: MealPlanRepository,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(Controls())
-
-    private val weekStart = PlanWeek.monday(LocalDate.now())
 
     val state: StateFlow<RecipesUiState> = combine(
         recipeRepository.observeAll(),
         stockRepository.observeItems(),
         settingsRepository.reminderSettings,
         controls,
-        mealPlanRepository.observeBetween(weekStart, weekStart.plusDays(6)),
-    ) { recipes, items, settings, c, planned ->
+    ) { recipes, items, settings, c ->
         val today = LocalDate.now()
-        val plannedDays = planned.map { it.date }.toSet()
         val pantry = items.map { it.toPantryEntry() }
-        // Beim Suchen immer in allen Rezepten, sonst nur Vorschläge (oder alle, wenn eingeschaltet).
-        val searching = c.query.isNotBlank()
-        val ranked = if (c.showAll || searching) {
-            RecipeMatcher.rankAll(recipes, pantry, today)
-        } else {
+        val ranked = if (c.onlyPantry) {
             RecipeMatcher.rank(recipes, pantry, today)
+        } else {
+            RecipeMatcher.rankAll(recipes, pantry, today)
         }
         val q = IngredientMatcher.normalize(c.query)
         val matches = ranked
-            .filter {
-                when (c.filter) {
-                    RecipeFilter.ALL -> true
-                    RecipeFilter.OWN -> !it.recipe.builtin
-                    RecipeFilter.VEGETARIAN -> it.recipe.vegetarian
-                }
-            }
+            .filter { !c.onlyOwn || !it.recipe.builtin }
+            .filter { !c.onlyVegetarian || it.recipe.vegetarian }
             .filter { m -> c.selectedGroup == null || m.have.any { it.groupId == c.selectedGroup } }
             .filter { m ->
                 q.isEmpty() || IngredientMatcher.normalize(m.recipe.title).contains(q) ||
@@ -95,17 +77,23 @@ class RecipesViewModel @Inject constructor(
             matches = matches,
             expiring = RecipeMatcher.expiringGroups(pantry, today, settings.leadDays),
             query = c.query,
-            filter = c.filter,
+            onlyOwn = c.onlyOwn,
+            onlyVegetarian = c.onlyVegetarian,
+            onlyPantry = c.onlyPantry,
             selectedGroup = c.selectedGroup,
-            showAll = c.showAll,
             today = today,
-            week = PlanWeek.days(weekStart).map { WeekDayUi(it, it in plannedDays) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipesUiState())
 
     fun setQuery(q: String) = controls.value.let { controls.value = it.copy(query = q) }
-    fun setFilter(f: RecipeFilter) = controls.value.let { controls.value = it.copy(filter = f) }
-    fun setShowAll(on: Boolean) = controls.value.let { controls.value = it.copy(showAll = on) }
+    fun toggleOwn() = controls.value.let { controls.value = it.copy(onlyOwn = !it.onlyOwn) }
+    fun toggleVegetarian() = controls.value.let { controls.value = it.copy(onlyVegetarian = !it.onlyVegetarian) }
+    fun togglePantry() = controls.value.let { controls.value = it.copy(onlyPantry = !it.onlyPantry) }
+
+    /** "Alle": setzt die Zusatzfilter zurück. */
+    fun clearFilters() = controls.value.let {
+        controls.value = it.copy(onlyOwn = false, onlyVegetarian = false, onlyPantry = false)
+    }
 
     /** Tippen auf einen Chip filtert auf Rezepte mit dieser Gruppe, erneutes Tippen hebt den Filter auf. */
     fun toggleGroup(groupId: String) = controls.value.let {

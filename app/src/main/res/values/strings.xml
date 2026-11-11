@@ -524,7 +524,6 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
 
     <!-- Rezepte: Was koche ich heute? -->
     <string name="recipes_title">Was koche ich heute?</string>
-    <string name="recipes_week_planned">Geplant</string>
     <string name="settings_recipes_summary">Rezeptvorschläge aus bald ablaufenden Produkten, eigene Rezepte</string>
     <plurals name="recipes_banner">
         <item quantity="one">%d Produkt läuft bald ab – Was koche ich heute?</item>
@@ -537,8 +536,8 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="recipes_filter_all">Alle</string>
     <string name="recipes_filter_own">Eigene</string>
     <string name="recipes_filter_vegetarian">Vegetarisch</string>
-    <string name="recipes_show_all">Alle Rezepte anzeigen</string>
-    <string name="recipes_empty">Keine passenden Vorschläge. Tippe auf „Alle Rezepte anzeigen“, um das ganze Rezeptbuch zu durchsuchen.</string>
+    <string name="recipes_filter_pantry">Kochbar mit Vorrat</string>
+    <string name="recipes_empty">Keine Rezepte, die du mit deinem Vorrat kochen kannst.</string>
     <string name="recipes_empty_all">Keine Rezepte gefunden.</string>
     <string name="recipe_add">Rezept hinzufügen</string>
     <string name="recipe_have_line">✓ %1$s</string>
