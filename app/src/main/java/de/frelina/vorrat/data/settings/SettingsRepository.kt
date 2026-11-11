@@ -61,6 +61,13 @@ class SettingsRepository @Inject constructor(
 
     suspend fun setGroupShoppingByDepartment(enabled: Boolean) = dataStore.edit { it[SHOPPING_BY_DEPARTMENT] = enabled }
 
+    /** Im Scanner-Modus "+ Bestand" gewählter Ort für neue Artikel (pro Gerät); null = kein Ort. */
+    val scanLocationId: Flow<String?> = dataStore.data.map { p -> p[SCAN_LOCATION] }
+
+    suspend fun setScanLocationId(id: String?) = dataStore.edit {
+        if (id == null) it.remove(SCAN_LOCATION) else it[SCAN_LOCATION] = id
+    }
+
     suspend fun setMyName(name: String) = dataStore.edit { it[MY_NAME] = name.trim().take(40) }
 
     suspend fun setNotifyWhenEmpty(enabled: Boolean) = dataStore.edit { it[NOTIFY_EMPTY] = enabled }
@@ -97,6 +104,7 @@ class SettingsRepository @Inject constructor(
         val NOTIFY_EMPTY = booleanPreferencesKey("household_notify_empty")
         val RECEIVE_NOTICES = booleanPreferencesKey("household_receive_notices")
         val NOTICES_SEEN_UNTIL = longPreferencesKey("household_notices_seen_until")
+        val SCAN_LOCATION = androidx.datastore.preferences.core.stringPreferencesKey("scan_purchase_location")
         val SHOPPING_BY_DEPARTMENT = booleanPreferencesKey("shopping_by_department")
     }
 }

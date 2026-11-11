@@ -234,7 +234,11 @@ fun VorratRoot(
                     onCreateManual = { navController.navigate(AddStockRoute()) },
                     onReadNfc = { nfcReadDialog = true },
                     onOpenPurchase = { navController.navigate(PurchaseRoute) },
+                    onOpenConsume = { navController.navigate(ConsumeRoute) },
                 )
+            }
+            composable<ConsumeRoute> {
+                de.frelina.vorrat.ui.consume.ConsumeScreen(onBack = { navController.popBackStack() })
             }
             composable<PurchaseRoute> {
                 de.frelina.vorrat.ui.purchase.PurchaseScreen(

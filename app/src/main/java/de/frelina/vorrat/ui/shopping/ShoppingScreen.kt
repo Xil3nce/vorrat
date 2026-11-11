@@ -2,6 +2,11 @@ package de.frelina.vorrat.ui.shopping
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -134,9 +139,9 @@ fun ShoppingScreen(
     viewModel: ShoppingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     var changeTarget by remember { mutableStateOf<Pair<ShoppingPayload, String>?>(null) }
     var editTarget by remember { mutableStateOf<ShoppingEntry?>(null) }
+    var addDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -152,14 +157,15 @@ fun ShoppingScreen(
                 },
             )
         },
+        floatingActionButton = {
+            // Wie im Bestand: 8 dp nach unten versetzt (nur ~8 dp Abstand zur Navigationsleiste).
+            SmallFloatingActionButton(onClick = { addDialog = true }, modifier = Modifier.offset(y = 8.dp)) {
+                Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.shopping_add_hint))
+            }
+        },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             if (!state.loading && !state.list.isEmpty) ShoppingSummary(state.list)
-            AddRow(
-                suggestions = suggestions,
-                unitSymbols = state.units.values.distinct().sorted(),
-                onAdd = viewModel::add,
-            )
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -181,7 +187,7 @@ fun ShoppingScreen(
                     onChangeDepartment = { payload, current -> changeTarget = payload to current },
                 )
                 else -> LazyColumn(
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = LIST_BOTTOM_PADDING),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     if (state.list.shortages.isNotEmpty()) {
@@ -210,6 +216,17 @@ fun ShoppingScreen(
                 }
             }
         }
+    }
+
+    if (addDialog) {
+        ShoppingAddDialog(
+            unitSymbols = state.units.values.distinct().sorted(),
+            onDismiss = { addDialog = false },
+            onAdd = { name, quantity, size, unit ->
+                addDialog = false
+                viewModel.add(name, quantity, size, unit)
+            },
+        )
     }
 
     editTarget?.let { entry ->
@@ -378,7 +395,7 @@ private fun GroupedList(
     val counts = remember(rows) { departmentCounts(rows) }
     LazyColumn(
         state = lazyListState,
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = LIST_BOTTOM_PADDING),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(rows, key = { it.key }) { row ->
@@ -467,126 +484,6 @@ private fun DepartmentHeader(name: String, count: Int, modifier: Modifier, handl
 @Composable
 private fun SectionLabel(text: Int) {
     de.frelina.vorrat.ui.components.SectionLabel(stringResource(text), Modifier.padding(top = 8.dp, start = 4.dp))
-}
-
-/**
- * Freitext-Eingabe mit Vorschlägen aus den bekannten Produkten, optional mit Packungsgröße und Einheit.
- * Ohne eigene Angabe kommt die Packung eines gewählten bekannten Produkts aus dem Produkt.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddRow(
-    suggestions: List<String>,
-    unitSymbols: List<String>,
-    onAdd: (name: String, packageSize: BigDecimal?, unit: String?) -> Unit,
-) {
-    var text by rememberSaveable { mutableStateOf("") }
-    var size by rememberSaveable { mutableStateOf("") }
-    var unit by rememberSaveable { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    var unitOpen by remember { mutableStateOf(false) }
-    val sizeResult = Validation.optionalPositiveDecimal(size)
-    val sizeInvalid = sizeResult is Validated.Error
-    val filtered = remember(text, suggestions) {
-        val q = text.trim()
-        if (q.length < 2) emptyList() else suggestions.filter { it.contains(q, ignoreCase = true) }.take(6)
-    }
-    fun submit(value: String = text) {
-        if (sizeInvalid) return
-        if (value.isNotBlank()) {
-            val packageSize = (sizeResult as? Validated.Ok)?.value
-            onAdd(value, packageSize, if (packageSize != null) unit.ifEmpty { null } else null)
-        }
-        text = ""
-        size = ""
-        unit = ""
-        expanded = false
-    }
-    val fieldColors = OutlinedTextFieldDefaults.colors(
-        unfocusedContainerColor = VorratTheme.colors.glass,
-        focusedContainerColor = VorratTheme.colors.glassStrong,
-        unfocusedBorderColor = VorratTheme.colors.glassBorder,
-    )
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded && filtered.isNotEmpty(),
-            onExpandedChange = { expanded = it },
-            modifier = Modifier.weight(1f),
-        ) {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it; expanded = true },
-                placeholder = {
-                    Text(stringResource(R.string.shopping_add_hint), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                },
-                shape = RoundedCornerShape(24.dp),
-                colors = fieldColors,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { submit() }),
-                modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
-            )
-            ExposedDropdownMenu(
-                expanded = expanded && filtered.isNotEmpty(),
-                onDismissRequest = { expanded = false },
-            ) {
-                filtered.forEach { s -> DropdownMenuItem(text = { Text(s) }, onClick = { submit(s) }) }
-            }
-        }
-        OutlinedTextField(
-            value = size,
-            onValueChange = { size = it },
-            placeholder = {
-                Text(stringResource(R.string.shopping_add_size_hint), style = MaterialTheme.typography.bodySmall, maxLines = 1)
-            },
-            isError = sizeInvalid,
-            shape = RoundedCornerShape(24.dp),
-            colors = fieldColors,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { submit() }),
-            modifier = Modifier.width(72.dp),
-        )
-        Box {
-            val unitLabel = stringResource(R.string.shopping_edit_unit)
-            Box(
-                Modifier.size(width = 48.dp, height = 56.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(VorratTheme.colors.glass)
-                    .border(1.dp, VorratTheme.colors.glassBorder, RoundedCornerShape(24.dp))
-                    .clickable(onClickLabel = unitLabel, role = Role.DropdownList) { unitOpen = true },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    unit.ifEmpty { stringResource(R.string.shopping_add_unit_none) },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (unit.isEmpty()) VorratTheme.colors.textSecondary else MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            DropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
-                    onClick = { unit = ""; unitOpen = false },
-                )
-                unitSymbols.forEach { symbol ->
-                    DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
-                }
-            }
-        }
-        FilledIconButton(
-            onClick = { submit() },
-            enabled = text.isNotBlank() && !sizeInvalid,
-            modifier = Modifier.size(48.dp),
-        ) {
-            Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.shopping_add))
-        }
-    }
 }
 
 /**
@@ -872,6 +769,104 @@ private fun LegendDot(color: Color, text: String) {
             modifier = Modifier.padding(start = 8.dp),
         )
     }
+}
+
+/** Unterkante der Listen: Platz, damit der Hinzufügen-Button den letzten Eintrag nicht verdeckt. */
+private val LIST_BOTTOM_PADDING = 88.dp
+
+/** Artikel hinzufügen: Name (Tastatur sofort offen), Anzahl, Packungsgröße und Einheit. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShoppingAddDialog(
+    unitSymbols: List<String>,
+    onDismiss: () -> Unit,
+    onAdd: (name: String, quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
+) {
+    var name by rememberSaveable { mutableStateOf("") }
+    var quantity by rememberSaveable { mutableIntStateOf(1) }
+    var size by rememberSaveable { mutableStateOf("") }
+    var unit by rememberSaveable { mutableStateOf("") }
+    var unitOpen by remember { mutableStateOf(false) }
+    val focus = remember { FocusRequester() }
+    val sizeResult = Validation.optionalPositiveDecimal(size)
+    val sizeError = (sizeResult as? Validated.Error)?.error
+    LaunchedEffect(Unit) { focus.requestFocus() }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.shopping_add_hint)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it.take(RemoteMapper.MAX_TEXT) },
+                    label = { Text(stringResource(R.string.shopping_edit_name)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                    modifier = Modifier.fillMaxWidth().focusRequester(focus),
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
+                    IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
+                        Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease))
+                    }
+                    Text(
+                        stringResource(R.string.shopping_quantity, quantity),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    IconButton(onClick = { quantity++ }, enabled = quantity < RemoteMapper.MAX_COUNT) {
+                        Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.action_increase))
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = size,
+                        onValueChange = { size = it },
+                        label = { Text(stringResource(R.string.shopping_edit_package)) },
+                        isError = sizeError != null,
+                        supportingText = sizeError?.let { e -> { Text(validationMessage(e)) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                        modifier = Modifier.weight(1f),
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = unitOpen,
+                        onExpandedChange = { unitOpen = it },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        OutlinedTextField(
+                            value = unit.ifEmpty { stringResource(R.string.shopping_edit_unit_none) },
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.shopping_edit_unit)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitOpen) },
+                            singleLine = true,
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        )
+                        ExposedDropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
+                                onClick = { unit = ""; unitOpen = false },
+                            )
+                            unitSymbols.forEach { symbol ->
+                                DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val value = if (sizeResult is Validated.Ok) sizeResult.value else null
+                    onAdd(name, quantity, value, if (value != null) unit.ifEmpty { null } else null)
+                },
+                enabled = sizeError == null && name.isNotBlank(),
+            ) { Text(stringResource(R.string.shopping_add)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }
 
 /** Anzahl, Packungsgröße und Einheit eines Listeneintrags pflegen (wie im Bestand-Formular). */

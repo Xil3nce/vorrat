@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.scan
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,11 +50,19 @@ fun ConsumeDialog(
     leadDays: Int,
     onDismiss: () -> Unit,
     onConsume: (entryId: String, amount: Int) -> Unit,
+    /** Vorausgewählter Eintrag/Menge (z. B. aus der Scan-Liste); sonst der Eintrag, der zuerst abläuft, und 1. */
+    initialEntryId: String? = null,
+    initialAmount: Int = 1,
+    @StringRes confirmLabel: Int = R.string.consume_action,
 ) {
     val sorted = remember(entries) { ConsumeLogic.order(entries) }
-    var selectedId by remember(sorted) { mutableStateOf(sorted.first().entryId) }
+    var selectedId by remember(sorted) {
+        mutableStateOf(sorted.firstOrNull { it.entryId == initialEntryId }?.entryId ?: sorted.first().entryId)
+    }
     val selected = sorted.firstOrNull { it.entryId == selectedId } ?: sorted.first()
-    var amount by remember(selectedId) { mutableIntStateOf(1) }
+    var amount by remember(selectedId) {
+        mutableIntStateOf(if (selectedId == initialEntryId) initialAmount.coerceIn(1, selected.quantity.coerceAtLeast(1)) else 1)
+    }
     val max = selected.quantity
     val today = LocalDate.now()
 
@@ -138,7 +147,7 @@ fun ConsumeDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConsume(selected.entryId, amount) }) { Text(stringResource(R.string.consume_action)) }
+            TextButton(onClick = { onConsume(selected.entryId, amount) }) { Text(stringResource(confirmLabel)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )

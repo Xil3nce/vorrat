@@ -167,7 +167,7 @@ fun PurchaseScreen(
 
 /** Nach links wischen entfernt den Artikel (mit Rückgängig); auch als Bedienungshilfen-Aktion. */
 @Composable
-private fun SwipeToDelete(onDelete: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+internal fun SwipeToDelete(onDelete: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     val swipeState = rememberListSwipeState()
     val label = stringResource(R.string.stock_swipe_delete)
     SwipeToDismissBox(

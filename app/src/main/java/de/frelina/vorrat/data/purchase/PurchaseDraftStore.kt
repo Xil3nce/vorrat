@@ -75,7 +75,7 @@ class PurchaseDraftStore(private val file: File) {
     suspend fun get(id: String): PurchaseDraft? = all().firstOrNull { it.id == id }
 
     /**
-     * Gescannten Artikel hinzufügen. Gleicher Barcode mit gleichem Ablaufdatum (und noch nicht bearbeitet)
+     * Gescannten Artikel hinzufügen. Gleicher Barcode mit gleichem Ablaufdatum und Ort (und noch nicht bearbeitet)
      * erhöht nur die Anzahl des vorhandenen Artikels. Liefert den betroffenen Artikel.
      */
     suspend fun addScanned(draft: PurchaseDraft): PurchaseDraft = modify { list ->
@@ -145,11 +145,15 @@ class PurchaseDraftStore(private val file: File) {
 
 /** Reine Regeln für die Einkaufsliste des Mehrfachscans. */
 object PurchaseLogic {
-    /** Index eines unbearbeiteten Artikels mit gleichem Barcode und Ablaufdatum, sonst -1. */
+    /** Index eines unbearbeiteten Artikels mit gleichem Barcode, Ablaufdatum und Ort, sonst -1. */
     fun twinIndex(list: List<PurchaseDraft>, scanned: PurchaseDraft): Int {
         val barcode = scanned.barcode ?: return -1
-        return list.indexOfFirst { !it.edited && it.barcode == barcode && it.expiry == scanned.expiry }
+        return list.indexOfFirst { !it.edited && it.barcode == barcode && it.expiry == scanned.expiry && it.locationId == scanned.locationId }
     }
+
+    /** Gespeicherter Ort für neue Artikel, nur wenn es ihn noch gibt (gelöschter Ort → kein Ort). */
+    fun resolveLocation(savedId: String?, existingIds: Collection<String>): String? =
+        savedId?.takeIf { it in existingIds }
 
     fun increment(draft: PurchaseDraft): PurchaseDraft {
         val n = draft.quantity.trim().toIntOrNull() ?: 0

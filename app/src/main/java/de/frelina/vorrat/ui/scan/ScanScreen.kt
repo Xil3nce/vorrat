@@ -21,7 +21,7 @@ import de.frelina.vorrat.ui.components.CountCircle
 import de.frelina.vorrat.ui.components.GlassIconButton
 import de.frelina.vorrat.ui.components.statusColor
 import de.frelina.vorrat.ui.theme.VorratTheme
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SegmentedButton
@@ -55,7 +55,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ButtonDefaults
+import de.frelina.vorrat.data.db.LocationEntity
 import androidx.compose.material.icons.outlined.FlashlightOff
 import androidx.compose.material.icons.outlined.FlashlightOn
 import androidx.compose.material.icons.outlined.Keyboard
@@ -122,6 +129,7 @@ fun ScanScreen(
     onCreateManual: () -> Unit,
     onReadNfc: () -> Unit,
     onOpenPurchase: () -> Unit,
+    onOpenConsume: () -> Unit,
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -130,15 +138,10 @@ fun ScanScreen(
     val mode by viewModel.mode.collectAsStateWithLifecycle()
     val units by viewModel.units.collectAsStateWithLifecycle()
     val purchaseCount by viewModel.purchaseCount.collectAsStateWithLifecycle()
+    val consumeCount by viewModel.consumeCount.collectAsStateWithLifecycle()
+    val locations by viewModel.locations.collectAsStateWithLifecycle()
+    val purchaseLocationId by viewModel.purchaseLocationId.collectAsStateWithLifecycle()
     var consumeFor by remember { mutableStateOf<ScanOutcome?>(null) }
-
-    // Entnehmen-Modus: bei einem Treffer im Bestand sofort die Mengenauswahl öffnen.
-    val current = state
-    LaunchedEffect(current, mode) {
-        if (mode == ScanMode.CONSUME && current is ScanUiState.Result && current.outcome.exactMatches.isNotEmpty()) {
-            consumeFor = current.outcome
-        }
-    }
 
     var hasPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
@@ -175,7 +178,8 @@ fun ScanScreen(
         // ---------------- Kamera (fix oben; bei "+ Bestand" immer groß – Ergebnis gibt es dort nicht)
         val purchase = mode == ScanMode.PURCHASE
         val idle = state is ScanUiState.Idle
-        val bigCamera = idle || purchase
+        val consume = mode == ScanMode.CONSUME
+        val bigCamera = idle || purchase || (consume && state is ScanUiState.Loading)
         val expiryFor = (state as? ScanUiState.PurchaseExpiry)?.outcome
         Box(
             Modifier
@@ -202,7 +206,7 @@ fun ScanScreen(
                     onClick = { torch = !torch },
                     modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
                 )
-                if (purchase && state is ScanUiState.Loading) {
+                if ((purchase || consume) && state is ScanUiState.Loading) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
                 if (idle) {
@@ -241,7 +245,7 @@ fun ScanScreen(
         // ---------------- Ergebnis (füllt den Platz dazwischen)
         when (val s = state) {
             ScanUiState.Idle, is ScanUiState.PurchaseExpiry -> Unit
-            is ScanUiState.Loading -> if (!purchase) GlassCard(Modifier.fillMaxWidth().weight(1f), shape = MaterialTheme.shapes.large) {
+            is ScanUiState.Loading -> if (!purchase && !consume) GlassCard(Modifier.fillMaxWidth().weight(1f), shape = MaterialTheme.shapes.large) {
                 Column(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -273,16 +277,35 @@ fun ScanScreen(
             )
         }
 
-        // ---------------- Einkauf anzeigen ("+ Bestand")
+        // ---------------- Scan-Liste ("+ Bestand": mit Ort daneben, "Entnehmen": volle Breite)
         if (purchase) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = onOpenPurchase,
+                    enabled = purchaseCount > 0,
+                    contentPadding = PaddingValues(horizontal = 12.dp),
+                    modifier = Modifier.weight(1f).height(52.dp),
+                ) {
+                    Icon(Icons.Outlined.ShoppingBag, contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.scan_list_show, purchaseCount), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                LocationPicker(
+                    locations = locations,
+                    selectedId = purchaseLocationId,
+                    onSelect = viewModel::setPurchaseLocation,
+                    modifier = Modifier.weight(1f).height(52.dp),
+                )
+            }
+        } else if (consume) {
             Button(
-                onClick = onOpenPurchase,
-                enabled = purchaseCount > 0,
+                onClick = onOpenConsume,
+                enabled = consumeCount > 0,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
             ) {
-                Icon(Icons.Outlined.ShoppingBag, contentDescription = null, modifier = Modifier.size(20.dp))
+                Icon(Icons.Outlined.RemoveCircleOutline, contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.purchase_show, purchaseCount))
+                Text(stringResource(R.string.scan_list_show, consumeCount))
             }
         }
 
@@ -343,6 +366,57 @@ fun ScanScreen(
                 outcome.localProduct?.let { onAddEntryForProduct(it.id) }
             },
         )
+    }
+}
+
+/** Ort für neue Artikel im Modus "+ Bestand": Dropdown mit "Kein Ort" und allen Orten; gewählter Ort hervorgehoben. */
+@Composable
+private fun LocationPicker(
+    locations: List<LocationEntity>,
+    selectedId: String?,
+    onSelect: (String?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var open by remember { mutableStateOf(false) }
+    val selected = locations.firstOrNull { it.id == selectedId }
+    val primary = MaterialTheme.colorScheme.primary
+    Box(modifier) {
+        OutlinedButton(
+            onClick = { open = true },
+            contentPadding = PaddingValues(start = 12.dp, end = 4.dp),
+            colors = if (selected != null) {
+                ButtonDefaults.outlinedButtonColors(containerColor = primary.copy(alpha = 0.16f), contentColor = primary)
+            } else {
+                ButtonDefaults.outlinedButtonColors(contentColor = VorratTheme.colors.textSecondary)
+            },
+            border = BorderStroke(1.dp, if (selected != null) primary else VorratTheme.colors.glassBorder),
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            Icon(Icons.Outlined.Place, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.size(6.dp))
+            Text(
+                selected?.name ?: stringResource(R.string.scan_location_none),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(Icons.Outlined.ArrowDropDown, contentDescription = stringResource(R.string.scan_location_cd))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.scan_location_menu_none)) },
+                trailingIcon = { if (selected == null) Icon(Icons.Outlined.Check, contentDescription = null) },
+                onClick = { open = false; onSelect(null) },
+            )
+            if (locations.isNotEmpty()) HorizontalDivider()
+            locations.forEach { location ->
+                DropdownMenuItem(
+                    text = { Text(location.name) },
+                    trailingIcon = { if (location.id == selected?.id) Icon(Icons.Outlined.Check, contentDescription = null) },
+                    onClick = { open = false; onSelect(location.id) },
+                )
+            }
+        }
     }
 }
 

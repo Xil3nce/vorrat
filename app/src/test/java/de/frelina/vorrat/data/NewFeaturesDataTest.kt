@@ -132,6 +132,18 @@ class NewFeaturesDataTest : DbTestBase() {
         assertEquals("g", known.unitSymbol)
     }
 
+    @Test fun `Hinzufuegen mit Menge - Freitext, Produkt verknuepft, bestehender Artikel wird erhoeht`() = runBlocking {
+        val p = product(name = "Nudeln")
+        val text = shopping.addText("Brot", quantity = 3)!!
+        assertEquals(3, text.quantity)
+        val linked = shopping.addText("nudeln", quantity = 2)!!
+        assertEquals(p, linked.productId)
+        assertEquals(2, linked.quantity)
+        val again = shopping.addText("Nudeln", quantity = 4)!!
+        assertEquals(6, again.quantity)
+        assertEquals(6, db.shoppingDao().getById(linked.id)!!.quantity)
+    }
+
     @Test fun `Kauf entfernt Produkt- und gleichnamige Freitext-Eintraege`() = runBlocking {
         val p = product(name = "Milch")
         shopping.addProduct(db.productDao().getById(p)!!)

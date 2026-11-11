@@ -16,6 +16,9 @@ import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.data.purchase.PurchaseDraft
 import de.frelina.vorrat.data.purchase.PurchaseDraftStore
+import de.frelina.vorrat.data.purchase.PurchaseLogic
+import de.frelina.vorrat.data.consume.ConsumeDraftStore
+import de.frelina.vorrat.data.db.LocationEntity
 import de.frelina.vorrat.domain.Validation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
@@ -24,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -51,7 +55,8 @@ class ScanViewModel @Inject constructor(
     private val shoppingRepository: ShoppingRepository,
     private val messages: UiMessages,
     private val purchaseDrafts: PurchaseDraftStore,
-    settingsRepository: SettingsRepository,
+    private val consumeDrafts: ConsumeDraftStore,
+    private val settingsRepository: SettingsRepository,
     private val catalogRepository: de.frelina.vorrat.data.repo.CatalogRepository,
 ) : ViewModel() {
 
@@ -59,7 +64,24 @@ class ScanViewModel @Inject constructor(
     val purchaseCount: StateFlow<Int> = purchaseDrafts.drafts.map { it.size }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
 
-    /** Zuletzt im Einkauf erfasster Barcode – kurz danach nicht gleich noch einmal erkennen. */
+    /** Anzahl der Zeilen in der Entnahme-Scan-Liste ("Entnehmen"). */
+    val consumeCount: StateFlow<Int> = consumeDrafts.drafts.map { it.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    /** Alle Orte (für die Auswahl in "+ Bestand"). */
+    val locations: StateFlow<List<LocationEntity>> = catalogRepository.observeLocations()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    /** In "+ Bestand" gewählter Ort für neue Artikel (pro Gerät gespeichert); null = kein Ort oder Ort gelöscht. */
+    val purchaseLocationId: StateFlow<String?> = combine(settingsRepository.scanLocationId, locations) { id, list ->
+        PurchaseLogic.resolveLocation(id, list.map { it.id })
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun setPurchaseLocation(id: String?) {
+        viewModelScope.launch { settingsRepository.setScanLocationId(id) }
+    }
+
+    /** Zuletzt gescannter Barcode ("+ Bestand"/"Entnehmen") – kurz danach nicht gleich noch einmal erkennen. */
     private var lastPurchase: Pair<String, Long>? = null
 
     /** Einheiten-ID → Symbol für die Packungsgröße im Ergebnis. */
@@ -81,8 +103,8 @@ class ScanViewModel @Inject constructor(
     fun setMode(mode: ScanMode) {
         val old = _mode.value
         _mode.value = mode
-        // Beim Wechsel von/zu "+ Bestand" neu beginnen (dort gibt es keine Ergebnis-Ansicht).
-        if (old != mode && (old == ScanMode.PURCHASE || mode == ScanMode.PURCHASE)) rescan()
+        // Beim Wechsel von/zu "+ Bestand" und "Entnehmen" neu beginnen (dort gibt es keine Treffer-Ansicht).
+        if (old != mode && (old != ScanMode.CHECK || mode != ScanMode.CHECK)) rescan()
     }
 
     /** Von der Kamera (automatische Erkennung) oder aus der manuellen Eingabe. */
@@ -101,7 +123,43 @@ class ScanViewModel @Inject constructor(
             job = viewModelScope.launch { _state.value = ScanUiState.PurchaseExpiry(scanRepository.resolve(barcode)) }
             return
         }
+        if (_mode.value == ScanMode.CONSUME) {
+            if (current !is ScanUiState.Idle) return
+            val last = lastPurchase
+            if (last != null && last.first == barcode && System.currentTimeMillis() - last.second < SAME_BARCODE_PAUSE_MS) return
+            job?.cancel()
+            _state.value = ScanUiState.Loading(barcode)
+            job = viewModelScope.launch { addToConsumeList(scanRepository.resolve(barcode)) }
+            return
+        }
         resolve(barcode, showLoading = true)
+    }
+
+    /**
+     * "Entnehmen": Treffer im Bestand kommen mit Menge 1 in die Scan-Liste (aus dem Eintrag, der zuerst abläuft),
+     * ohne Treffer zeigt die Ergebnis-Karte wie sonst "nicht im Bestand".
+     */
+    private suspend fun addToConsumeList(outcome: ScanOutcome) {
+        if (outcome.exactMatches.isEmpty()) {
+            val onList = outcome.localProduct?.let { shoppingRepository.isOnList(it.id) } ?: false
+            _state.value = ScanUiState.Result(outcome, onList)
+            return
+        }
+        val result = consumeDrafts.addScan(outcome.exactMatches)
+        lastPurchase = outcome.barcode to System.currentTimeMillis()
+        _state.value = ScanUiState.Idle
+        val name = outcome.exactMatches.first().productName
+        messages.show(
+            when {
+                result.entry == null -> UiMessage(R.string.consume_list_exhausted, listOf(name))
+                result.isNew && result.total == 1 -> {
+                    val place = result.entry.locationName
+                    if (place != null) UiMessage(R.string.consume_list_added, listOf(name, place))
+                    else UiMessage(R.string.consume_list_added_short, listOf(name))
+                }
+                else -> UiMessage(R.string.consume_list_more, listOf(name, result.total))
+            },
+        )
     }
 
     /** "+ Bestand": Artikel mit Ablaufdatum ([expiry] = null: ohne) in den Einkauf übernehmen, weiter scannen. */
@@ -147,7 +205,8 @@ class ScanViewModel @Inject constructor(
             imagePath = local?.imagePath ?: remote?.imagePath,
             imageFromCache = local == null && remote?.imagePath != null,
             fromOff = remote != null,
-            locationId = match?.locationId ?: locations.singleOrNull()?.id,
+            locationId = PurchaseLogic.resolveLocation(settingsRepository.scanLocationId.first(), locations.map { it.id })
+                ?: match?.locationId ?: locations.singleOrNull()?.id,
             level = match?.level?.toString().orEmpty(),
             shelf = match?.shelf?.toString().orEmpty(),
             expiry = expiry?.let(Validation::formatDate).orEmpty(),

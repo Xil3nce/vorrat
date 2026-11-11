@@ -6,7 +6,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.db.DepartmentEntity
 import de.frelina.vorrat.data.repo.DepartmentRepository
-import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.ShoppingEntry
 import de.frelina.vorrat.data.repo.ShoppingList
 import de.frelina.vorrat.data.repo.ShoppingRepository
@@ -60,7 +59,6 @@ data class ShoppingUiState(
 @HiltViewModel
 class ShoppingViewModel @Inject constructor(
     private val repository: ShoppingRepository,
-    productRepository: ProductRepository,
     private val departmentRepository: DepartmentRepository,
     private val settings: SettingsRepository,
     private val messages: UiMessages,
@@ -85,11 +83,6 @@ class ShoppingViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
 
-    /** Produktnamen als Vorschläge für die Eingabe. */
-    val suggestions: StateFlow<List<String>> = productRepository.observeAll()
-        .map { products -> products.map { it.name }.distinct() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
     private fun inputs(list: ShoppingList): List<BoardInput<ShoppingPayload>> =
         list.shortages.map { s ->
             BoardInput<ShoppingPayload>(
@@ -112,8 +105,9 @@ class ShoppingViewModel @Inject constructor(
             )
         }
 
-    fun add(name: String, packageSize: java.math.BigDecimal? = null, unitSymbol: String? = null) =
-        viewModelScope.launch { repository.addText(name, packageSize = packageSize, unitSymbol = unitSymbol) }
+    /** Neuer Artikel aus dem Hinzufügen-Dialog (Name passt zu Produkt → verknüpft; steht schon drauf → Menge erhöht). */
+    fun add(name: String, quantity: Int = 1, packageSize: java.math.BigDecimal? = null, unitSymbol: String? = null) =
+        viewModelScope.launch { repository.addText(name, quantity, packageSize, unitSymbol) }
 
     /** Name, Anzahl und Packungsgröße aus dem Bearbeiten-Dialog. */
     fun updateDetails(id: String, name: String, quantity: Int, packageSize: java.math.BigDecimal?, unitSymbol: String?) =

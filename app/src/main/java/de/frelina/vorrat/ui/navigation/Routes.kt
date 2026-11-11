@@ -48,6 +48,8 @@ import kotlinx.serialization.Serializable
 )
 /** Einkauf ("+ Bestand"): gescannte Artikel prüfen und in den Bestand übernehmen. */
 @Serializable data object PurchaseRoute
+/** Entnehmen: im Scanner vorgemerkte Entnahmen prüfen und gesammelt ausbuchen. */
+@Serializable data object ConsumeRoute
 @Serializable data class EditEntryRoute(val editEntryId: String)
 
 /** Formular vorbelegt mit den Werten eines Eintrags; neuer Eintrag entsteht erst beim Speichern. */

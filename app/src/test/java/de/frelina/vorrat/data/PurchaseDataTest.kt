@@ -2,6 +2,7 @@ package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.purchase.PurchaseDraft
 import de.frelina.vorrat.data.purchase.PurchaseDraftStore
+import de.frelina.vorrat.data.purchase.PurchaseLogic
 import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
@@ -121,5 +122,32 @@ class PurchaseDataTest : DbTestBase() {
         assertEquals(1, result.committed)
         assertEquals(1, result.incomplete)
         assertEquals(listOf("2"), store.all().map { it.barcode })
+    }
+
+    @Test
+    fun sameBarcodeAndExpiry_butOtherLocation_addsSecondArticle_andCommitUsesDraftLocation() = runBlocking {
+        val type = stck()
+        val kitchen = location("Küche")
+        val cellar = location("Keller")
+        store.addScanned(PurchaseDraft(barcode = "777", name = "Reis", locationId = kitchen, quantityTypeId = type))
+        val same = store.addScanned(PurchaseDraft(barcode = "777", name = "Reis", locationId = kitchen, quantityTypeId = type))
+        assertEquals("2", same.quantity)
+        store.addScanned(PurchaseDraft(barcode = "777", name = "Reis", locationId = cellar, quantityTypeId = type))
+        assertEquals(listOf(kitchen, cellar), store.all().map { it.locationId })
+
+        val result = committer.commitAll()
+
+        assertEquals(2, result.committed)
+        val rice = db.productDao().getByBarcode("777")!!
+        val entries = db.stockEntryDao().getEntriesForProduct(rice.id)
+        assertEquals(setOf(kitchen, cellar), entries.map { it.locationId }.toSet())
+        assertEquals(2, entries.single { it.locationId == kitchen }.quantity)
+    }
+
+    @Test
+    fun resolveLocation_onlyKnownLocations() {
+        assertEquals("a", PurchaseLogic.resolveLocation("a", listOf("a", "b")))
+        assertEquals(null, PurchaseLogic.resolveLocation("gone", listOf("a", "b")))
+        assertEquals(null, PurchaseLogic.resolveLocation(null, listOf("a")))
     }
 }
