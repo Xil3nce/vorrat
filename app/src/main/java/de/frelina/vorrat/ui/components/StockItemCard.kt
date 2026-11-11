@@ -12,8 +12,6 @@ import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.Nfc
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.outlined.Schedule
-import de.frelina.vorrat.ui.components.GlassCard
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import de.frelina.vorrat.R
+import de.frelina.vorrat.ui.theme.VorratTheme
 import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.domain.ExpiryLogic
 import de.frelina.vorrat.domain.ExpiryStatus
@@ -58,6 +57,13 @@ fun expiryText(item: StockItem, today: LocalDate, leadDays: Int): String {
     return if (suffix != null) "$base – $suffix" else base
 }
 
+/** Anteil für den Ablaufbalken: abgelaufen = voll (rot), sonst verbleibende Tage bezogen auf zwei Monate. */
+fun expiryFraction(item: StockItem, today: LocalDate): Float? {
+    val date = item.effectiveExpiry ?: return null
+    val days = java.time.temporal.ChronoUnit.DAYS.between(today, date)
+    return if (days < 0) 1f else (days / 60f).coerceIn(0.04f, 1f)
+}
+
 @Composable
 fun StockItemCard(
     item: StockItem,
@@ -67,70 +73,76 @@ fun StockItemCard(
     modifier: Modifier = Modifier,
 ) {
     val status = ExpiryLogic.status(item.effectiveExpiry, today, leadDays)
-    val colors = expiryColors(status)
-    val cardColors = if (colors != null) {
-        CardDefaults.cardColors(containerColor = colors.container, contentColor = colors.content)
-    } else {
-        CardDefaults.cardColors()
-    }
-    val content: @Composable () -> Unit = {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 72.dp)
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            ProductImage(item.imagePath, size = 56.dp)
-            Column(Modifier.weight(1f)) {
-                Text(
-                    item.productName,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                item.brand?.takeIf { it.isNotBlank() }?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Text(locationText(item), style = MaterialTheme.typography.bodyMedium)
-                item.frozenAt?.let { frozen ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.AcUnit, contentDescription = null, modifier = Modifier.padding(end = 4.dp).size(16.dp))
-                        Text(
-                            stringResource(R.string.frozen_at_label, Validation.formatDate(frozen)),
-                            style = MaterialTheme.typography.bodySmall,
-                        )
-                        if (item.nfcTagId != null) {
+    val color = statusColor(status)
+    GlassCard(modifier = modifier.fillMaxWidth(), onClick = onClick) {
+        Column(Modifier.padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                ProductImage(item.imagePath, size = 52.dp, name = item.productName)
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        item.productName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    val sub = listOfNotNull(item.brand?.takeIf { it.isNotBlank() }, locationText(item)).joinToString(" · ")
+                    Text(
+                        sub,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = VorratTheme.colors.textSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    item.frozenAt?.let { frozen ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                Icons.Outlined.Nfc,
-                                contentDescription = stringResource(R.string.nfc_linked),
-                                modifier = Modifier.padding(start = 6.dp).size(16.dp),
+                                Icons.Outlined.AcUnit,
+                                contentDescription = null,
+                                tint = VorratTheme.colors.info,
+                                modifier = Modifier.padding(end = 4.dp).size(14.dp),
                             )
+                            Text(
+                                stringResource(R.string.frozen_at_label, Validation.formatDate(frozen)),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = VorratTheme.colors.textSecondary,
+                            )
+                            if (item.nfcTagId != null) {
+                                Icon(
+                                    Icons.Outlined.Nfc,
+                                    contentDescription = stringResource(R.string.nfc_linked),
+                                    tint = VorratTheme.colors.textSecondary,
+                                    modifier = Modifier.padding(start = 6.dp).size(14.dp),
+                                )
+                            }
                         }
                     }
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) {
-                        Icon(
-                            if (status == ExpiryStatus.EXPIRED) Icons.Outlined.ErrorOutline else Icons.Outlined.Schedule,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 4.dp),
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) {
+                            Icon(
+                                if (status == ExpiryStatus.EXPIRED) Icons.Outlined.ErrorOutline else Icons.Outlined.Schedule,
+                                contentDescription = null,
+                                tint = color,
+                                modifier = Modifier.padding(end = 4.dp).size(14.dp),
+                            )
+                        }
+                        Text(
+                            expiryText(item, today, leadDays),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) color
+                            else VorratTheme.colors.textTertiary,
                         )
                     }
-                    Text(expiryText(item, today, leadDays), style = MaterialTheme.typography.bodySmall)
                 }
+                CountCircle(stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol))
             }
-            Text(
-                stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
+            expiryFraction(item, today)?.let { fraction ->
+                ExpiryBar(fraction, color, Modifier.padding(top = 10.dp))
+            }
         }
-    }
-    if (onClick != null) {
-        GlassCard(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
-    } else {
-        GlassCard(modifier = modifier.fillMaxWidth(), colors = cardColors) { content() }
     }
 }

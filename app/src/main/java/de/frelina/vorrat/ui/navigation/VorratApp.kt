@@ -234,6 +234,7 @@ fun VorratRoot(
                     onAddNewProduct = { navController.navigate(AddStockRoute(barcode = it)) },
                     onAddEntryForProduct = { navController.navigate(AddStockRoute(productId = it)) },
                     onCreateManual = { navController.navigate(AddStockRoute()) },
+                    onReadNfc = { nfcReadDialog = true },
                 )
             }
             composable<ShoppingRoute> {

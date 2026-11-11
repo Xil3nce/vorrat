@@ -1,5 +1,15 @@
 package de.frelina.vorrat.ui.stock
 
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.components.GlassIconButton
+import de.frelina.vorrat.ui.components.SegmentRing
+import de.frelina.vorrat.ui.theme.VorratTheme
+import java.time.LocalTime
 import de.frelina.vorrat.domain.StockQueries
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -88,21 +98,27 @@ fun StockScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.stock_title)) },
+                title = {
+                    Column {
+                        Text(
+                            stringResource(greetingFor(LocalTime.now())),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = VorratTheme.colors.textSecondary,
+                        )
+                        Text(
+                            stringResource(R.string.stock_title),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                },
                 actions = {
-                    IconButton(onClick = onReadNfc) {
-                        Icon(Icons.Outlined.Nfc, contentDescription = stringResource(R.string.nfc_read_title))
-                    }
-                    IconButton(onClick = onOpenRecipes) {
-                        Icon(Icons.Outlined.Restaurant, contentDescription = stringResource(R.string.recipes_title))
-                    }
-                    IconButton(onClick = onOpenHistory) {
-                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.history_title))
-                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(end = 8.dp)) {
+                    GlassIconButton(Icons.Outlined.Nfc, stringResource(R.string.nfc_read_title), onReadNfc)
+                    GlassIconButton(Icons.Outlined.Restaurant, stringResource(R.string.recipes_title), onOpenRecipes)
+                    GlassIconButton(Icons.Outlined.History, stringResource(R.string.history_title), onOpenHistory)
                     Box {
-                        IconButton(onClick = { sortMenu = true }) {
-                            Icon(Icons.AutoMirrored.Outlined.Sort, contentDescription = stringResource(R.string.stock_sort))
-                        }
+                        GlassIconButton(Icons.AutoMirrored.Outlined.Sort, stringResource(R.string.stock_sort), { sortMenu = true })
                         DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                             SortItem(R.string.stock_sort_expiry, state.sort == StockSort.EXPIRY) {
                                 viewModel.setSort(StockSort.EXPIRY); sortMenu = false
@@ -111,6 +127,7 @@ fun StockScreen(
                                 viewModel.setSort(StockSort.LOCATION); sortMenu = false
                             }
                         }
+                    }
                     }
                 },
             )
@@ -128,50 +145,120 @@ fun StockScreen(
             }
         },
     ) { padding ->
-        Column(Modifier.padding(padding).fillMaxSize()) {
-            FilterRow(state, viewModel)
-            if (state.expiredCount > 0 || state.soonCount > 0) {
-                ExpiryBanner(
-                    expired = state.expiredCount,
-                    soon = state.soonCount,
-                    onShow = {
-                        viewModel.setFilter(if (state.expiredCount > 0) StockFilter.EXPIRED else StockFilter.SOON)
-                    },
-                )
+        when {
+            state.loading -> Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-            if (state.soonCount > 0) {
-                RecipeBanner(state.soonCount, onShow = onOpenRecipes)
-            }
-            if (state.unassignedCount > 0 && state.locationId != StockQueries.NO_LOCATION) {
-                UnassignedBanner(state.unassignedCount, onShow = { viewModel.setLocation(StockQueries.NO_LOCATION) })
-            }
-            when {
-                state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+            else -> LazyColumn(
+                modifier = Modifier.padding(padding).fillMaxSize(),
+                contentPadding = PaddingValues(top = 4.dp, bottom = 96.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                if (state.totalCount > 0) {
+                    item(key = "overview") {
+                        OverviewCard(state, onFilter = viewModel::setFilter, modifier = Modifier.padding(horizontal = 16.dp))
+                    }
                 }
-                state.items.isEmpty() -> Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Text(
-                        stringResource(if (state.totalCount == 0) R.string.stock_empty else R.string.stock_empty_filtered),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                item(key = "filters") { FilterRow(state, viewModel) }
+                if (state.soonCount > 0) {
+                    item(key = "recipes") { RecipeBanner(state.soonCount, onShow = onOpenRecipes) }
                 }
-                else -> LazyColumn(
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(state.items, key = { it.entryId }) { item ->
-                        SwipeableStockItem(
-                            onDelete = { viewModel.delete(item.entryId) },
-                            onDuplicate = { onDuplicateEntry(item.entryId) },
-                            modifier = Modifier.animateItem(),
-                        ) {
-                            StockItemCard(item, state.today, state.leadDays, onClick = { onOpenEntry(item.entryId) })
-                        }
+                if (state.unassignedCount > 0 && state.locationId != StockQueries.NO_LOCATION) {
+                    item(key = "unassigned") {
+                        UnassignedBanner(state.unassignedCount, onShow = { viewModel.setLocation(StockQueries.NO_LOCATION) })
+                    }
+                }
+                if (state.items.isEmpty()) {
+                    item(key = "empty") {
+                        Text(
+                            stringResource(if (state.totalCount == 0) R.string.stock_empty else R.string.stock_empty_filtered),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = VorratTheme.colors.textSecondary,
+                            modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        )
+                    }
+                }
+                items(state.items, key = { it.entryId }) { item ->
+                    SwipeableStockItem(
+                        onDelete = { viewModel.delete(item.entryId) },
+                        onDuplicate = { onDuplicateEntry(item.entryId) },
+                        modifier = Modifier.animateItem().padding(horizontal = 16.dp),
+                    ) {
+                        StockItemCard(item, state.today, state.leadDays, onClick = { onOpenEntry(item.entryId) })
                     }
                 }
             }
         }
+    }
+}
+
+/** Begrüßung nach Tageszeit. */
+private fun greetingFor(time: LocalTime): Int = when (time.hour) {
+    in 4..10 -> R.string.stock_greeting_morning
+    in 11..17 -> R.string.stock_greeting_day
+    else -> R.string.stock_greeting_evening
+}
+
+/**
+ * Übersicht mit Ring: Anteile abgelaufen (rot), bald ab (gelb), gut haltbar (grün).
+ * Antippen einer Zeile filtert die Liste.
+ */
+@Composable
+private fun OverviewCard(state: StockUiState, onFilter: (StockFilter) -> Unit, modifier: Modifier = Modifier) {
+    val colors = VorratTheme.colors
+    val total = state.totalCount.coerceAtLeast(1)
+    val ok = (state.totalCount - state.expiredCount - state.soonCount).coerceAtLeast(0)
+    GlassCard(modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+        Row(
+            Modifier.padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            SegmentRing(
+                segments = listOf(
+                    state.expiredCount.toFloat() / total to colors.danger,
+                    state.soonCount.toFloat() / total to colors.warning,
+                    ok.toFloat() / total to colors.accent,
+                ),
+                size = 104.dp,
+                stroke = 11.dp,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(state.totalCount.toString(), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text(
+                        pluralStringResource(R.plurals.stock_overview_entries, state.totalCount),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.textSecondary,
+                    )
+                }
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                OverviewLine(colors.accent, pluralStringResource(R.plurals.stock_overview_ok, ok, ok)) { onFilter(StockFilter.ALL) }
+                OverviewLine(colors.warning, pluralStringResource(R.plurals.stock_overview_soon, state.soonCount, state.soonCount)) {
+                    onFilter(StockFilter.SOON)
+                }
+                OverviewLine(
+                    colors.danger,
+                    pluralStringResource(R.plurals.stock_overview_expired, state.expiredCount, state.expiredCount),
+                ) { onFilter(StockFilter.EXPIRED) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OverviewLine(color: Color, text: String, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 6.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.size(10.dp).clip(CircleShape).background(color))
+        Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 10.dp))
     }
 }
 
@@ -288,31 +375,6 @@ private fun SlotFilterChip(
                     onClick = { onSelect(n); menu = false },
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun ExpiryBanner(expired: Int, soon: Int, onShow: () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    val (container, content) = if (expired > 0) {
-        colors.errorContainer to colors.onErrorContainer
-    } else {
-        colors.tertiaryContainer to colors.onTertiaryContainer
-    }
-    Surface(
-        color = container,
-        contentColor = content,
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Row(Modifier.padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Outlined.WarningAmber, contentDescription = null)
-            Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                if (expired > 0) Text(pluralStringResource(R.plurals.banner_expired, expired, expired))
-                if (soon > 0) Text(pluralStringResource(R.plurals.banner_soon, soon, soon))
-            }
-            TextButton(onClick = onShow) { Text(stringResource(R.string.banner_show)) }
         }
     }
 }

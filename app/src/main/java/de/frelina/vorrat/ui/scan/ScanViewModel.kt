@@ -40,7 +40,13 @@ class ScanViewModel @Inject constructor(
     private val shoppingRepository: ShoppingRepository,
     private val messages: UiMessages,
     settingsRepository: SettingsRepository,
+    catalogRepository: de.frelina.vorrat.data.repo.CatalogRepository,
 ) : ViewModel() {
+
+    /** Einheiten-ID → Symbol für die Packungsgröße im Ergebnis. */
+    val units: StateFlow<Map<String, String>> = catalogRepository.observeUnits()
+        .map { list -> list.associate { it.id to it.symbol } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
     private val _state = MutableStateFlow<ScanUiState>(ScanUiState.Idle)
     val state: StateFlow<ScanUiState> = _state.asStateFlow()

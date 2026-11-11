@@ -92,6 +92,25 @@
 
     <!-- Bestand -->
     <string name="stock_title">Bestand</string>
+    <string name="stock_greeting_morning">Guten Morgen</string>
+    <string name="stock_greeting_day">Hallo</string>
+    <string name="stock_greeting_evening">Guten Abend</string>
+    <plurals name="stock_overview_entries">
+        <item quantity="one">Eintrag</item>
+        <item quantity="other">Einträge</item>
+    </plurals>
+    <plurals name="stock_overview_ok">
+        <item quantity="one">%d gut haltbar</item>
+        <item quantity="other">%d gut haltbar</item>
+    </plurals>
+    <plurals name="stock_overview_soon">
+        <item quantity="one">%d läuft bald ab</item>
+        <item quantity="other">%d laufen bald ab</item>
+    </plurals>
+    <plurals name="stock_overview_expired">
+        <item quantity="one">%d abgelaufen</item>
+        <item quantity="other">%d abgelaufen</item>
+    </plurals>
     <string name="stock_empty">Noch nichts im Bestand. Scanne ein Produkt oder lege es manuell an.</string>
     <string name="stock_empty_filtered">Keine Einträge für diesen Filter.</string>
     <string name="stock_sort">Sortierung</string>
@@ -185,6 +204,12 @@
     <string name="scan_open_settings">Systemeinstellungen öffnen</string>
     <string name="scan_hint">Barcode in den Rahmen halten – die Erkennung startet automatisch.</string>
     <string name="scan_again">Neu scannen</string>
+    <string name="scan_tile_barcode">Barcode</string>
+    <string name="scan_tile_nfc">NFC-Chip</string>
+    <string name="scan_tile_type">Eingeben</string>
+    <string name="scan_tile_new">Neu anlegen</string>
+    <string name="scan_total_single">%1$d× im Bestand</string>
+    <string name="scan_total_places">%1$d× an %2$d Orten</string>
     <string name="scan_torch_on">Taschenlampe einschalten</string>
     <string name="scan_torch_off">Taschenlampe ausschalten</string>
     <string name="scan_enter_barcode">Barcode eingeben</string>

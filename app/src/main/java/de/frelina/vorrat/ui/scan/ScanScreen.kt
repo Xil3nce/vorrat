@@ -1,5 +1,26 @@
 package de.frelina.vorrat.ui.scan
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.outlined.Nfc
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
+import de.frelina.vorrat.domain.ExpiryLogic
+import de.frelina.vorrat.domain.ExpiryStatus
+import de.frelina.vorrat.domain.ShoppingLogic
+import de.frelina.vorrat.ui.components.CountCircle
+import de.frelina.vorrat.ui.components.GlassIconButton
+import de.frelina.vorrat.ui.components.statusColor
+import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -96,12 +117,14 @@ fun ScanScreen(
     onAddNewProduct: (barcode: String) -> Unit,
     onAddEntryForProduct: (productId: String) -> Unit,
     onCreateManual: () -> Unit,
+    onReadNfc: () -> Unit,
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val leadDays by viewModel.leadDays.collectAsStateWithLifecycle()
     val mode by viewModel.mode.collectAsStateWithLifecycle()
+    val units by viewModel.units.collectAsStateWithLifecycle()
     var consumeFor by remember { mutableStateOf<ScanOutcome?>(null) }
 
     // Entnehmen-Modus: bei einem Treffer im Bestand sofort die Mengenauswahl öffnen.
@@ -129,9 +152,9 @@ fun ScanScreen(
         viewModel.refresh()
     }
 
-    Column(Modifier.fillMaxSize()) {
-        // ---------------- Modus
-        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+    Column(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // ---------------- Modus (Prüfen / Entnehmen)
+        SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             listOf(ScanMode.CHECK to R.string.scan_mode_check, ScanMode.CONSUME to R.string.scan_mode_consume)
                 .forEachIndexed { index, (m, label) ->
                     SegmentedButton(
@@ -141,43 +164,43 @@ fun ScanScreen(
                     ) { Text(stringResource(label)) }
                 }
         }
-        // ---------------- Kamera
+        // ---------------- Kamera (fix oben)
+        val idle = state is ScanUiState.Idle
         Box(
             Modifier
                 .fillMaxWidth()
-                .weight(if (state is ScanUiState.Idle) 1f else 0.45f)
+                .then(if (idle) Modifier.weight(1f) else Modifier.height(200.dp))
+                .clip(RoundedCornerShape(28.dp))
+                .background(Color.Black)
                 .clipToBounds(), // PreviewView skaliert sein TextureView – ohne Clip ragt das Bild ins Ergebnis
         ) {
             if (hasPermission) {
                 CameraPreview(
-                    analyzing = state is ScanUiState.Idle,
+                    analyzing = idle,
                     torchOn = torch,
                     onBarcode = viewModel::onBarcode,
                     modifier = Modifier.fillMaxSize(),
                 )
-                IconButton(
+                ScanFrame(Modifier.fillMaxSize().padding(horizontal = 44.dp, vertical = 28.dp))
+                GlassIconButton(
+                    if (torch) Icons.Outlined.FlashlightOff else Icons.Outlined.FlashlightOn,
+                    stringResource(if (torch) R.string.scan_torch_off else R.string.scan_torch_on),
                     onClick = { torch = !torch },
-                    modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(48.dp),
-                ) {
-                    Icon(
-                        if (torch) Icons.Outlined.FlashlightOff else Icons.Outlined.FlashlightOn,
-                        contentDescription = stringResource(if (torch) R.string.scan_torch_off else R.string.scan_torch_on),
-                        tint = MaterialTheme.colorScheme.inverseOnSurface,
+                    modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
+                )
+                if (idle) {
+                    Text(
+                        stringResource(if (mode == ScanMode.CONSUME) R.string.scan_hint_consume else R.string.scan_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = VorratTheme.colors.textTertiary,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(12.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.Black.copy(alpha = 0.45f))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                     )
-                }
-                if (state is ScanUiState.Idle) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.8f),
-                        contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
-                    ) {
-                        Text(
-                            stringResource(if (mode == ScanMode.CONSUME) R.string.scan_hint_consume else R.string.scan_hint),
-                            Modifier.padding(12.dp),
-                            textAlign = TextAlign.Center,
-                        )
-                    }
                 }
             } else {
                 PermissionRequest(
@@ -192,11 +215,15 @@ fun ScanScreen(
             }
         }
 
-        // ---------------- Ergebnis
+        // ---------------- Ergebnis (füllt den Platz dazwischen)
         when (val s = state) {
             ScanUiState.Idle -> Unit
-            is ScanUiState.Loading -> Box(Modifier.fillMaxWidth().weight(0.55f), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            is ScanUiState.Loading -> GlassCard(Modifier.fillMaxWidth().weight(1f), shape = MaterialTheme.shapes.large) {
+                Column(
+                    Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     CircularProgressIndicator()
                     Spacer(Modifier.height(12.dp))
                     Text(stringResource(R.string.scan_loading, s.barcode))
@@ -206,6 +233,7 @@ fun ScanScreen(
                 outcome = s.outcome,
                 onShoppingList = s.onShoppingList,
                 leadDays = leadDays,
+                units = units,
                 onOpenEntry = onOpenEntry,
                 onRetry = viewModel::retry,
                 onConsume = { consumeFor = s.outcome },
@@ -218,31 +246,24 @@ fun ScanScreen(
                         else -> onAddNewProduct(o.barcode)
                     }
                 },
-                modifier = Modifier.weight(0.55f),
+                modifier = Modifier.weight(1f),
             )
         }
 
-        // ---------------- Bedienleiste (unten, einhändig erreichbar)
+        // ---------------- Modus-Kacheln (immer fix unten)
         Row(
-            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            Modifier.fillMaxWidth().padding(bottom = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
         ) {
-            OutlinedButton(onClick = { manualDialog = true }, modifier = Modifier.height(56.dp)) {
-                Icon(Icons.Outlined.Keyboard, contentDescription = stringResource(R.string.scan_enter_barcode))
-            }
-            OutlinedButton(onClick = onCreateManual, modifier = Modifier.height(56.dp)) {
-                Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.stock_add_manual))
-            }
-            Button(
+            ModeTile(
+                Icons.Outlined.QrCodeScanner,
+                stringResource(if (idle) R.string.scan_tile_barcode else R.string.scan_again),
+                active = idle,
                 onClick = viewModel::rescan,
-                enabled = state !is ScanUiState.Idle,
-                modifier = Modifier.weight(1f).height(56.dp),
-            ) {
-                Icon(Icons.Outlined.QrCodeScanner, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.scan_again), style = MaterialTheme.typography.titleMedium)
-            }
+            )
+            ModeTile(Icons.Outlined.Nfc, stringResource(R.string.scan_tile_nfc), active = false, onClick = onReadNfc)
+            ModeTile(Icons.Outlined.Keyboard, stringResource(R.string.scan_tile_type), active = false, onClick = { manualDialog = true })
+            ModeTile(Icons.Outlined.Add, stringResource(R.string.scan_tile_new), active = false, onClick = onCreateManual)
         }
     }
 
@@ -296,11 +317,58 @@ private fun PermissionRequest(denied: Boolean, onRequest: () -> Unit, onOpenSett
     }
 }
 
+/** Kachel der unteren Modusleiste. */
+@Composable
+private fun RowScope.ModeTile(icon: ImageVector, label: String, active: Boolean, onClick: () -> Unit) {
+    val colors = VorratTheme.colors
+    Column(
+        Modifier
+            .weight(1f)
+            .height(64.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(if (active) colors.accent.copy(alpha = 0.14f) else colors.glass)
+            .border(1.dp, if (active) colors.accent.copy(alpha = 0.6f) else colors.glassBorder, RoundedCornerShape(18.dp))
+            .clickable(role = Role.Button, onClick = onClick),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(icon, contentDescription = null, tint = if (active) colors.accent else colors.textTertiary, modifier = Modifier.size(22.dp))
+        Text(
+            label,
+            style = MaterialTheme.typography.labelSmall,
+            color = if (active) MaterialTheme.colorScheme.onSurface else colors.textTertiary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 4.dp, start = 4.dp, end = 4.dp),
+        )
+    }
+}
+
+/** Rahmen-Ecken über dem Kamerabild. */
+@Composable
+private fun ScanFrame(modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.onSurface
+    Canvas(modifier) {
+        val len = 38.dp.toPx()
+        val w = 3.dp.toPx()
+        val stroke = Stroke(w, cap = StrokeCap.Round)
+        val r = size.width
+        val b = size.height
+        listOf(
+            Offset(0f, len) to Offset(0f, 0f), Offset(0f, 0f) to Offset(len, 0f),
+            Offset(r - len, 0f) to Offset(r, 0f), Offset(r, 0f) to Offset(r, len),
+            Offset(0f, b - len) to Offset(0f, b), Offset(0f, b) to Offset(len, b),
+            Offset(r - len, b) to Offset(r, b), Offset(r, b) to Offset(r, b - len),
+        ).forEach { (from, to) -> drawLine(color, from, to, strokeWidth = stroke.width, cap = StrokeCap.Round) }
+    }
+}
+
 @Composable
 private fun ResultPanel(
     outcome: ScanOutcome,
     onShoppingList: Boolean,
     leadDays: Int,
+    units: Map<String, String>,
     onOpenEntry: (String) -> Unit,
     onRetry: () -> Unit,
     onConsume: () -> Unit,
@@ -309,141 +377,178 @@ private fun ResultPanel(
     modifier: Modifier = Modifier,
 ) {
     val today = LocalDate.now()
-    Column(
-        modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        // Kopf: gescanntes Produkt
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            ProductImage(outcome.localProduct?.imagePath ?: outcome.remote?.imagePath, size = 64.dp)
-            Column(Modifier.weight(1f)) {
-                Text(
-                    outcome.displayName ?: stringResource(R.string.scan_unknown_product, outcome.barcode),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                (outcome.localProduct?.brand ?: outcome.remote?.brand)?.let { Text(it) }
-                Text(stringResource(R.string.detail_barcode, outcome.barcode), style = MaterialTheme.typography.bodySmall)
-                if (outcome.localProduct == null && outcome.remote != null) {
-                    Text(stringResource(R.string.scan_source_off), style = MaterialTheme.typography.labelSmall)
-                }
-            }
-        }
-
-        // Fehler/Hinweise zur OFF-Abfrage
-        outcome.lookupError?.let { err ->
-            GlassCard(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
-                Column(Modifier.padding(12.dp)) {
+    val colors = VorratTheme.colors
+    GlassCard(modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+        Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Kopf: gescanntes Produkt (fix)
+            val name = outcome.displayName ?: stringResource(R.string.scan_unknown_product, outcome.barcode)
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                ProductImage(outcome.localProduct?.imagePath ?: outcome.remote?.imagePath, size = 52.dp, name = name)
+                Column(Modifier.weight(1f)) {
                     Text(
-                        stringResource(
-                            when (err) {
-                                LookupErrorKind.NO_NETWORK -> R.string.scan_error_network
-                                LookupErrorKind.TIMEOUT -> R.string.scan_error_timeout
-                                LookupErrorKind.RATE_LIMITED -> R.string.scan_error_rate_limited
-                                LookupErrorKind.SERVER -> R.string.scan_error_server
-                            },
-                        ),
+                        name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                    TextButton(onClick = onRetry) { Text(stringResource(R.string.scan_retry)) }
+                    val pack = ShoppingLogic.packageLabel(
+                        outcome.localProduct?.packageSize ?: outcome.remote?.packageSize,
+                        outcome.localProduct?.unitId?.let(units::get) ?: outcome.remote?.unitSymbol,
+                    )
+                    val total = outcome.exactMatches.sumOf { it.quantity }
+                    val places = outcome.exactMatches.size
+                    val stock = when {
+                        places == 0 -> null
+                        places == 1 -> stringResource(R.string.scan_total_single, total)
+                        else -> stringResource(R.string.scan_total_places, total, places)
+                    }
+                    val brand = outcome.localProduct?.brand ?: outcome.remote?.brand
+                    val sub = listOfNotNull(brand?.takeIf { it.isNotBlank() }, pack, stock).joinToString(" · ")
+                    Text(
+                        sub.ifEmpty { stringResource(R.string.detail_barcode, outcome.barcode) },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textSecondary,
+                    )
                 }
             }
-        }
-        if (outcome.remoteNotFound) Text(stringResource(R.string.scan_off_not_found))
 
-        if (outcome.exactMatches.isNotEmpty()) {
-            // Zustand 1: exakter Treffer
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    stringResource(R.string.scan_in_stock),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-            outcome.exactMatches.forEach { item ->
-                StockItemCard(item, today, leadDays, onClick = { onOpenEntry(item.entryId) })
-            }
-            OutlinedButton(onClick = onConsume, modifier = Modifier.fillMaxWidth().height(48.dp)) {
-                Icon(Icons.Outlined.RemoveCircleOutline, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.consume_action))
-            }
-        } else {
-            Text(
-                stringResource(R.string.scan_not_in_stock),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            if (outcome.alternatives.isNotEmpty()) {
-                // Zustand 2: Alternativen – eigener, deutlich getrennter Abschnitt
-                HorizontalDivider()
-                OutlinedCard(
-                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.tertiary),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Outlined.SwapHoriz, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+            // Mitte: nur dieser Teil scrollt (Orte, Alternativen, Hinweise)
+            Column(
+                Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (outcome.localProduct == null && outcome.remote != null) {
+                    Text(stringResource(R.string.scan_source_off), style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
+                }
+                outcome.lookupError?.let { err ->
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.errorContainer)
+                            .padding(12.dp),
+                    ) {
+                        Text(
+                            stringResource(
+                                when (err) {
+                                    LookupErrorKind.NO_NETWORK -> R.string.scan_error_network
+                                    LookupErrorKind.TIMEOUT -> R.string.scan_error_timeout
+                                    LookupErrorKind.RATE_LIMITED -> R.string.scan_error_rate_limited
+                                    LookupErrorKind.SERVER -> R.string.scan_error_server
+                                },
+                            ),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                        )
+                        TextButton(onClick = onRetry) { Text(stringResource(R.string.scan_retry)) }
+                    }
+                }
+                if (outcome.remoteNotFound) Text(stringResource(R.string.scan_off_not_found), color = colors.textSecondary)
+
+                if (outcome.exactMatches.isNotEmpty()) {
+                    outcome.exactMatches.forEach { item -> PlaceRow(item, today, leadDays, onClick = { onOpenEntry(item.entryId) }) }
+                } else {
+                    Text(
+                        stringResource(R.string.scan_not_in_stock),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    if (outcome.alternatives.isNotEmpty()) {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+                            Icon(Icons.Outlined.SwapHoriz, contentDescription = null, tint = colors.warning)
                             Spacer(Modifier.size(8.dp))
                             Text(
                                 stringResource(R.string.scan_alternatives_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.tertiary,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = colors.warning,
                             )
                         }
                         outcome.alternatives.forEach { item ->
-                            Text(
-                                stringResource(R.string.scan_alternative_badge),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.tertiary,
-                            )
-                            StockItemCard(item, today, leadDays, onClick = { onOpenEntry(item.entryId) })
+                            PlaceRow(item, today, leadDays, onClick = { onOpenEntry(item.entryId) }, showName = true)
+                        }
+                    } else {
+                        Text(stringResource(R.string.scan_nothing), color = colors.textSecondary)
+                        when {
+                            outcome.category == null && outcome.localProduct == null && outcome.lookupError != null ->
+                                Text(stringResource(R.string.scan_offline_no_alternatives), style = MaterialTheme.typography.bodySmall)
+                            outcome.category == null && (outcome.localProduct != null || outcome.remote != null) ->
+                                Text(stringResource(R.string.scan_no_category), style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 }
-            } else {
-                // Zustand 3: nichts vorrätig
-                Text(stringResource(R.string.scan_nothing))
-                when {
-                    outcome.category == null && outcome.localProduct == null && outcome.lookupError != null ->
-                        Text(stringResource(R.string.scan_offline_no_alternatives), style = MaterialTheme.typography.bodySmall)
-                    outcome.category == null && (outcome.localProduct != null || outcome.remote != null) ->
-                        Text(stringResource(R.string.scan_no_category), style = MaterialTheme.typography.bodySmall)
+
+                if (onShoppingList) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 4.dp)) {
+                        Icon(Icons.Outlined.ShoppingCart, contentDescription = null, tint = colors.info, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.shopping_on_list), style = MaterialTheme.typography.bodyMedium, color = colors.info)
+                    }
+                } else if (outcome.displayName != null) {
+                    TextButton(onClick = onAddToShoppingList) {
+                        Icon(Icons.Outlined.AddShoppingCart, contentDescription = null)
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.shopping_add_product))
+                    }
+                }
+            }
+
+            // Aktionen fest am unteren Kartenrand
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Button(onClick = onAdd, modifier = Modifier.weight(1f).height(48.dp)) {
+                    Text(
+                        stringResource(
+                            if (outcome.localProduct == null && outcome.remote == null) R.string.scan_create_manual
+                            else R.string.scan_add_to_stock,
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                if (outcome.exactMatches.isNotEmpty()) {
+                    OutlinedButton(onClick = onConsume, modifier = Modifier.height(48.dp)) {
+                        Text(stringResource(R.string.consume_action))
+                    }
                 }
             }
         }
+    }
+}
 
-        if (onShoppingList) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Outlined.ShoppingCart, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    stringResource(R.string.shopping_on_list),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
-        } else if (outcome.displayName != null) {
-            TextButton(onClick = onAddToShoppingList) {
-                Icon(Icons.Outlined.AddShoppingCart, contentDescription = null)
-                Spacer(Modifier.size(8.dp))
-                Text(stringResource(R.string.shopping_add_product))
-            }
-        }
-        FilledTonalButton(onClick = onAdd, modifier = Modifier.fillMaxWidth().height(56.dp)) {
-            Icon(Icons.Outlined.Add, contentDescription = null)
-            Spacer(Modifier.size(8.dp))
+/** Eine Zeile je Ort: Status-Punkt, Ort, Ablauf-Info, kleiner Kreis mit Anzahl am Ende. */
+@Composable
+private fun PlaceRow(item: StockItem, today: LocalDate, leadDays: Int, onClick: () -> Unit, showName: Boolean = false) {
+    val status = ExpiryLogic.status(item.effectiveExpiry, today, leadDays)
+    val color = statusColor(status)
+    val colors = VorratTheme.colors
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(colors.glass)
+            .border(1.dp, colors.glassBorder.copy(alpha = 0.08f), RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Box(Modifier.size(8.dp).clip(CircleShape).background(color))
+        Column(Modifier.weight(1f)) {
             Text(
-                stringResource(
-                    if (outcome.localProduct == null && outcome.remote == null) R.string.scan_create_manual else R.string.scan_add_to_stock,
-                ),
+                if (showName) item.productName else locationText(item),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                if (showName) locationText(item) + " · " + expiryText(item, today, leadDays) else expiryText(item, today, leadDays),
+                style = MaterialTheme.typography.bodySmall,
+                color = if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) color else colors.textSecondary,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
             )
         }
+        CountCircle(stringResource(R.string.shopping_quantity, item.quantity), size = 36.dp)
     }
 }
 
