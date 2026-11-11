@@ -17,6 +17,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.theme.VorratTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -81,7 +85,7 @@ fun SearchScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val today = LocalDate.now()
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_search)) }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_search), fontWeight = FontWeight.SemiBold) }) }) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
             OutlinedTextField(
                 value = state.query,
@@ -95,6 +99,12 @@ fun SearchScreen(
                         }
                     }
                 },
+                shape = RoundedCornerShape(24.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = VorratTheme.colors.glass,
+                    focusedContainerColor = VorratTheme.colors.glassStrong,
+                    unfocusedBorderColor = VorratTheme.colors.glassBorder,
+                ),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             )
@@ -117,6 +127,6 @@ fun SearchScreen(
 @Composable
 private fun Hint(text: String) {
     Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-        Text(text, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
+        Text(text, textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge, color = VorratTheme.colors.textSecondary)
     }
 }
