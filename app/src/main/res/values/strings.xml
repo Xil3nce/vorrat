@@ -523,6 +523,7 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
 
     <!-- Rezepte: Was koche ich heute? -->
     <string name="recipes_title">Was koche ich heute?</string>
+    <string name="recipes_week_planned">Geplant</string>
     <string name="settings_recipes_summary">Rezeptvorschläge aus bald ablaufenden Produkten, eigene Rezepte</string>
     <plurals name="recipes_banner">
         <item quantity="one">%d Produkt läuft bald ab – Was koche ich heute?</item>

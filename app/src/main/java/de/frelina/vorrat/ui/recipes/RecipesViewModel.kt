@@ -3,11 +3,13 @@ package de.frelina.vorrat.ui.recipes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.frelina.vorrat.data.repo.MealPlanRepository
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.domain.ExpiringGroup
 import de.frelina.vorrat.domain.IngredientMatcher
+import de.frelina.vorrat.domain.PlanWeek
 import de.frelina.vorrat.domain.RecipeMatch
 import de.frelina.vorrat.domain.RecipeMatcher
 import de.frelina.vorrat.domain.toPantryEntry
@@ -21,6 +23,9 @@ import javax.inject.Inject
 
 enum class RecipeFilter { ALL, OWN, VEGETARIAN }
 
+/** Ein Tag der Wochenleiste; [planned], wenn im Essensplan etwas eingetragen ist. */
+data class WeekDayUi(val date: LocalDate, val planned: Boolean)
+
 data class RecipesUiState(
     val loading: Boolean = true,
     val matches: List<RecipeMatch> = emptyList(),
@@ -31,6 +36,8 @@ data class RecipesUiState(
     /** Alle Rezepte zeigen (auch ohne Treffer) statt nur der Vorschläge. */
     val showAll: Boolean = false,
     val today: LocalDate = LocalDate.now(),
+    /** Aktuelle Woche (Mo–So) des Essensplans. */
+    val week: List<WeekDayUi> = emptyList(),
 )
 
 private data class Controls(
@@ -45,17 +52,22 @@ class RecipesViewModel @Inject constructor(
     recipeRepository: RecipeRepository,
     stockRepository: StockRepository,
     settingsRepository: SettingsRepository,
+    mealPlanRepository: MealPlanRepository,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(Controls())
+
+    private val weekStart = PlanWeek.monday(LocalDate.now())
 
     val state: StateFlow<RecipesUiState> = combine(
         recipeRepository.observeAll(),
         stockRepository.observeItems(),
         settingsRepository.reminderSettings,
         controls,
-    ) { recipes, items, settings, c ->
+        mealPlanRepository.observeBetween(weekStart, weekStart.plusDays(6)),
+    ) { recipes, items, settings, c, planned ->
         val today = LocalDate.now()
+        val plannedDays = planned.map { it.date }.toSet()
         val pantry = items.map { it.toPantryEntry() }
         // Beim Suchen immer in allen Rezepten, sonst nur Vorschläge (oder alle, wenn eingeschaltet).
         val searching = c.query.isNotBlank()
@@ -87,6 +99,7 @@ class RecipesViewModel @Inject constructor(
             selectedGroup = c.selectedGroup,
             showAll = c.showAll,
             today = today,
+            week = PlanWeek.days(weekStart).map { WeekDayUi(it, it in plannedDays) },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipesUiState())
 

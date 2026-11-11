@@ -4,7 +4,18 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
 import de.frelina.vorrat.ui.components.GlassIconButton
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.Role
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -128,6 +139,9 @@ fun RecipesScreen(
                     }
                 }
             }
+            item(key = "week") {
+                WeekStrip(state.week, state.today, onClick = onOpenMealPlan)
+            }
             item(key = "search") {
                 OutlinedTextField(
                     value = state.query,
@@ -187,6 +201,52 @@ fun RecipesScreen(
             }
             items(state.matches, key = { it.recipe.id }) { match ->
                 RecipeCard(match, state.today, onClick = { onOpenRecipe(match.recipe.id) }, modifier = Modifier.animateItem())
+            }
+        }
+    }
+}
+
+private val WEEKDAY_FORMAT = DateTimeFormatter.ofPattern("EEE", Locale.GERMANY)
+
+/** Wochenleiste des Essensplans: sieben Glas-Pillen Mo–So, heute hervorgehoben, Punkt bei geplantem Tag. */
+@Composable
+private fun WeekStrip(week: List<WeekDayUi>, today: LocalDate, onClick: () -> Unit) {
+    if (week.isEmpty()) return
+    val colors = VorratTheme.colors
+    val plannedLabel = stringResource(R.string.recipes_week_planned)
+    val openLabel = stringResource(R.string.mealplan_title)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        week.forEach { day ->
+            val isToday = day.date == today
+            val shape = RoundedCornerShape(16.dp)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(shape)
+                    .background(if (isToday) colors.accent.copy(alpha = 0.18f) else colors.glass)
+                    .border(1.dp, if (isToday) colors.accent else colors.glassBorder, shape)
+                    .clickable(onClickLabel = openLabel, role = Role.Button, onClick = onClick)
+                    .semantics { if (day.planned) stateDescription = plannedLabel }
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                Text(
+                    day.date.format(WEEKDAY_FORMAT).trimEnd('.'),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isToday) colors.accent else colors.textSecondary,
+                    maxLines = 1,
+                )
+                Text(
+                    day.date.dayOfMonth.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isToday) colors.accent else MaterialTheme.colorScheme.onSurface,
+                )
+                Box(
+                    Modifier.size(6.dp).clip(CircleShape)
+                        .background(if (day.planned) colors.accent else Color.Transparent),
+                )
             }
         }
     }
