@@ -71,6 +71,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material3.ListItemDefaults
+import de.frelina.vorrat.ui.components.SectionLabel
+import de.frelina.vorrat.ui.theme.VorratTheme
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -133,16 +145,19 @@ fun SettingsScreen(
         )
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.settings_title)) }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.settings_title), fontWeight = FontWeight.SemiBold) }) }) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())) {
             if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+            val itemColors = settingsItemColors()
 
             // ---------------- Haushalt
             household?.let { h ->
                 val formatted = InviteCode.format(h.code)
                 SectionHeader(R.string.settings_household)
+                SettingsGroup {
                 ListItem(
-                    leadingContent = { Icon(Icons.Outlined.Groups, contentDescription = null) },
+                    colors = itemColors,
+                    leadingContent = { RowIcon(Icons.Outlined.Groups) },
                     headlineContent = {
                         Text(formatted, style = MaterialTheme.typography.titleMedium.copy(fontFamily = FontFamily.Monospace))
                     },
@@ -167,34 +182,42 @@ fun SettingsScreen(
                 Text(
                     stringResource(R.string.settings_household_hint),
                     style = MaterialTheme.typography.bodySmall,
+                    color = VorratTheme.colors.textSecondary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
+                RowDivider()
                 ListItem(
-                    leadingContent = { Icon(Icons.Outlined.Badge, contentDescription = null) },
+                    colors = itemColors,
+                    leadingContent = { RowIcon(Icons.Outlined.Badge) },
                     headlineContent = { Text(stringResource(R.string.settings_my_name)) },
                     supportingContent = {
                         Text(householdSettings.myName.ifBlank { stringResource(R.string.settings_my_name_empty) })
                     },
                     modifier = Modifier.clickable { nameDialog = true },
                 )
+                RowDivider()
                 ListItem(
-                    leadingContent = { Icon(Icons.Outlined.RemoveShoppingCart, contentDescription = null) },
+                    colors = itemColors,
+                    leadingContent = { RowIcon(Icons.Outlined.RemoveShoppingCart) },
                     headlineContent = { Text(stringResource(R.string.settings_notify_empty)) },
                     supportingContent = { Text(stringResource(R.string.settings_notify_empty_summary)) },
                     trailingContent = {
                         Switch(checked = householdSettings.notifyWhenEmpty, onCheckedChange = viewModel::setNotifyWhenEmpty)
                     },
                 )
+                RowDivider()
                 ListItem(
-                    leadingContent = { Icon(Icons.Outlined.NotificationsActive, contentDescription = null) },
+                    colors = itemColors,
+                    leadingContent = { RowIcon(Icons.Outlined.NotificationsActive) },
                     headlineContent = { Text(stringResource(R.string.settings_receive_notices)) },
                     supportingContent = { Text(stringResource(R.string.settings_receive_notices_summary)) },
                     trailingContent = {
                         Switch(checked = householdSettings.receiveNotices, onCheckedChange = viewModel::setReceiveNotices)
                     },
                 )
+                RowDivider()
                 NavItem(Icons.Outlined.History, R.string.history_title, R.string.settings_history_summary, onOpenHistory)
-                HorizontalDivider()
+                }
             }
             if (nameDialog) {
                 var name by rememberSaveable { mutableStateOf(householdSettings.myName) }
@@ -224,22 +247,30 @@ fun SettingsScreen(
             }
 
             // ---------------- Rezepte
-            NavItem(Icons.Outlined.Restaurant, R.string.recipes_title, R.string.settings_recipes_summary, onOpenRecipes)
-            NavItem(Icons.Outlined.CalendarMonth, R.string.mealplan_title, R.string.settings_mealplan_summary, onOpenMealPlan)
-            NavItem(Icons.AutoMirrored.Outlined.ViewList, R.string.departments_title, R.string.settings_departments_summary, onOpenDepartments)
-            HorizontalDivider()
+            SettingsGroup {
+                NavItem(Icons.Outlined.Restaurant, R.string.recipes_title, R.string.settings_recipes_summary, onOpenRecipes)
+                RowDivider()
+                NavItem(Icons.Outlined.CalendarMonth, R.string.mealplan_title, R.string.settings_mealplan_summary, onOpenMealPlan)
+                RowDivider()
+                NavItem(Icons.AutoMirrored.Outlined.ViewList, R.string.departments_title, R.string.settings_departments_summary, onOpenDepartments)
+            }
 
             // ---------------- Stammdaten
             SectionHeader(R.string.settings_catalogs)
-            NavItem(Icons.Outlined.Place, R.string.settings_locations, R.string.settings_locations_summary, onOpenLocations)
-            NavItem(Icons.Outlined.Straighten, R.string.settings_units, R.string.settings_units_summary, onOpenUnits)
-            NavItem(Icons.Outlined.Category, R.string.settings_quantity_types, R.string.settings_quantity_types_summary, onOpenQuantityTypes)
-            HorizontalDivider()
+            SettingsGroup {
+                NavItem(Icons.Outlined.Place, R.string.settings_locations, R.string.settings_locations_summary, onOpenLocations)
+                RowDivider()
+                NavItem(Icons.Outlined.Straighten, R.string.settings_units, R.string.settings_units_summary, onOpenUnits)
+                RowDivider()
+                NavItem(Icons.Outlined.Category, R.string.settings_quantity_types, R.string.settings_quantity_types_summary, onOpenQuantityTypes)
+            }
 
             // ---------------- Erinnerungen
             SectionHeader(R.string.settings_reminders)
+            SettingsGroup {
             ListItem(
-                leadingContent = { Icon(Icons.Outlined.NotificationsActive, contentDescription = null) },
+                colors = itemColors,
+                leadingContent = { RowIcon(Icons.Outlined.NotificationsActive) },
                 headlineContent = { Text(stringResource(R.string.settings_reminders_enabled)) },
                 trailingContent = {
                     Switch(
@@ -254,13 +285,13 @@ fun SettingsScreen(
             if (reminder.enabled) {
                 if (!allowed) {
                     GlassCard(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
+                        border = BorderStroke(1.dp, VorratTheme.colors.danger.copy(alpha = 0.5f)),
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
                     ) {
                         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Outlined.WarningAmber, contentDescription = null)
-                                Text(stringResource(R.string.settings_notifications_denied), Modifier.padding(start = 8.dp))
+                                Icon(Icons.Outlined.WarningAmber, contentDescription = null, tint = VorratTheme.colors.danger)
+                                Text(stringResource(R.string.settings_notifications_denied), Modifier.padding(start = 8.dp), color = VorratTheme.colors.danger)
                             }
                             OutlinedButton(onClick = { rationale = true }) {
                                 Text(stringResource(R.string.settings_notifications_request))
@@ -273,9 +304,10 @@ fun SettingsScreen(
                         }
                     }
                 }
+                RowDivider()
                 ListItem(
-                    modifier = Modifier,
-                    leadingContent = { Icon(Icons.Outlined.Schedule, contentDescription = null) },
+                    colors = itemColors,
+                    leadingContent = { RowIcon(Icons.Outlined.Schedule) },
                     headlineContent = { Text(stringResource(R.string.settings_reminders_time)) },
                     supportingContent = {
                         Text(
@@ -287,7 +319,9 @@ fun SettingsScreen(
                         TextButton(onClick = { timeDialog = true }) { Text(stringResource(R.string.action_edit)) }
                     },
                 )
+                RowDivider()
                 ListItem(
+                    colors = itemColors,
                     headlineContent = { Text(stringResource(R.string.settings_reminders_lead)) },
                     supportingContent = {
                         Text(pluralStringResource(R.plurals.settings_reminders_lead_days, reminder.leadDays, reminder.leadDays))
@@ -306,29 +340,34 @@ fun SettingsScreen(
                 Text(
                     stringResource(R.string.settings_reminders_inexact),
                     style = MaterialTheme.typography.bodySmall,
+                    color = VorratTheme.colors.textSecondary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
             }
-            HorizontalDivider()
+            }
 
             // ---------------- Backup
             SectionHeader(R.string.settings_backup)
+            SettingsGroup {
             NavItem(Icons.Outlined.Upload, R.string.settings_backup_export, R.string.settings_backup_export_summary) {
                 if (!busy) exportLauncher.launch("vorrat-backup-${LocalDate.now()}.zip")
             }
+            RowDivider()
             NavItem(Icons.Outlined.Download, R.string.settings_backup_import, R.string.settings_backup_import_summary) {
                 if (!busy) importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed"))
             }
-            HorizontalDivider()
+            }
 
             // ---------------- App-Update
             SectionHeader(R.string.settings_update)
             val update by updates.state.collectAsStateWithLifecycle()
+            SettingsGroup {
             ListItem(
+                colors = itemColors,
                 modifier = Modifier.fillMaxWidth().clickable(enabled = !update.checking) {
                     if (update.available != null) updates.showPrompt() else updates.checkNow()
                 },
-                leadingContent = { Icon(Icons.Outlined.SystemUpdate, contentDescription = null) },
+                leadingContent = { RowIcon(Icons.Outlined.SystemUpdate) },
                 headlineContent = {
                     Text(
                         update.available?.let { stringResource(R.string.settings_update_available, it.version) }
@@ -344,10 +383,12 @@ fun SettingsScreen(
                     }
                 },
             )
-            HorizontalDivider()
+            }
 
             // ---------------- Über
-            NavItem(Icons.Outlined.Info, R.string.settings_about, R.string.settings_about_summary, onOpenAbout)
+            SettingsGroup {
+                NavItem(Icons.Outlined.Info, R.string.settings_about, R.string.settings_about_summary, onOpenAbout)
+            }
         }
     }
 
@@ -403,27 +444,56 @@ fun SettingsScreen(
 }
 
 @Composable
+private fun settingsItemColors() = ListItemDefaults.colors(
+    containerColor = Color.Transparent,
+    supportingColor = VorratTheme.colors.textSecondary,
+    overlineColor = VorratTheme.colors.textSecondary,
+)
+
+@Composable
 private fun SectionHeader(text: Int) {
-    Text(
-        stringResource(text),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
-    )
+    SectionLabel(stringResource(text), Modifier.padding(start = 20.dp, end = 16.dp, top = 16.dp, bottom = 6.dp))
+}
+
+@Composable
+private fun SettingsGroup(content: @Composable ColumnScope.() -> Unit) {
+    GlassCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) { Column(content = content) }
+}
+
+@Composable
+private fun RowDivider() {
+    HorizontalDivider(color = VorratTheme.colors.glassBorder)
+}
+
+/** Symbol in kleinem rundem Glas-Kreis. */
+@Composable
+private fun RowIcon(icon: ImageVector) {
+    Box(
+        Modifier.size(36.dp).clip(CircleShape).background(VorratTheme.colors.glassStrong),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription = null, Modifier.size(18.dp), tint = VorratTheme.colors.textTertiary)
+    }
 }
 
 @Composable
 private fun NavItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: Int,
     summary: Int,
     onClick: () -> Unit,
 ) {
     ListItem(
+        colors = settingsItemColors(),
         modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
-        leadingContent = { Icon(icon, contentDescription = null) },
+        leadingContent = { RowIcon(icon) },
         headlineContent = { Text(stringResource(title)) },
         supportingContent = { Text(stringResource(summary)) },
-        trailingContent = { Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, Modifier.size(24.dp)) },
+        trailingContent = {
+            Icon(
+                Icons.AutoMirrored.Outlined.KeyboardArrowRight, contentDescription = null, Modifier.size(24.dp),
+                tint = VorratTheme.colors.textSecondary,
+            )
+        },
     )
 }
