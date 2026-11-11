@@ -1,5 +1,8 @@
 package de.frelina.vorrat.ui.stock
 
+import androidx.compose.ui.text.font.FontWeight
+import de.frelina.vorrat.ui.theme.VorratTheme
+import de.frelina.vorrat.ui.components.GlassIconButton
 import java.time.LocalDate
 import de.frelina.vorrat.ui.components.NumberField
 import de.frelina.vorrat.ui.components.DateField
@@ -86,11 +89,9 @@ fun EntryDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.detail_title)) },
+                title = { Text(stringResource(R.string.detail_title), fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = stringResource(R.string.action_back))
-                    }
+                    GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },
             )
         },
@@ -111,13 +112,15 @@ fun EntryDetailScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    ProductImage(item.imagePath, size = 112.dp)
+                GlassCard(Modifier.fillMaxWidth()) {
+                Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ProductImage(item.imagePath, size = 112.dp, name = item.productName)
                     Column(Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.Top) {
                             Text(
                                 item.productName,
                                 style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.SemiBold,
                                 modifier = Modifier.weight(1f),
                             )
                             if (nutrition != null) {
@@ -130,20 +133,22 @@ fun EntryDetailScreen(
                                 }
                             }
                         }
-                        item.brand?.let { Text(it, style = MaterialTheme.typography.bodyLarge) }
+                        item.brand?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = VorratTheme.colors.textTertiary) }
                         val product = state.product
-                        product?.barcode?.let { Text(stringResource(R.string.detail_barcode, it), style = MaterialTheme.typography.bodySmall) }
+                        product?.barcode?.let { Text(stringResource(R.string.detail_barcode, it), style = MaterialTheme.typography.bodySmall, color = VorratTheme.colors.textSecondary) }
                         CategoryResolver.displayName(product?.category)?.let {
-                            Text(stringResource(R.string.detail_category, it), style = MaterialTheme.typography.bodySmall)
+                            Text(stringResource(R.string.detail_category, it), style = MaterialTheme.typography.bodySmall, color = VorratTheme.colors.textSecondary)
                         }
                         if (product?.packageSize != null) {
                             val unit = state.units.firstOrNull { it.id == product.unitId }?.symbol.orEmpty()
                             Text(
                                 stringResource(R.string.detail_package, product.packageSize.toPlainString(), unit),
                                 style = MaterialTheme.typography.bodySmall,
+                                color = VorratTheme.colors.textSecondary,
                             )
                         }
                     }
+                }
                 }
 
                 StockItemCard(item, state.today, state.leadDays, onClick = null)
@@ -168,8 +173,13 @@ fun EntryDetailScreen(
                 item.note?.takeIf { it.isNotBlank() }?.let {
                     Text(stringResource(R.string.detail_note, it), style = MaterialTheme.typography.bodyMedium)
                 }
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Icon(Icons.Outlined.Nfc, contentDescription = null)
+                GlassCard(Modifier.fillMaxWidth()) {
+                Row(
+                    Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Icon(Icons.Outlined.Nfc, contentDescription = null, tint = VorratTheme.colors.textTertiary)
                     Text(
                         stringResource(if (item.nfcTagId != null) R.string.nfc_linked else R.string.nfc_not_linked),
                         style = MaterialTheme.typography.bodyMedium,
@@ -183,6 +193,7 @@ fun EntryDetailScreen(
                     OutlinedButton(onClick = { nfcDialog = true }) {
                         Text(stringResource(if (item.nfcTagId != null) R.string.nfc_rewrite else R.string.nfc_write))
                     }
+                }
                 }
                 if (nfcDialog) {
                     de.frelina.vorrat.nfc.NfcDialog(
@@ -204,7 +215,7 @@ fun EntryDetailScreen(
                             modifier = Modifier.size(64.dp),
                         ) { Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease)) }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(stringResource(R.string.detail_quantity), style = MaterialTheme.typography.labelLarge)
+                            Text(stringResource(R.string.detail_quantity), style = MaterialTheme.typography.labelLarge, color = VorratTheme.colors.textSecondary)
                             Text(
                                 stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
                                 style = MaterialTheme.typography.headlineMedium,
