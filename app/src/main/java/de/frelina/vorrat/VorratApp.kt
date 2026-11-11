@@ -32,6 +32,7 @@ class VorratApp : Application(), Configuration.Provider {
     @Inject lateinit var workManager: androidx.work.WorkManager
     @Inject lateinit var householdStore: de.frelina.vorrat.data.household.HouseholdStore
     @Inject lateinit var departmentRepository: de.frelina.vorrat.data.repo.DepartmentRepository
+    @Inject lateinit var purchaseDrafts: de.frelina.vorrat.data.purchase.PurchaseDraftStore
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -61,7 +62,8 @@ class VorratApp : Application(), Configuration.Provider {
         // Verwaiste Bilder (z. B. abgebrochene Erfassung) entfernen.
         appScope.launch {
             runCatching {
-                val referenced = productDao.getAllImagePaths().toSet() + lookupCacheDao.getAllImagePaths().toSet()
+                val referenced = productDao.getAllImagePaths().toSet() + lookupCacheDao.getAllImagePaths().toSet() +
+                    purchaseDrafts.imagePaths()
                 imageStore.deleteUnreferenced(referenced)
             }
         }

@@ -182,3 +182,59 @@ data class EntryForm(
         )
     }
 }
+
+// ---------------------------------------------------------------- Einkauf (Mehrfachscan)
+
+fun de.frelina.vorrat.data.purchase.PurchaseDraft.toProductForm() = ProductForm(
+    name = name,
+    brand = brand,
+    category = category,
+    packageSize = packageSize,
+    unitId = unitId,
+    barcode = barcode.orEmpty(),
+    imagePath = imagePath,
+    minStock = minStock,
+    ingredientGroup = ingredientGroup,
+)
+
+fun de.frelina.vorrat.data.purchase.PurchaseDraft.toEntryForm() = EntryForm(
+    locationId = locationId,
+    level = level,
+    shelf = shelf,
+    expiry = expiry,
+    quantity = quantity,
+    quantityTypeId = quantityTypeId,
+    note = note,
+    frozen = frozen,
+    frozenAt = frozenAt,
+    nfcTagId = nfcTagId,
+)
+
+/** Formularwerte in den Artikel übernehmen ([product] = null: bekanntes Produkt, Produktdaten bleiben). */
+fun de.frelina.vorrat.data.purchase.PurchaseDraft.withForms(product: ProductForm?, entry: EntryForm) = copy(
+    name = product?.name ?: name,
+    brand = product?.brand ?: brand,
+    category = product?.category ?: category,
+    packageSize = product?.packageSize ?: packageSize,
+    unitId = if (product != null) product.unitId else unitId,
+    barcode = if (product != null) product.barcode.trim().ifEmpty { null } else barcode,
+    imagePath = if (product != null) product.imagePath else imagePath,
+    minStock = product?.minStock ?: minStock,
+    ingredientGroup = if (product != null) product.ingredientGroup else ingredientGroup,
+    locationId = entry.locationId,
+    level = entry.level,
+    shelf = entry.shelf,
+    expiry = entry.expiry,
+    quantity = entry.quantity,
+    quantityTypeId = entry.quantityTypeId,
+    note = entry.note,
+    frozen = entry.frozen,
+    frozenAt = entry.frozenAt,
+    nfcTagId = entry.nfcTagId,
+    edited = true,
+)
+
+/** Alle Pflichtangaben vorhanden (bei unbekanntem Produkt auch Name usw.)? */
+fun de.frelina.vorrat.data.purchase.PurchaseDraft.isComplete(): Boolean =
+    toEntryForm().validate(entryId = id).second != null &&
+        (productId != null || toProductForm().validate().second != null)

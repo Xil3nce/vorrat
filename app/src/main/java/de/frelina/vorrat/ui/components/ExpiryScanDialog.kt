@@ -69,7 +69,12 @@ import kotlin.coroutines.resume
  * und erst mit "Übernehmen" ins Formular geschrieben.
  */
 @Composable
-fun ExpiryScanDialog(onDismiss: () -> Unit, onDate: (LocalDate) -> Unit) {
+fun ExpiryScanDialog(
+    onDismiss: () -> Unit,
+    onDate: (LocalDate) -> Unit,
+    title: String? = null,
+    onSkip: (() -> Unit)? = null,
+) {
     val context = LocalContext.current
     var hasPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
@@ -91,8 +96,10 @@ fun ExpiryScanDialog(onDismiss: () -> Unit, onDate: (LocalDate) -> Unit) {
                         Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.action_cancel))
                     }
                     Text(
-                        stringResource(R.string.expiry_scan_title),
+                        title ?: stringResource(R.string.expiry_scan_title),
                         style = MaterialTheme.typography.titleLarge,
+                        maxLines = 2,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
                     IconButton(onClick = { torch = !torch }) {
@@ -135,8 +142,14 @@ fun ExpiryScanDialog(onDismiss: () -> Unit, onDate: (LocalDate) -> Unit) {
                         textAlign = TextAlign.Center,
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = onDismiss, modifier = Modifier.height(56.dp)) {
-                            Text(stringResource(R.string.action_cancel))
+                        if (onSkip != null) {
+                            OutlinedButton(onClick = onSkip, modifier = Modifier.height(56.dp)) {
+                                Text(stringResource(R.string.expiry_scan_skip))
+                            }
+                        } else {
+                            OutlinedButton(onClick = onDismiss, modifier = Modifier.height(56.dp)) {
+                                Text(stringResource(R.string.action_cancel))
+                            }
                         }
                         Button(
                             onClick = { date?.let(onDate) },

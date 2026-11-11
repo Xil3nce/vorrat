@@ -88,6 +88,7 @@ class StockFormViewModel @Inject constructor(
     private val shoppingRepository: ShoppingRepository,
     private val imageStore: ImageStore,
     private val messages: UiMessages,
+    private val purchaseDrafts: de.frelina.vorrat.data.purchase.PurchaseDraftStore,
 ) : ViewModel() {
 
     // Die Routen haben unterschiedliche Argumentnamen → Modus eindeutig bestimmbar.
@@ -99,11 +100,15 @@ class StockFormViewModel @Inject constructor(
     private val frozenArg: Boolean = savedStateHandle.get<Boolean>("frozen") == true
     private val nfcTagArg: String? = savedStateHandle.get<String>("nfcTagId")?.takeIf { it.isNotBlank() }
 
+    /** Artikel aus dem Einkauf ("+ Bestand"): Speichern schreibt in den Einkauf, nicht in den Bestand. */
+    private val draftId: String? = savedStateHandle.get<String>("draftId")?.takeIf { it.isNotBlank() }
+    val draftMode: Boolean = draftId != null
+
     /**
      * ID des neuen Eintrags – steht schon vor dem Speichern fest, damit ein NFC-Chip bereits im Formular
      * beschrieben werden kann. Beim Bearbeiten die ID des bestehenden Eintrags.
      */
-    val nfcEntryId: String = entryId ?: savedStateHandle.get<String>(KEY_NEW_ENTRY_ID)
+    val nfcEntryId: String = entryId ?: draftId ?: savedStateHandle.get<String>(KEY_NEW_ENTRY_ID)
         ?: de.frelina.vorrat.data.db.newId().also { savedStateHandle[KEY_NEW_ENTRY_ID] = it }
 
     /** Kauf von der Einkaufsliste: dieser Eintrag wird nach dem Speichern entfernt. */
@@ -153,6 +158,7 @@ class StockFormViewModel @Inject constructor(
             locationId = locs.singleOrNull()?.id,
         )
         when {
+            draftId != null -> loadDraft(draftId, defaultEntry)
             entryId != null -> {
                 val entry = stockRepository.getEntry(entryId)
                 val product = entry?.let { productRepository.getById(it.productId) }
@@ -216,6 +222,47 @@ class StockFormViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun loadDraft(id: String, defaultEntry: EntryForm) {
+        val draft = purchaseDrafts.get(id)
+        if (draft == null) {
+            _state.value = StockFormState(FormMode.NEW_PRODUCT, loading = false, entry = defaultEntry)
+            _saved.tryEmit(Unit) // schon übernommen oder entfernt
+            return
+        }
+        val product = draft.productId?.let { productRepository.getById(it) }
+        _state.value = if (product != null) {
+            StockFormState(FormMode.EXISTING_PRODUCT, loading = false, existingProduct = product, entry = draft.toEntryForm())
+        } else {
+            imageFromCache = draft.imageFromCache
+            StockFormState(
+                FormMode.NEW_PRODUCT,
+                loading = false,
+                product = draft.toProductForm(),
+                entry = draft.toEntryForm(),
+                prefilledFromOff = draft.fromOff,
+            )
+        }
+    }
+
+    /** Einkauf: Eingaben prüfen und in den Artikel übernehmen (noch nicht in den Bestand). */
+    private suspend fun saveDraft(id: String, s: StockFormState) {
+        val draft = purchaseDrafts.get(id)
+        if (draft == null) {
+            _saved.tryEmit(Unit)
+            return
+        }
+        val newProduct = s.mode == FormMode.NEW_PRODUCT
+        val (productForm, fields) = if (newProduct) s.product.validate() else s.product to null
+        val (entryForm, entry) = s.entry.validate(entryId = id)
+        _state.update { it.copy(product = productForm, entry = entryForm) }
+        if ((newProduct && fields == null) || entry == null) return
+        val updated = draft.withForms(product = if (newProduct) s.product else null, entry = s.entry)
+        // Ein neu aufgenommenes Bild gehört jetzt dem Artikel (nicht mehr aus dem OFF-Cache).
+        purchaseDrafts.update(if (newProduct) updated.copy(imageFromCache = imageFromCache) else updated)
+        pendingImage = null
+        _saved.tryEmit(Unit)
     }
 
     private suspend fun loadExisting(productId: String, entry: EntryForm) {
@@ -319,6 +366,10 @@ class StockFormViewModel @Inject constructor(
         if (s.saving) return@launch
         _state.update { it.copy(saving = true) }
         try {
+            if (draftId != null) {
+                saveDraft(draftId, s)
+                return@launch
+            }
             when (s.mode) {
                 FormMode.NEW_PRODUCT -> saveNewProduct(s)
                 FormMode.EXISTING_PRODUCT -> saveExistingProductEntry(s)

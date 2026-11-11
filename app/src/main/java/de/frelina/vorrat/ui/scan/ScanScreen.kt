@@ -27,6 +27,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material.icons.outlined.RemoveCircleOutline
 import android.Manifest
 import android.content.Intent
@@ -120,6 +121,7 @@ fun ScanScreen(
     onAddEntryForProduct: (productId: String) -> Unit,
     onCreateManual: () -> Unit,
     onReadNfc: () -> Unit,
+    onOpenPurchase: () -> Unit,
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -127,6 +129,7 @@ fun ScanScreen(
     val leadDays by viewModel.leadDays.collectAsStateWithLifecycle()
     val mode by viewModel.mode.collectAsStateWithLifecycle()
     val units by viewModel.units.collectAsStateWithLifecycle()
+    val purchaseCount by viewModel.purchaseCount.collectAsStateWithLifecycle()
     var consumeFor by remember { mutableStateOf<ScanOutcome?>(null) }
 
     // Entnehmen-Modus: bei einem Treffer im Bestand sofort die Mengenauswahl öffnen.
@@ -155,34 +158,43 @@ fun ScanScreen(
     }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        // ---------------- Modus (Prüfen / Entnehmen)
+        // ---------------- Modus (Prüfen / + Bestand / Entnehmen)
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(top = 8.dp)) {
-            listOf(ScanMode.CHECK to R.string.scan_mode_check, ScanMode.CONSUME to R.string.scan_mode_consume)
-                .forEachIndexed { index, (m, label) ->
-                    SegmentedButton(
-                        selected = mode == m,
-                        onClick = { viewModel.setMode(m) },
-                        shape = SegmentedButtonDefaults.itemShape(index, 2),
-                    ) { Text(stringResource(label)) }
-                }
+            listOf(
+                ScanMode.CHECK to R.string.scan_mode_check,
+                ScanMode.PURCHASE to R.string.scan_mode_purchase,
+                ScanMode.CONSUME to R.string.scan_mode_consume,
+            ).forEachIndexed { index, (m, label) ->
+                SegmentedButton(
+                    selected = mode == m,
+                    onClick = { viewModel.setMode(m) },
+                    shape = SegmentedButtonDefaults.itemShape(index, 3),
+                ) { Text(stringResource(label), maxLines = 1) }
+            }
         }
-        // ---------------- Kamera (fix oben)
+        // ---------------- Kamera (fix oben; bei "+ Bestand" immer groß – Ergebnis gibt es dort nicht)
+        val purchase = mode == ScanMode.PURCHASE
         val idle = state is ScanUiState.Idle
+        val bigCamera = idle || purchase
+        val expiryFor = (state as? ScanUiState.PurchaseExpiry)?.outcome
         Box(
             Modifier
                 .fillMaxWidth()
-                .then(if (idle) Modifier.weight(1f) else Modifier.height(200.dp))
+                .then(if (bigCamera) Modifier.weight(1f) else Modifier.height(200.dp))
                 .clip(RoundedCornerShape(28.dp))
                 .background(Color.Black)
                 .clipToBounds(), // PreviewView skaliert sein TextureView – ohne Clip ragt das Bild ins Ergebnis
         ) {
             if (hasPermission) {
-                CameraPreview(
-                    analyzing = idle,
-                    torchOn = torch,
-                    onBarcode = viewModel::onBarcode,
-                    modifier = Modifier.fillMaxSize(),
-                )
+                // Während des Ablaufdatum-Scans gehört die Kamera dem Dialog; danach wird sie neu gebunden.
+                if (expiryFor == null) {
+                    CameraPreview(
+                        analyzing = idle,
+                        torchOn = torch,
+                        onBarcode = viewModel::onBarcode,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
                 ScanFrame(Modifier.fillMaxSize().padding(horizontal = 44.dp, vertical = 28.dp))
                 GlassIconButton(
                     if (torch) Icons.Outlined.FlashlightOff else Icons.Outlined.FlashlightOn,
@@ -190,9 +202,18 @@ fun ScanScreen(
                     onClick = { torch = !torch },
                     modifier = Modifier.align(Alignment.TopEnd).padding(10.dp),
                 )
+                if (purchase && state is ScanUiState.Loading) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
                 if (idle) {
                     Text(
-                        stringResource(if (mode == ScanMode.CONSUME) R.string.scan_hint_consume else R.string.scan_hint),
+                        stringResource(
+                            when (mode) {
+                                ScanMode.CONSUME -> R.string.scan_hint_consume
+                                ScanMode.PURCHASE -> R.string.scan_hint_purchase
+                                ScanMode.CHECK -> R.string.scan_hint
+                            },
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = VorratTheme.colors.textTertiary,
                         textAlign = TextAlign.Center,
@@ -219,8 +240,8 @@ fun ScanScreen(
 
         // ---------------- Ergebnis (füllt den Platz dazwischen)
         when (val s = state) {
-            ScanUiState.Idle -> Unit
-            is ScanUiState.Loading -> GlassCard(Modifier.fillMaxWidth().weight(1f), shape = MaterialTheme.shapes.large) {
+            ScanUiState.Idle, is ScanUiState.PurchaseExpiry -> Unit
+            is ScanUiState.Loading -> if (!purchase) GlassCard(Modifier.fillMaxWidth().weight(1f), shape = MaterialTheme.shapes.large) {
                 Column(
                     Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -252,6 +273,19 @@ fun ScanScreen(
             )
         }
 
+        // ---------------- Einkauf anzeigen ("+ Bestand")
+        if (purchase) {
+            Button(
+                onClick = onOpenPurchase,
+                enabled = purchaseCount > 0,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+            ) {
+                Icon(Icons.Outlined.ShoppingBag, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.purchase_show, purchaseCount))
+            }
+        }
+
         // ---------------- Modus-Kacheln (immer fix unten)
         Row(
             Modifier.fillMaxWidth().padding(bottom = 4.dp),
@@ -269,6 +303,17 @@ fun ScanScreen(
         }
     }
 
+    (state as? ScanUiState.PurchaseExpiry)?.outcome?.let { outcome ->
+        de.frelina.vorrat.ui.components.ExpiryScanDialog(
+            title = stringResource(
+                R.string.purchase_expiry_for,
+                outcome.displayName ?: stringResource(R.string.scan_unknown_product, outcome.barcode),
+            ),
+            onDismiss = viewModel::cancelPurchase,
+            onDate = { viewModel.addToPurchase(it) },
+            onSkip = { viewModel.addToPurchase(null) },
+        )
+    }
     if (manualDialog) {
         ManualBarcodeDialog(
             onDismiss = { manualDialog = false },

@@ -98,7 +98,7 @@ fun StockFormScreen(
 
     LaunchedEffect(Unit) { viewModel.saved.collect { onDone() } }
 
-    val title = when (state.mode) {
+    val title = if (viewModel.draftMode) R.string.purchase_edit_title else when (state.mode) {
         FormMode.NEW_PRODUCT -> when {
             state.frozenMode -> R.string.frozen_add_title
             viewModel.fromScan -> R.string.add_title

@@ -233,11 +233,33 @@
     <string name="scan_increased">Anzahl erhöht</string>
     <string name="scan_mode_check">Prüfen</string>
     <string name="scan_mode_consume">Entnehmen</string>
+    <string name="scan_mode_purchase">+ Bestand</string>
+    <string name="scan_hint_purchase">Einkauf: Artikel nacheinander scannen, danach jeweils das Ablaufdatum.</string>
+    <string name="purchase_show">Einkauf anzeigen (%1$d)</string>
+    <string name="purchase_added">%1$s zum Einkauf hinzugefügt</string>
+    <string name="purchase_added_more">%1$s: jetzt %2$d× im Einkauf</string>
+    <string name="purchase_title">Einkauf</string>
+    <string name="purchase_edit_title">Einkauf: Artikel ergänzen</string>
+    <string name="purchase_empty">Noch keine Artikel gescannt. Im Scanner „+ Bestand“ wählen und die Einkäufe nacheinander scannen.</string>
+    <string name="purchase_hint">Antippen zum Ergänzen der Details, nach links wischen zum Entfernen.</string>
+    <string name="purchase_commit_count">In Bestand übernehmen (%1$d)</string>
+    <string name="purchase_item_incomplete">Angaben fehlen – antippen zum Ergänzen</string>
+    <string name="purchase_removed">Artikel aus dem Einkauf entfernt</string>
+    <string name="purchase_expiry_for">Ablaufdatum für %1$s</string>
+    <plurals name="purchase_incomplete">
+        <item quantity="one">%1$d Artikel ist unvollständig – bitte zuerst ergänzen.</item>
+        <item quantity="other">%1$d Artikel sind unvollständig – bitte zuerst ergänzen.</item>
+    </plurals>
+    <plurals name="purchase_committed">
+        <item quantity="one">%1$d Artikel in den Bestand übernommen</item>
+        <item quantity="other">%1$d Artikel in den Bestand übernommen</item>
+    </plurals>
     <string name="scan_hint_consume">Entnehmen: Barcode scannen, Anzahl wählen – fertig.</string>
     <string name="expiry_scan_title">Ablaufdatum scannen</string>
     <string name="expiry_scan_hint">Das aufgedruckte Datum (MHD) in den Rahmen halten …</string>
     <string name="expiry_scan_found">Erkannt: %1$s</string>
     <string name="expiry_scan_apply">Übernehmen</string>
+    <string name="expiry_scan_skip">Ohne Datum</string>
     <string name="consume_title">Entnehmen</string>
     <string name="consume_choose_entry">Aus welchem Eintrag? (Was zuerst abläuft, ist vorausgewählt.)</string>
     <string name="consume_all">Alle (%1$d)</string>

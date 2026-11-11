@@ -14,7 +14,12 @@ import de.frelina.vorrat.domain.ConsumeLogic
 import de.frelina.vorrat.domain.ExpiryLogic
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
+import de.frelina.vorrat.data.purchase.PurchaseDraft
+import de.frelina.vorrat.data.purchase.PurchaseDraftStore
+import de.frelina.vorrat.domain.Validation
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,10 +33,16 @@ sealed interface ScanUiState {
     data object Idle : ScanUiState
     data class Loading(val barcode: String) : ScanUiState
     data class Result(val outcome: ScanOutcome, val onShoppingList: Boolean = false) : ScanUiState
+
+    /** "+ Bestand": Produkt erkannt, jetzt wird das Ablaufdatum gescannt. */
+    data class PurchaseExpiry(val outcome: ScanOutcome) : ScanUiState
 }
 
-/** Prüfen (im Laden: habe ich das?) oder Entnehmen (zuhause: verbraucht). */
-enum class ScanMode { CHECK, CONSUME }
+/**
+ * Prüfen (im Laden: habe ich das?), + Bestand (Einkauf nacheinander scannen, danach gesammelt übernehmen)
+ * oder Entnehmen (zuhause: verbraucht).
+ */
+enum class ScanMode { CHECK, PURCHASE, CONSUME }
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
@@ -39,9 +50,17 @@ class ScanViewModel @Inject constructor(
     private val stockRepository: StockRepository,
     private val shoppingRepository: ShoppingRepository,
     private val messages: UiMessages,
+    private val purchaseDrafts: PurchaseDraftStore,
     settingsRepository: SettingsRepository,
-    catalogRepository: de.frelina.vorrat.data.repo.CatalogRepository,
+    private val catalogRepository: de.frelina.vorrat.data.repo.CatalogRepository,
 ) : ViewModel() {
+
+    /** Anzahl der Artikel im aktuellen Einkauf ("+ Bestand"). */
+    val purchaseCount: StateFlow<Int> = purchaseDrafts.drafts.map { it.size }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
+
+    /** Zuletzt im Einkauf erfasster Barcode – kurz danach nicht gleich noch einmal erkennen. */
+    private var lastPurchase: Pair<String, Long>? = null
 
     /** Einheiten-ID → Symbol für die Packungsgröße im Ergebnis. */
     val units: StateFlow<Map<String, String>> = catalogRepository.observeUnits()
@@ -60,7 +79,10 @@ class ScanViewModel @Inject constructor(
     val mode: StateFlow<ScanMode> = _mode.asStateFlow()
 
     fun setMode(mode: ScanMode) {
+        val old = _mode.value
         _mode.value = mode
+        // Beim Wechsel von/zu "+ Bestand" neu beginnen (dort gibt es keine Ergebnis-Ansicht).
+        if (old != mode && (old == ScanMode.PURCHASE || mode == ScanMode.PURCHASE)) rescan()
     }
 
     /** Von der Kamera (automatische Erkennung) oder aus der manuellen Eingabe. */
@@ -70,7 +92,67 @@ class ScanViewModel @Inject constructor(
         val current = _state.value
         if (current is ScanUiState.Loading) return
         if (current is ScanUiState.Result && current.outcome.barcode == barcode) return
+        if (_mode.value == ScanMode.PURCHASE) {
+            if (current !is ScanUiState.Idle) return
+            val last = lastPurchase
+            if (last != null && last.first == barcode && System.currentTimeMillis() - last.second < SAME_BARCODE_PAUSE_MS) return
+            job?.cancel()
+            _state.value = ScanUiState.Loading(barcode)
+            job = viewModelScope.launch { _state.value = ScanUiState.PurchaseExpiry(scanRepository.resolve(barcode)) }
+            return
+        }
         resolve(barcode, showLoading = true)
+    }
+
+    /** "+ Bestand": Artikel mit Ablaufdatum ([expiry] = null: ohne) in den Einkauf übernehmen, weiter scannen. */
+    fun addToPurchase(expiry: LocalDate?) = viewModelScope.launch {
+        val outcome = (_state.value as? ScanUiState.PurchaseExpiry)?.outcome ?: return@launch
+        val draft = purchaseDrafts.addScanned(buildDraft(outcome, expiry))
+        lastPurchase = outcome.barcode to System.currentTimeMillis()
+        _state.value = ScanUiState.Idle
+        val count = draft.quantity.toIntOrNull() ?: 1
+        val name = outcome.displayName
+        messages.show(
+            when {
+                name == null -> UiMessage(R.string.purchase_added, listOf(outcome.barcode))
+                count > 1 -> UiMessage(R.string.purchase_added_more, listOf(name, count))
+                else -> UiMessage(R.string.purchase_added, listOf(name))
+            },
+        )
+    }
+
+    /** Ablaufdatum-Scan abgebrochen: Artikel nicht übernehmen. */
+    fun cancelPurchase() {
+        (_state.value as? ScanUiState.PurchaseExpiry)?.let { lastPurchase = it.outcome.barcode to System.currentTimeMillis() }
+        rescan()
+    }
+
+    private suspend fun buildDraft(outcome: ScanOutcome, expiry: LocalDate?): PurchaseDraft {
+        val types = catalogRepository.observeQuantityTypes().first()
+        val locations = catalogRepository.observeLocations().first()
+        val local = outcome.localProduct
+        val remote = outcome.remote.takeIf { local == null }
+        // Bekanntes Produkt: Ort und Menge-Art wie beim vorhandenen Bestand vorschlagen.
+        val match = outcome.exactMatches.firstOrNull()
+        val remoteUnit = remote?.unitSymbol?.let { catalogRepository.findUnitIdBySymbol(it) }
+        return PurchaseDraft(
+            barcode = outcome.barcode,
+            productId = local?.id,
+            name = local?.name ?: remote?.name.orEmpty(),
+            brand = local?.brand ?: remote?.brand.orEmpty(),
+            category = local?.category ?: remote?.category.orEmpty(),
+            packageSize = local?.packageSize?.toPlainString()
+                ?: remote?.packageSize?.takeIf { remoteUnit != null }?.toPlainString().orEmpty(),
+            unitId = local?.unitId ?: remoteUnit,
+            imagePath = local?.imagePath ?: remote?.imagePath,
+            imageFromCache = local == null && remote?.imagePath != null,
+            fromOff = remote != null,
+            locationId = match?.locationId ?: locations.singleOrNull()?.id,
+            level = match?.level?.toString().orEmpty(),
+            shelf = match?.shelf?.toString().orEmpty(),
+            expiry = expiry?.let(Validation::formatDate).orEmpty(),
+            quantityTypeId = match?.quantityTypeId ?: types.firstOrNull()?.id,
+        )
     }
 
     fun rescan() {
@@ -148,5 +230,9 @@ class ScanViewModel @Inject constructor(
         }
         if (added != null) messages.show(UiMessage(R.string.shopping_added))
         refresh()
+    }
+
+    private companion object {
+        const val SAME_BARCODE_PAUSE_MS = 2_500L
     }
 }

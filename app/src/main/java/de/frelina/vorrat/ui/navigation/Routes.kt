@@ -43,7 +43,11 @@ import kotlinx.serialization.Serializable
     val shoppingItemId: String? = null,
     val frozen: Boolean = false,
     val nfcTagId: String? = null,
+    /** Artikel aus dem Einkauf ("+ Bestand") ergänzen – gespeichert wird in den Einkauf, nicht in den Bestand. */
+    val draftId: String? = null,
 )
+/** Einkauf ("+ Bestand"): gescannte Artikel prüfen und in den Bestand übernehmen. */
+@Serializable data object PurchaseRoute
 @Serializable data class EditEntryRoute(val editEntryId: String)
 
 /** Formular vorbelegt mit den Werten eines Eintrags; neuer Eintrag entsteht erst beim Speichern. */
