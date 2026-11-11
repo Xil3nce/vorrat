@@ -30,7 +30,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -153,7 +152,7 @@ fun MissingToShoppingDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SwipeToRemove(onRemove: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val state = rememberSwipeToDismissBoxState(positionalThreshold = { total -> total * 0.4f })
+    val state = de.frelina.vorrat.ui.components.rememberListSwipeState()
     val label = stringResource(R.string.recipe_missing_remove)
     SwipeToDismissBox(
         state = state,

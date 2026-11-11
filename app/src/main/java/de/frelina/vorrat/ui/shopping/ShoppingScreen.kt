@@ -74,7 +74,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -758,7 +757,7 @@ private fun SwipeableShoppingItem(
     content: @Composable () -> Unit,
 ) {
     // Erst ab 40 % der Breite auslösen, damit kurze Wischer beim Scrollen nichts abhaken.
-    val swipeState = rememberSwipeToDismissBoxState(positionalThreshold = { totalDistance -> totalDistance * 0.4f })
+    val swipeState = de.frelina.vorrat.ui.components.rememberListSwipeState()
     val scope = rememberCoroutineScope()
     val checkLabel = stringResource(R.string.shopping_swipe_check)
     val boughtLabel = stringResource(R.string.shopping_bought)
