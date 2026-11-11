@@ -72,6 +72,9 @@ data class ShoppingItemDto(
     val quantity: Int = 1,
     val note: String? = null,
     val createdAt: Long = 0,
+    /** Seit schemaVersion 9. */
+    val packageSize: String? = null,
+    val unitSymbol: String? = null,
 )
 
 @Serializable

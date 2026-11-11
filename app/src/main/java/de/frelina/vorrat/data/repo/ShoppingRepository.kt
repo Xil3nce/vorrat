@@ -7,12 +7,14 @@ import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.db.ShoppingDao
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryDao
+import de.frelina.vorrat.data.db.UnitDao
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
 import de.frelina.vorrat.domain.Shortage
 import de.frelina.vorrat.domain.ShoppingLogic
 import kotlinx.coroutines.flow.Flow
+import java.math.BigDecimal
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,6 +33,7 @@ class ShoppingRepository @Inject constructor(
     private val shoppingDao: ShoppingDao,
     private val productDao: ProductDao,
     private val stockDao: StockEntryDao,
+    private val unitDao: UnitDao,
     private val remote: RemoteWriter,
     private val imageStore: ImageStore,
 ) {
@@ -140,16 +143,26 @@ class ShoppingRepository @Inject constructor(
             save(updated)
             return updated
         }
-        return insert(product.id, product.name, quantity)
+        // Packungsgröße des Produkts übernehmen (änderbar über "Bearbeiten").
+        val unit = product.unitId?.let { unitDao.getById(it)?.symbol }
+        return insert(product.id, product.name, quantity, product.packageSize, unit)
     }
 
-    private suspend fun insert(productId: String?, name: String, quantity: Int): ShoppingItemEntity {
+    private suspend fun insert(
+        productId: String?,
+        name: String,
+        quantity: Int,
+        packageSize: BigDecimal? = null,
+        unitSymbol: String? = null,
+    ): ShoppingItemEntity {
         val item = ShoppingItemEntity(
             productId = productId,
             name = name,
             quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT),
             note = null,
             createdAt = System.currentTimeMillis(),
+            packageSize = packageSize?.takeIf { it.signum() > 0 },
+            unitSymbol = unitSymbol?.trim()?.takeIf { it.isNotEmpty() },
         )
         save(item)
         return item
@@ -158,6 +171,18 @@ class ShoppingRepository @Inject constructor(
     suspend fun setQuantity(id: String, quantity: Int) {
         val item = shoppingDao.getById(id) ?: return
         save(item.copy(quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT)))
+    }
+
+    /** Anzahl und Packungsgröße eines Eintrags ändern ("2× 500 g"). */
+    suspend fun updateDetails(id: String, quantity: Int, packageSize: BigDecimal?, unitSymbol: String?) {
+        val item = shoppingDao.getById(id) ?: return
+        save(
+            item.copy(
+                quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT),
+                packageSize = packageSize?.takeIf { it.signum() > 0 },
+                unitSymbol = unitSymbol?.trim()?.take(RemoteMapper.MAX_UNIT)?.takeIf { it.isNotEmpty() },
+            ),
+        )
     }
 
     suspend fun getById(id: String): ShoppingItemEntity? = shoppingDao.getById(id)

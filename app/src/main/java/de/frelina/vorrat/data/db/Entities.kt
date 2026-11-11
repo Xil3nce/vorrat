@@ -212,6 +212,9 @@ data class ShoppingItemEntity(
     val quantity: Int,
     val note: String?,
     val createdAt: Long,
+    /** Packungsgröße (z. B. 500) samt Einheit ("g"); beides optional. Seit Schema 9. */
+    val packageSize: BigDecimal? = null,
+    val unitSymbol: String? = null,
 )
 
 /**

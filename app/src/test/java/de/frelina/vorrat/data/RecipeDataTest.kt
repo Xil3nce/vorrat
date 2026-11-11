@@ -106,7 +106,7 @@ class RecipeDataTest : DbTestBase() {
     }
 
     @Test fun `Fehlendes auf die Einkaufsliste ohne Duplikate`() = runBlocking {
-        val shopping = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), writer, images)
+        val shopping = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), db.unitDao(), writer, images)
         assertEquals(2, shopping.addMissing(listOf("Eier", "Mehl", " ")))
         assertEquals(1, shopping.addMissing(listOf("eier", "Butter", "Mehl")))
         assertEquals(3, db.shoppingDao().getAll().size)

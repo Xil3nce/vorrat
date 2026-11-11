@@ -1,5 +1,28 @@
 package de.frelina.vorrat.ui.shopping
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.text.input.KeyboardType
+import de.frelina.vorrat.data.db.ShoppingItemEntity
+import de.frelina.vorrat.data.repo.ShoppingList
+import de.frelina.vorrat.data.sync.RemoteMapper
+import de.frelina.vorrat.domain.ShoppingLogic
+import de.frelina.vorrat.domain.Validated
+import de.frelina.vorrat.domain.Validation
+import de.frelina.vorrat.ui.components.AmountBadge
+import de.frelina.vorrat.ui.components.SegmentRing
+import de.frelina.vorrat.ui.components.glassBorder
+import de.frelina.vorrat.ui.components.validationMessage
+import de.frelina.vorrat.ui.theme.VorratTheme
+import java.math.BigDecimal
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -112,6 +135,7 @@ fun ShoppingScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     var changeTarget by remember { mutableStateOf<Pair<ShoppingPayload, String>?>(null) }
+    var editTarget by remember { mutableStateOf<ShoppingEntry?>(null) }
 
     Scaffold(
         topBar = {
@@ -129,6 +153,7 @@ fun ShoppingScreen(
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {
+            if (!state.loading && !state.list.isEmpty) ShoppingSummary(state.list)
             AddRow(suggestions = suggestions, onAdd = viewModel::add)
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -145,7 +170,7 @@ fun ShoppingScreen(
                     state = state,
                     onBought = onBought,
                     onCheck = viewModel::check,
-                    onQuantity = viewModel::setQuantity,
+                    onEdit = { editTarget = it },
                     onMoveToDepartment = viewModel::moveToDepartment,
                     onSaveDepartmentOrder = viewModel::saveDepartmentOrder,
                     onChangeDepartment = { payload, current -> changeTarget = payload to current },
@@ -157,7 +182,12 @@ fun ShoppingScreen(
                     if (state.list.shortages.isNotEmpty()) {
                         item(key = "h-short") { SectionLabel(R.string.shopping_section_shortage) }
                         items(state.list.shortages, key = { "s-" + it.product.id }) { s ->
-                            ShortageRow(s, onBought = { onBought(s.product.id, null) }, modifier = Modifier.animateItem())
+                            ShortageRow(
+                                s,
+                                units = state.units,
+                                onBought = { onBought(s.product.id, null) },
+                                modifier = Modifier.animateItem(),
+                            )
                         }
                     }
                     if (state.list.items.isNotEmpty()) {
@@ -166,7 +196,7 @@ fun ShoppingScreen(
                             ItemRow(
                                 entry = e,
                                 onCheck = { viewModel.check(e.item.id) },
-                                onQuantity = { viewModel.setQuantity(e.item.id, it) },
+                                onEdit = { editTarget = e },
                                 onBought = { onBought(e.item.productId, e.item.id) },
                                 modifier = Modifier.animateItem(),
                             )
@@ -175,6 +205,18 @@ fun ShoppingScreen(
                 }
             }
         }
+    }
+
+    editTarget?.let { entry ->
+        ShoppingItemDialog(
+            item = entry.item,
+            unitSymbols = state.units.values.distinct().sorted(),
+            onDismiss = { editTarget = null },
+            onSave = { quantity, size, unit ->
+                editTarget = null
+                viewModel.updateDetails(entry.item.id, quantity, size, unit)
+            },
+        )
     }
 
     changeTarget?.let { (payload, current) ->
@@ -266,7 +308,7 @@ private fun GroupedList(
     state: ShoppingUiState,
     onBought: (productId: String?, shoppingItemId: String?) -> Unit,
     onCheck: (String) -> Unit,
-    onQuantity: (String, Int) -> Unit,
+    onEdit: (ShoppingEntry) -> Unit,
     onMoveToDepartment: (ShoppingPayload, String) -> Unit,
     onSaveDepartmentOrder: (List<String>) -> Unit,
     onChangeDepartment: (ShoppingPayload, String) -> Unit,
@@ -360,6 +402,7 @@ private fun GroupedList(
                     when (payload) {
                         is ShoppingPayload.Short -> ShortageRow(
                             s = payload.shortage,
+                            units = state.units,
                             onBought = { onBought(payload.shortage.product.id, null) },
                             modifier = dragModifier,
                             onChangeDepartment = change,
@@ -367,7 +410,7 @@ private fun GroupedList(
                         is ShoppingPayload.Item -> ItemRow(
                             entry = payload.entry,
                             onCheck = { onCheck(payload.entry.item.id) },
-                            onQuantity = { onQuantity(payload.entry.item.id, it) },
+                            onEdit = { onEdit(payload.entry) },
                             onBought = { onBought(payload.entry.item.productId, payload.entry.item.id) },
                             modifier = dragModifier,
                             onChangeDepartment = change,
@@ -418,12 +461,7 @@ private fun DepartmentHeader(name: String, count: Int, modifier: Modifier, handl
 
 @Composable
 private fun SectionLabel(text: Int) {
-    Text(
-        stringResource(text),
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = 8.dp),
-    )
+    de.frelina.vorrat.ui.components.SectionLabel(stringResource(text), Modifier.padding(top = 8.dp, start = 4.dp))
 }
 
 /** Freitext-Eingabe mit Vorschlägen aus den bekannten Produkten. */
@@ -453,7 +491,13 @@ private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it; expanded = true },
-                label = { Text(stringResource(R.string.shopping_add_hint)) },
+                placeholder = { Text(stringResource(R.string.shopping_add_hint)) },
+                shape = RoundedCornerShape(24.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = VorratTheme.colors.glass,
+                    focusedContainerColor = VorratTheme.colors.glassStrong,
+                    unfocusedBorderColor = VorratTheme.colors.glassBorder,
+                ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { submit() }),
@@ -466,7 +510,11 @@ private fun AddRow(suggestions: List<String>, onAdd: (String) -> Unit) {
                 filtered.forEach { s -> DropdownMenuItem(text = { Text(s) }, onClick = { submit(s) }) }
             }
         }
-        IconButton(onClick = { submit() }, enabled = text.isNotBlank()) {
+        FilledIconButton(
+            onClick = { submit() },
+            enabled = text.isNotBlank(),
+            modifier = Modifier.padding(start = 8.dp).size(52.dp),
+        ) {
             Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.shopping_add))
         }
     }
@@ -486,38 +534,40 @@ internal fun ShoppingCard(
     modifier: Modifier = Modifier,
     highlighted: Boolean = false,
     onChangeDepartment: (() -> Unit)? = null,
+    onEdit: (() -> Unit)? = null,
     trailing: @Composable () -> Unit,
 ) {
-    val colors = if (highlighted) {
-        CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-        )
-    } else {
-        CardDefaults.cardColors()
-    }
-    GlassCard(onClick = onClick, modifier = modifier.fillMaxWidth(), colors = colors) {
+    // Hervorgehoben (unter Mindestbestand): gelblicher Rand statt farbiger Fläche.
+    val border = if (highlighted) BorderStroke(1.dp, VorratTheme.colors.warning.copy(alpha = 0.45f)) else glassBorder()
+    GlassCard(onClick = onClick, modifier = modifier.fillMaxWidth(), border = border) {
         Row(
             Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            ProductImage(imagePath, size = 56.dp)
+            ProductImage(imagePath, size = 48.dp, name = name)
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         name,
                         style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
-                    if (onChangeDepartment != null) ItemMenu(name, onChangeDepartment)
+                    if (onChangeDepartment != null || onEdit != null) ItemMenu(name, onChangeDepartment, onEdit)
                 }
                 brand?.takeIf { it.isNotBlank() }?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = VorratTheme.colors.textSecondary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
-                detail()
+                CompositionLocalProvider(LocalContentColor provides VorratTheme.colors.textSecondary) { detail() }
             }
             trailing()
         }
@@ -526,7 +576,7 @@ internal fun ShoppingCard(
 
 /** Kleines Menü am Eintrag: "Abteilung ändern …" (Alternative zum Ziehen). */
 @Composable
-private fun ItemMenu(name: String, onChangeDepartment: () -> Unit) {
+private fun ItemMenu(name: String, onChangeDepartment: (() -> Unit)?, onEdit: (() -> Unit)?) {
     var open by remember { mutableStateOf(false) }
     Box {
         IconButton(onClick = { open = true }, modifier = Modifier.size(36.dp)) {
@@ -537,10 +587,18 @@ private fun ItemMenu(name: String, onChangeDepartment: () -> Unit) {
             )
         }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.shopping_change_department)) },
-                onClick = { open = false; onChangeDepartment() },
-            )
+            if (onEdit != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.shopping_edit_action)) },
+                    onClick = { open = false; onEdit() },
+                )
+            }
+            if (onChangeDepartment != null) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.shopping_change_department)) },
+                    onClick = { open = false; onChangeDepartment() },
+                )
+            }
         }
     }
 }
@@ -548,6 +606,7 @@ private fun ItemMenu(name: String, onChangeDepartment: () -> Unit) {
 @Composable
 private fun ShortageRow(
     s: Shortage,
+    units: Map<String, String>,
     onBought: () -> Unit,
     modifier: Modifier = Modifier,
     onChangeDepartment: (() -> Unit)? = null,
@@ -575,11 +634,12 @@ private fun ShortageRow(
         highlighted = true,
         onChangeDepartment = onChangeDepartment,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                stringResource(R.string.shopping_missing, s.missing),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+        Column(horizontalAlignment = Alignment.End) {
+            val pack = ShoppingLogic.packageLabel(s.product.packageSize, s.product.unitId?.let(units::get))
+            AmountBadge(
+                if (pack != null) stringResource(R.string.shopping_missing_package, s.missing, pack)
+                else stringResource(R.string.shopping_missing, s.missing),
+                color = VorratTheme.colors.warning,
             )
             IconButton(onClick = onBought) {
                 Icon(Icons.Outlined.AddShoppingCart, contentDescription = stringResource(R.string.shopping_bought_to_stock))
@@ -592,7 +652,7 @@ private fun ShortageRow(
 private fun ItemRow(
     entry: ShoppingEntry,
     onCheck: () -> Unit,
-    onQuantity: (Int) -> Unit,
+    onEdit: () -> Unit,
     onBought: () -> Unit,
     modifier: Modifier = Modifier,
     onChangeDepartment: (() -> Unit)? = null,
@@ -617,22 +677,17 @@ private fun ItemRow(
             },
             onClick = onBought,
             onChangeDepartment = onChangeDepartment,
+            onEdit = onEdit,
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    stringResource(R.string.shopping_quantity, entry.item.quantity),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Row {
-                    IconButton(onClick = { onQuantity(entry.item.quantity - 1) }, enabled = entry.item.quantity > 1) {
-                        Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease))
-                    }
-                    IconButton(onClick = { onQuantity(entry.item.quantity + 1) }) {
-                        Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.action_increase))
-                    }
-                }
-            }
+            // Menge/Packung nur hier rechts; Antippen öffnet "Menge und Packung".
+            val editLabel = stringResource(R.string.shopping_edit_action)
+            AmountBadge(
+                shoppingAmountText(entry.item),
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClickLabel = editLabel, role = Role.Button, onClick = onEdit),
+            )
         }
     }
 }
@@ -707,4 +762,148 @@ private fun SwipeBackground(direction: SwipeToDismissBoxValue, checkLabel: Strin
             SwipeToDismissBoxValue.Settled -> Unit
         }
     }
+}
+
+/** Text der Plakette: "750 g", "2× 500 g", "3×" bzw. "1×". */
+@Composable
+private fun shoppingAmountText(item: ShoppingItemEntity): String {
+    val pack = ShoppingLogic.packageLabel(item.packageSize, item.unitSymbol)
+    return when {
+        pack == null -> stringResource(R.string.shopping_quantity, item.quantity)
+        item.quantity > 1 -> stringResource(R.string.shopping_quantity_package, item.quantity, pack)
+        else -> pack
+    }
+}
+
+/** Übersicht oben: Ring mit Anteil "Nachkaufen" (gelb) und "Auf der Liste" (blau). */
+@Composable
+private fun ShoppingSummary(list: ShoppingList) {
+    val total = list.count.coerceAtLeast(1)
+    val colors = VorratTheme.colors
+    GlassCard(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp), shape = MaterialTheme.shapes.large) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SegmentRing(
+                segments = listOf(
+                    list.shortages.size.toFloat() / total to colors.warning,
+                    list.items.size.toFloat() / total to colors.info,
+                ),
+                size = 72.dp,
+                stroke = 8.dp,
+            ) {
+                Text(list.count.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    pluralStringResource(R.plurals.shopping_summary_total, list.count, list.count),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                LegendDot(colors.warning, pluralStringResource(R.plurals.shopping_summary_short, list.shortages.size, list.shortages.size))
+                LegendDot(colors.info, pluralStringResource(R.plurals.shopping_summary_items, list.items.size, list.items.size))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LegendDot(color: Color, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(8.dp).clip(CircleShape).background(color))
+        Text(
+            text,
+            style = MaterialTheme.typography.bodySmall,
+            color = VorratTheme.colors.textSecondary,
+            modifier = Modifier.padding(start = 8.dp),
+        )
+    }
+}
+
+/** Anzahl, Packungsgröße und Einheit eines Listeneintrags pflegen (wie im Bestand-Formular). */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShoppingItemDialog(
+    item: ShoppingItemEntity,
+    unitSymbols: List<String>,
+    onDismiss: () -> Unit,
+    onSave: (quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
+) {
+    var quantity by rememberSaveable { mutableIntStateOf(item.quantity) }
+    var size by rememberSaveable { mutableStateOf(item.packageSize?.toPlainString()?.replace('.', ',').orEmpty()) }
+    var unit by rememberSaveable { mutableStateOf(item.unitSymbol.orEmpty()) }
+    var unitOpen by remember { mutableStateOf(false) }
+    val sizeResult = Validation.optionalPositiveDecimal(size)
+    val sizeError = (sizeResult as? Validated.Error)?.error
+    val options = (unitSymbols + listOfNotNull(item.unitSymbol)).distinct()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.shopping_edit_title, item.name)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
+                    IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
+                        Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease))
+                    }
+                    Text(
+                        stringResource(R.string.shopping_quantity, quantity),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    IconButton(onClick = { quantity++ }, enabled = quantity < RemoteMapper.MAX_COUNT) {
+                        Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.action_increase))
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = size,
+                        onValueChange = { size = it },
+                        label = { Text(stringResource(R.string.shopping_edit_package)) },
+                        isError = sizeError != null,
+                        supportingText = sizeError?.let { e -> { Text(validationMessage(e)) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
+                        modifier = Modifier.weight(1f),
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = unitOpen,
+                        onExpandedChange = { unitOpen = it },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        OutlinedTextField(
+                            value = unit.ifEmpty { stringResource(R.string.shopping_edit_unit_none) },
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.shopping_edit_unit)) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitOpen) },
+                            singleLine = true,
+                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                        )
+                        ExposedDropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
+                                onClick = { unit = ""; unitOpen = false },
+                            )
+                            options.forEach { symbol ->
+                                DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val value = if (sizeResult is Validated.Ok) sizeResult.value else null
+                    onSave(quantity, value, unit.ifEmpty { null })
+                },
+                enabled = sizeError == null,
+            ) { Text(stringResource(R.string.action_save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }

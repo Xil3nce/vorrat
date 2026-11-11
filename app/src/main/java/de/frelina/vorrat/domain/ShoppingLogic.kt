@@ -10,6 +10,13 @@ data class Shortage(val product: ProductEntity, val have: Int, val min: Int) {
 
 object ShoppingLogic {
 
+    /** Packungsgröße für die Anzeige: "500 g", "1,5 l"; ohne Größe null. */
+    fun packageLabel(size: java.math.BigDecimal?, unit: String?): String? {
+        if (size == null || size.signum() <= 0) return null
+        val number = size.stripTrailingZeros().toPlainString().replace('.', ',')
+        return listOfNotNull(number, unit?.trim()?.takeIf { it.isNotEmpty() }).joinToString(" ")
+    }
+
     /** Produkte, deren Bestand (Summe der Anzahlen aller Einträge) unter dem Mindestbestand liegt. */
     fun shortages(products: List<ProductEntity>, stock: List<StockItem>): List<Shortage> {
         val totals = stock.groupBy { it.productId }.mapValues { (_, items) -> items.sumOf { it.quantity } }

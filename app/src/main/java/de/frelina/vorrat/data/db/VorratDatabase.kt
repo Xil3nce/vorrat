@@ -42,14 +42,14 @@ abstract class VorratDatabase : RoomDatabase() {
     abstract fun stapleDao(): StapleDao
 
     companion object {
-        const val VERSION = 8
+        const val VERSION = 9
         const val NAME = "vorrat.db"
 
         /**
          * Alle Migrationen. Neue Schema-Versionen: VERSION erhöhen, Migration hier ergänzen,
          * exportiertes Schema (app/schemas) committen und einen MigrationTest schreiben.
          */
-        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+        val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
 
         /** Startwerte für Einheiten und Menge-Arten beim ersten Anlegen der Datenbank. */
         val SEED_CALLBACK = object : Callback() {
@@ -276,5 +276,13 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
             "CREATE TABLE IF NOT EXISTS `staples` (`key` TEXT NOT NULL, `label` TEXT NOT NULL, " +
                 "`createdAt` INTEGER NOT NULL, PRIMARY KEY(`key`))",
         )
+    }
+}
+
+/** v8 → v9: Packungsgröße und Einheit an Einträgen der Einkaufsliste. */
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `shopping_items` ADD COLUMN `packageSize` TEXT")
+        db.execSQL("ALTER TABLE `shopping_items` ADD COLUMN `unitSymbol` TEXT")
     }
 }

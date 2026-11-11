@@ -24,7 +24,7 @@ import java.time.LocalDate
 class NewFeaturesDataTest : DbTestBase() {
 
     private val stockRepo get() = StockRepository(db, db.stockEntryDao(), db.productDao(), writer)
-    private val shopping get() = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), writer, images)
+    private val shopping get() = ShoppingRepository(db.shoppingDao(), db.productDao(), db.stockEntryDao(), db.unitDao(), writer, images)
 
     private suspend fun typeId() = db.quantityTypeDao().findBySymbol("Stck.")!!.id
 

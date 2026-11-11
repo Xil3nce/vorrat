@@ -10,6 +10,7 @@ import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.ShoppingEntry
 import de.frelina.vorrat.data.repo.ShoppingList
 import de.frelina.vorrat.data.repo.ShoppingRepository
+import de.frelina.vorrat.data.repo.CatalogRepository
 import de.frelina.vorrat.data.settings.SettingsRepository
 import de.frelina.vorrat.domain.BoardInput
 import de.frelina.vorrat.domain.BoardRow
@@ -50,6 +51,8 @@ data class ShoppingUiState(
     val grouped: Boolean = true,
     /** Abteilungen in der gespeicherten Reihenfolge (Standard-Abteilungen, solange noch keine vorliegen). */
     val departments: List<DepartmentEntity> = emptyList(),
+    /** Einheiten-ID → Symbol (Packungsgröße der Produkte). */
+    val units: Map<String, String> = emptyMap(),
     /** Flache Liste aus Überschriften und Einträgen. */
     val rows: List<BoardRow<ShoppingPayload>> = emptyList(),
 )
@@ -61,6 +64,7 @@ class ShoppingViewModel @Inject constructor(
     private val departmentRepository: DepartmentRepository,
     private val settings: SettingsRepository,
     private val messages: UiMessages,
+    catalogRepository: CatalogRepository,
 ) : ViewModel() {
 
     val state: StateFlow<ShoppingUiState> = combine(
@@ -68,13 +72,15 @@ class ShoppingViewModel @Inject constructor(
         departmentRepository.observeDepartments(),
         departmentRepository.observeAssignments(),
         settings.groupShoppingByDepartment,
-    ) { list, stored, assignments, grouped ->
+        catalogRepository.observeUnits(),
+    ) { list, stored, assignments, grouped, units ->
         val departments = stored.ifEmpty { DepartmentDefaults.entities() }
         ShoppingUiState(
             loading = false,
             list = list,
             grouped = grouped,
             departments = departments,
+            units = units.associate { it.id to it.symbol },
             rows = if (grouped) ShoppingBoard.build(departments, assignments, inputs(list)) else emptyList(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
@@ -107,6 +113,10 @@ class ShoppingViewModel @Inject constructor(
         }
 
     fun add(name: String) = viewModelScope.launch { repository.addText(name) }
+
+    /** Anzahl und Packungsgröße aus dem Bearbeiten-Dialog. */
+    fun updateDetails(id: String, quantity: Int, packageSize: java.math.BigDecimal?, unitSymbol: String?) =
+        viewModelScope.launch { repository.updateDetails(id, quantity, packageSize, unitSymbol) }
 
     fun setQuantity(id: String, quantity: Int) = viewModelScope.launch {
         if (quantity >= 1) repository.setQuantity(id, quantity)

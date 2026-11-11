@@ -22,6 +22,26 @@
     <string name="shopping_free_text">Freitext – noch kein Produkt</string>
     <string name="shopping_swipe_check">Abhaken</string>
     <string name="shopping_missing">fehlt %1$d</string>
+    <string name="shopping_missing_package">fehlt %1$d× %2$s</string>
+    <string name="shopping_quantity_package">%1$d× %2$s</string>
+    <string name="shopping_edit_action">Menge und Packung ändern</string>
+    <string name="shopping_edit_title">„%1$s“</string>
+    <string name="shopping_edit_quantity">Anzahl</string>
+    <string name="shopping_edit_package">Packungsgröße</string>
+    <string name="shopping_edit_unit">Einheit</string>
+    <string name="shopping_edit_unit_none">ohne</string>
+    <plurals name="shopping_summary_total">
+        <item quantity="one">%d Artikel auf der Liste</item>
+        <item quantity="other">%d Artikel auf der Liste</item>
+    </plurals>
+    <plurals name="shopping_summary_short">
+        <item quantity="one">%d zum Nachkaufen</item>
+        <item quantity="other">%d zum Nachkaufen</item>
+    </plurals>
+    <plurals name="shopping_summary_items">
+        <item quantity="one">%d selbst hinzugefügt</item>
+        <item quantity="other">%d selbst hinzugefügt</item>
+    </plurals>
     <string name="shopping_checked">„%1$s“ abgehakt</string>
     <string name="shopping_removed_after_purchase">Gespeichert – von der Einkaufsliste genommen</string>
     <string name="shopping_add_product">Auf die Einkaufsliste</string>

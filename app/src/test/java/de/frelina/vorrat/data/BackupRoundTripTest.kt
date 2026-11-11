@@ -81,7 +81,10 @@ class BackupRoundTripTest : DbTestBase() {
             ),
         )
         db.shoppingDao().upsert(
-            de.frelina.vorrat.data.db.ShoppingItemEntity(productId = p1, name = "Nutella", quantity = 2, note = null, createdAt = 7),
+            de.frelina.vorrat.data.db.ShoppingItemEntity(
+                productId = p1, name = "Nutella", quantity = 2, note = null, createdAt = 7,
+                packageSize = java.math.BigDecimal("450"), unitSymbol = "g",
+            ),
         )
         db.shoppingDao().upsert(
             de.frelina.vorrat.data.db.ShoppingItemEntity(productId = null, name = "Brot", quantity = 1, note = null, createdAt = 8),

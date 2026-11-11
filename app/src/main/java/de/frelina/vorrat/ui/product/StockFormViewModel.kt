@@ -201,12 +201,18 @@ class StockFormViewModel @Inject constructor(
             }
             else -> {
                 // Freitext von der Einkaufsliste: Namen vorbelegen.
-                val name = shoppingItemId?.let { shoppingRepository.getById(it)?.name }.orEmpty()
+                // Freitext von der Einkaufsliste: Name und Packungsgröße vorbelegen.
+                val item = shoppingItemId?.let { shoppingRepository.getById(it) }
+                val unitId = item?.unitSymbol?.let { catalogRepository.findUnitIdBySymbol(it) }
                 _state.value = StockFormState(
                     FormMode.NEW_PRODUCT,
                     loading = false,
                     entry = defaultEntry,
-                    product = ProductForm(name = name),
+                    product = ProductForm(
+                        name = item?.name.orEmpty(),
+                        packageSize = item?.packageSize?.toPlainString().orEmpty(),
+                        unitId = unitId,
+                    ),
                 )
             }
         }

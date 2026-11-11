@@ -310,6 +310,34 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 8 nach 9 ergaenzt Packungsgroesse in der Einkaufsliste`() {
+        createAt(8) {
+            execSQL(
+                "INSERT INTO shopping_items (id, productId, name, quantity, note, createdAt) " +
+                    "VALUES ('s1', NULL, 'Mehl', 2, NULL, 3)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val item = db.shoppingDao().getById("s1")!!
+                assertEquals("Mehl", item.name)
+                assertEquals(2, item.quantity)
+                assertNull(item.packageSize)
+                assertNull(item.unitSymbol)
+                db.shoppingDao().upsert(item.copy(packageSize = java.math.BigDecimal("1.5"), unitSymbol = "kg"))
+                val saved = db.shoppingDao().getById("s1")!!
+                assertEquals(java.math.BigDecimal("1.5"), saved.packageSize)
+                assertEquals("kg", saved.unitSymbol)
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

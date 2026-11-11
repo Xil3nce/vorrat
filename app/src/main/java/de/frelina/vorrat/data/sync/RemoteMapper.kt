@@ -87,6 +87,8 @@ object RemoteMapper {
         "quantity" to s.quantity.toLong(),
         "note" to s.note,
         "createdAt" to s.createdAt,
+        "packageSize" to s.packageSize?.toPlainString(),
+        "unitSymbol" to s.unitSymbol,
     )
 
     fun toMap(r: RecipeEntity): Map<String, Any?> = mapOf(
@@ -221,6 +223,8 @@ object RemoteMapper {
             quantity = m.long("quantity")?.toInt()?.takeIf { it in 1..MAX_COUNT } ?: 1,
             note = m.str("note"),
             createdAt = m.long("createdAt") ?: 0,
+            packageSize = m.str("packageSize")?.toBigDecimalOrNull()?.takeIf { it.signum() > 0 },
+            unitSymbol = m.str("unitSymbol")?.trim()?.take(MAX_UNIT)?.takeIf(String::isNotBlank),
         )
     }
 
@@ -276,6 +280,7 @@ object RemoteMapper {
     const val MAX_PLAN_PERSONS = 99
     const val MAX_STAPLE_LABEL = 60
     const val MAX_PLAN_NOTE = 300
+    const val MAX_UNIT = 12
     private const val MAX_ID_LENGTH = 200
     private const val MAX_KEY_LENGTH = 160
 

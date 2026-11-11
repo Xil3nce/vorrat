@@ -75,6 +75,8 @@ class CatalogRepository @Inject constructor(
     // ---------- Packungseinheiten ----------
     fun observeUnits(): Flow<List<UnitEntity>> = unitDao.observeAll()
 
+    suspend fun findUnitIdBySymbol(symbol: String): String? = unitDao.findBySymbol(symbol.trim())?.id
+
     suspend fun saveUnit(id: String?, symbol: String, name: String): SaveResult {
         val s = symbol.trim()
         val n = name.trim()
