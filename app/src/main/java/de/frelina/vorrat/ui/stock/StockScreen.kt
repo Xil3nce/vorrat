@@ -108,6 +108,7 @@ fun StockScreen(
 
     Scaffold(
         topBar = {
+            Box {
             TopAppBar(
                 title = {
                     Column {
@@ -142,6 +143,15 @@ fun StockScreen(
                     }
                 },
             )
+            // Offener Speed-Dial: Tippen auf die Kopfzeile klappt ihn nur zu.
+            if (dialOpen) {
+                Box(
+                    Modifier
+                        .matchParentSize()
+                        .clickable(interactionSource = null, indication = null) { dialOpen = false },
+                )
+            }
+            }
         },
         floatingActionButton = {
             // Speed-Dial: Optionen-Button, darüber klappen "Manuell anlegen" und "Einfrieren" auf.
