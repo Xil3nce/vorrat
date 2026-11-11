@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.stock
 
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -60,7 +61,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -155,7 +155,12 @@ fun StockScreen(
         },
         floatingActionButton = {
             // Speed-Dial: Optionen-Button, darüber klappen "Manuell anlegen" und "Einfrieren" auf.
-            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // 8 dp nach unten versetzt: nur ~8 dp Abstand zur Navigationsleiste (Scaffold lässt 16 dp).
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.offset(y = 8.dp),
+            ) {
                 AnimatedVisibility(
                     visible = dialOpen,
                     enter = fadeIn() + slideInVertically { it / 2 },
@@ -183,7 +188,7 @@ fun StockScreen(
             }
             else -> LazyColumn(
                 modifier = Modifier.padding(padding).fillMaxSize(),
-                contentPadding = PaddingValues(top = 4.dp, bottom = 96.dp),
+                contentPadding = PaddingValues(top = 4.dp, bottom = 64.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 if (state.totalCount > 0) {
@@ -439,7 +444,7 @@ private fun SwipeableStockItem(
     content: @Composable () -> Unit,
 ) {
     // Erst ab 40 % der Breite auslösen (Standard sind 56 dp – zu empfindlich, kurze Wischer beim Scrollen würden löschen/duplizieren).
-    val swipeState = rememberSwipeToDismissBoxState(positionalThreshold = { totalDistance -> totalDistance * 0.4f })
+    val swipeState = de.frelina.vorrat.ui.components.rememberListSwipeState()
     val scope = rememberCoroutineScope()
     val deleteLabel = stringResource(R.string.stock_swipe_delete)
     val duplicateLabel = stringResource(R.string.stock_swipe_duplicate)

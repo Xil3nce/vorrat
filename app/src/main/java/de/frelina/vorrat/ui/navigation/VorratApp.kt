@@ -6,15 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
@@ -127,10 +124,14 @@ fun VorratRoot(
     val backStack by navController.currentBackStackEntryAsState()
     val destination = backStack?.destination
     val showBottomBar = TOP_LEVEL.any { t -> destination?.hierarchy?.any { it.hasRoute(t.routeClass) } == true }
-    // Screens mit FAB bzw. unterer Bedienleiste: Snackbar darüber anzeigen, damit sie nichts verdeckt.
-    val liftSnackbar = listOf(StockRoute::class, LocationsRoute::class, ScanRoute::class, ShoppingRoute::class, RecipesRoute::class,
-        DepartmentsRoute::class, MealPlanRoute::class, PlanShoppingRoute::class)
-        .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
+    // Screens mit FAB: Snackbar darüber anzeigen, damit sie nichts verdeckt. Mit Leiste sitzt nur der kleine
+    // Speed-Dial des Bestands knapp über ihr; ohne Leiste liegen die erweiterten FABs 16 dp über dem Rand.
+    val liftSnackbar = if (showBottomBar) {
+        destination?.hierarchy?.any { it.hasRoute(StockRoute::class) } == true
+    } else {
+        listOf(LocationsRoute::class, RecipesRoute::class, DepartmentsRoute::class, MealPlanRoute::class, PlanShoppingRoute::class)
+            .any { r -> destination?.hierarchy?.any { it.hasRoute(r) } == true }
+    }
 
     LaunchedEffect(Unit) {
         messages.messages.collect { msg ->
@@ -199,7 +200,7 @@ fun VorratRoot(
 
     Scaffold(
         containerColor = Color.Transparent,
-        snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) 72.dp else 0.dp)) },
+        snackbarHost = { SnackbarHost(snackbar, Modifier.padding(bottom = if (liftSnackbar) (if (showBottomBar) 56.dp else 72.dp) else 0.dp)) },
         bottomBar = {
             if (showBottomBar) {
                 FloatingNavBar(
@@ -310,8 +311,8 @@ fun VorratRoot(
 }
 
 /**
- * Schwebende Leiste (Abstand 12 dp seitlich, 14 dp unten) mit rundem Scan-Button in der Mitte,
- * der nach oben herausragt.
+ * Schwebende Leiste (Abstand 12 dp seitlich, 4 dp unten); der Scan-Punkt in der Mitte sitzt auf derselben
+ * Zeilenhöhe wie die anderen, als Kreis in Akzentfarbe hervorgehoben.
  */
 @Composable
 private fun FloatingNavBar(isSelected: (TopLevel) -> Boolean, onSelect: (TopLevel) -> Unit) {
@@ -321,7 +322,7 @@ private fun FloatingNavBar(isSelected: (TopLevel) -> Boolean, onSelect: (TopLeve
         Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 12.dp, end = 12.dp, bottom = 14.dp, top = 34.dp),
+            .padding(start = 12.dp, end = 12.dp, bottom = 4.dp),
     ) {
         Row(
             Modifier
@@ -335,55 +336,47 @@ private fun FloatingNavBar(isSelected: (TopLevel) -> Boolean, onSelect: (TopLeve
             verticalAlignment = Alignment.CenterVertically,
         ) {
             TOP_LEVEL.forEach { item ->
-                if (item === scan) {
-                    Spacer(Modifier.width(72.dp))
-                } else {
-                    val selected = isSelected(item)
-                    val tint = if (selected) colors.accent else colors.textSecondary
-                    Column(
-                        Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .clip(RoundedCornerShape(24.dp))
-                            .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item) }),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                    ) {
+                val selected = isSelected(item)
+                val tint = if (selected) colors.accent else colors.textSecondary
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(24.dp))
+                        .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item) }),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    if (item === scan) {
+                        Box(
+                            Modifier
+                                .size(26.dp)
+                                .clip(CircleShape)
+                                .background(if (selected) colors.accent else colors.accent.copy(alpha = 0.16f))
+                                .border(1.5.dp, colors.accent.copy(alpha = 0.7f), CircleShape),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                item.icon,
+                                contentDescription = null,
+                                tint = if (selected) colors.onAccent else colors.accent,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    } else {
                         Icon(item.icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
-                        Text(
-                            stringResource(item.label),
-                            color = tint,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                            maxLines = 1,
-                            softWrap = false,
-                            overflow = TextOverflow.Visible,
-                        )
                     }
+                    Text(
+                        stringResource(item.label),
+                        color = tint,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Visible,
+                    )
                 }
             }
-        }
-        val scanSelected = isSelected(scan)
-        Box(
-            Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-34).dp)
-                .size(76.dp)
-                .clip(CircleShape)
-                .background(colors.accent.copy(alpha = if (scanSelected) 0.24f else 0.12f))
-                .padding(6.dp)
-                .clip(CircleShape)
-                .background(if (scanSelected) colors.accent else colors.onAccent)
-                .border(2.dp, colors.accent.copy(alpha = 0.7f), CircleShape)
-                .selectable(selected = scanSelected, role = Role.Tab, onClick = { onSelect(scan) }),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                scan.icon,
-                contentDescription = stringResource(scan.label),
-                tint = if (scanSelected) colors.onAccent else colors.accent,
-                modifier = Modifier.size(28.dp),
-            )
         }
     }
 }
