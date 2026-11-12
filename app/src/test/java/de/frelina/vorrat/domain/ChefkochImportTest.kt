@@ -72,6 +72,29 @@ class ChefkochImportTest {
         assertEquals("Quelle: https://www.chefkoch.de/rezepte/7", r.steps.last())
     }
 
+    @Test
+    fun `Vorschaubild mit Größe und Bildnachweis`() {
+        val dto = ChefkochRecipeDto(
+            id = "42", title = "Lasagne",
+            ingredientGroups = listOf(ChefkochIngredientGroupDto(ingredients = listOf(ChefkochIngredientDto("Nudeln")))),
+            hasImage = true,
+            previewImageUrlTemplate = "https://img.chefkoch-cdn.de/rezepte/42/bilder/9/<format>/lasagne.jpg",
+            previewImageCredits = "Koch123",
+        )
+        assertEquals("https://img.chefkoch-cdn.de/rezepte/42/bilder/9/crop-960x720/lasagne.jpg", ChefkochMapper.imageUrl(dto))
+        assertEquals(listOf("Quelle: https://www.chefkoch.de/rezepte/42", "Bild: Koch123"), ChefkochMapper.toRecipe(dto).steps)
+    }
+
+    @Test
+    fun `kein Bild ohne Vorschau oder bei fremder Adresse`() {
+        val base = ChefkochRecipeDto(id = "1", previewImageCredits = "X")
+        assertNull(ChefkochMapper.imageUrl(base))
+        assertNull(ChefkochMapper.imageUrl(base.copy(previewImageUrlTemplate = "https://img.chefkoch-cdn.de/a/<format>/b.jpg")))
+        assertNull(ChefkochMapper.imageUrl(base.copy(hasImage = true, previewImageUrlTemplate = "https://evil.example/<format>/b.jpg")))
+        assertNull(ChefkochMapper.imageUrl(base.copy(hasImage = true, previewImageUrlTemplate = "http://img.chefkoch-cdn.de/<format>/b.jpg")))
+        assertEquals(listOf("Quelle: https://www.chefkoch.de/rezepte/1"), ChefkochMapper.toRecipe(base).steps)
+    }
+
     private companion object {
         val SAMPLE = """
             {

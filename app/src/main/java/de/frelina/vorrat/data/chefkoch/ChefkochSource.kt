@@ -15,7 +15,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 sealed interface ChefkochResult {
-    data class Ok(val recipe: Recipe) : ChefkochResult
+    /** [imageUrl]: Vorschaubild des Rezepts zum Nachladen mit [ChefkochSource.downloadImage], falls vorhanden. */
+    data class Ok(val recipe: Recipe, val imageUrl: String? = null) : ChefkochResult
     data object NotFound : ChefkochResult
     data object NoNetwork : ChefkochResult
     data object Failed : ChefkochResult
@@ -49,7 +50,7 @@ class ChefkochSource @Inject constructor(
                         val dto = json.decodeFromString<ChefkochRecipeDto>(r.body.string())
                         val recipe = ChefkochMapper.toRecipe(dto)
                         if (recipe.title.isBlank() || recipe.ingredients.isEmpty()) ChefkochResult.Failed
-                        else ChefkochResult.Ok(recipe)
+                        else ChefkochResult.Ok(recipe, ChefkochMapper.imageUrl(dto))
                     }
                 }
             }
@@ -62,7 +63,19 @@ class ChefkochSource @Inject constructor(
         }
     }
 
+    /** Bild laden (höchstens [MAX_IMAGE_BYTES]); null bei Fehler – das Rezept wird dann ohne Bild übernommen. */
+    suspend fun downloadImage(url: String): ByteArray? = withContext(Dispatchers.IO) {
+        runCatching {
+            client.newCall(Request.Builder().url(url).build()).execute().use { r ->
+                val length = r.body.contentLength()
+                if (!r.isSuccessful || length > MAX_IMAGE_BYTES) null
+                else r.body.bytes().takeIf { it.isNotEmpty() && it.size <= MAX_IMAGE_BYTES }
+            }
+        }.getOrNull()
+    }
+
     private companion object {
+        const val MAX_IMAGE_BYTES = 5L * 1024 * 1024
         const val BASE_URL = "https://api.chefkoch.de/v2"
     }
 }

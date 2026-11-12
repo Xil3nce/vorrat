@@ -104,7 +104,15 @@ class ImageStore(private val dir: File) {
 
     /** Bild von Kamera/Galerie verkleinert (max. [MAX_EDGE] px) als JPEG übernehmen. */
     suspend fun importFromUri(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
-        val source = ImageDecoder.createSource(context.contentResolver, uri)
+        importScaled(ImageDecoder.createSource(context.contentResolver, uri))
+    }
+
+    /** Heruntergeladenes Bild verkleinert (max. [MAX_EDGE] px) als JPEG übernehmen; wirft, wenn es kein Bild ist. */
+    suspend fun importFromBytes(bytes: ByteArray): String = withContext(Dispatchers.IO) {
+        importScaled(ImageDecoder.createSource(java.nio.ByteBuffer.wrap(bytes)))
+    }
+
+    private fun importScaled(source: ImageDecoder.Source): String {
         val bitmap = ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
             val w = info.size.width
             val h = info.size.height
@@ -118,7 +126,7 @@ class ImageStore(private val dir: File) {
         val name = newName("jpg")
         FileOutputStream(file(name)).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 85, it) }
         bitmap.recycle()
-        name
+        return name
     }
 
     suspend fun delete(name: String?) = withContext(Dispatchers.IO) {

@@ -106,6 +106,8 @@ class EditRecipeViewModel @Inject constructor(
             when (val result = chefkoch.load(id)) {
                 is ChefkochResult.Ok -> {
                     fill(result.recipe, editingExisting = false)
+                    // Ein schon gewähltes eigenes Foto hat Vorrang vor dem Chefkoch-Bild.
+                    if (_state.value.imagePath == null) result.imageUrl?.let { importImage(it) }
                     messages.show(UiMessage(R.string.recipe_import_done))
                 }
                 ChefkochResult.NotFound -> messages.show(UiMessage(R.string.recipe_import_not_found, tone = MessageTone.ERROR))
@@ -114,6 +116,23 @@ class EditRecipeViewModel @Inject constructor(
             }
             _state.update { it.copy(importing = false) }
         }
+    }
+
+    /** Chefkoch-Bild als noch nicht gespeichertes Foto übernehmen; ohne Erfolg bleibt das Rezept einfach ohne Bild. */
+    private suspend fun importImage(url: String) {
+        val bytes = chefkoch.downloadImage(url) ?: return
+        val name = try {
+            imageStore.importFromBytes(bytes)
+        } catch (_: Exception) {
+            return
+        }
+        if (_state.value.imagePath != null) {
+            imageStore.delete(name) // inzwischen wurde selbst ein Foto gewählt
+            return
+        }
+        discardPendingImage()
+        pendingImage = name
+        _state.update { it.copy(imagePath = name, imageError = false) }
     }
 
     private suspend fun load() {
