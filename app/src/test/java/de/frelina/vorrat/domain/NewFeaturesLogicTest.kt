@@ -91,6 +91,65 @@ class NewFeaturesLogicTest {
         assertNull(ExpiryDateParser.parse("", today))
     }
 
+    @Test fun `Monatsnamen deutsch englisch franzoesisch`() {
+        assertEquals(LocalDate.of(2026, 11, 24), ExpiryDateParser.parse("BEST BEFORE 24 NOV 2026", today))
+        assertEquals(LocalDate.of(2027, 3, 5), ExpiryDateParser.parse("MHD 05.Mär.27", today))
+        assertEquals(LocalDate.of(2027, 12, 31), ExpiryDateParser.parse("mind. haltbar bis Ende Dez. 2027", today))
+        assertEquals(LocalDate.of(2027, 7, 31), ExpiryDateParser.parse("DDM JUIL 2027", today))
+        assertEquals(LocalDate.of(2027, 5, 31), ExpiryDateParser.parse("Mai 2027", today))
+        assertEquals(LocalDate.of(2027, 1, 12), ExpiryDateParser.parse("EXP12JAN27", today))
+        assertNull(ExpiryDateParser.parse("Mainz 2027", today)) // kein Monatsname
+    }
+
+    @Test fun `ISO und Komma als Trenner`() {
+        assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("2027-03-12", today))
+        assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("12,03,27", today))
+    }
+
+    @Test fun `ohne Trennzeichen nur hinter einem Stichwort`() {
+        assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("MHD 120327", today))
+        assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("MHD: 12032027 L123", today))
+        assertNull(ExpiryDateParser.parse("4006040120327", today)) // Teil einer Nummer
+        assertNull(ExpiryDateParser.parse("Art. 120327", today))
+    }
+
+    @Test fun `weitere Lesefehler werden korrigiert`() {
+        assertEquals(LocalDate.of(2027, 5, 15), ExpiryDateParser.parse("MHD 1S.O5.2O27", today))
+        assertEquals(LocalDate.of(2027, 8, 18), ExpiryDateParser.parse("MHD |8.O8.27", today))
+        assertEquals(LocalDate.of(2027, 2, 28), ExpiryDateParser.parse("MHD 28.O2.Z7", today))
+    }
+
+    @Test fun `Woerter verdecken kein Datum und werden nicht als Zahl gelesen`() {
+        // "s 30.12" darf das echte Datum nicht schlucken
+        assertEquals(LocalDate.of(2026, 12, 30), ExpiryDateParser.parse("los 30.12.2026", today))
+        assertNull(ExpiryDateParser.parse("Bio Iso Sol", today))
+    }
+
+    @Test fun `unsichere Schreibweisen zaehlen nicht ohne Stichwort`() {
+        // Nährwerte/Preise dürfen kein Datum ergeben
+        assertNull(ExpiryDateParser.parse("Preis 12.30", today))
+        assertNull(ExpiryDateParser.parse("Fett 10 5 27 g", today))
+        assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("Fett 10 5 27 g  12.03.2027", today))
+        // mit Stichwort schon
+        assertEquals(LocalDate.of(2030, 12, 31), ExpiryDateParser.parse("MHD 12.30", today))
+    }
+
+    @Test fun `Stabilisierung braucht mehrere gleiche Lesungen`() {
+        val s = ExpiryDateStabilizer(window = 5, required = 3)
+        val a = LocalDate.of(2027, 3, 12)
+        val b = LocalDate.of(2027, 3, 18)
+        assertNull(s.offer(a))
+        assertNull(s.offer(b))
+        assertNull(s.offer(null))
+        assertNull(s.offer(a))
+        assertEquals(a, s.offer(a))
+        // ein einzelner Ausreißer ändert nichts
+        assertEquals(a, s.offer(b))
+        assertEquals(a, s.offer(null))
+        // bis das andere Datum im Fenster die Mehrheit hat
+        assertEquals(b, s.offer(b))
+    }
+
     // ---------------------------------------------------------------- Einkaufsliste
     private fun product(id: String, name: String, min: Int?) = ProductEntity(
         id = id, barcode = null, name = name, brand = null, category = null, packageSize = null, unitId = null,
