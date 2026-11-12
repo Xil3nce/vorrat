@@ -24,6 +24,7 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import de.frelina.vorrat.ui.components.GlassCard
+import de.frelina.vorrat.ui.components.ProductImage
 import de.frelina.vorrat.ui.components.ProgressRing
 import de.frelina.vorrat.ui.components.SectionLabel
 import de.frelina.vorrat.ui.theme.VorratTheme
@@ -204,6 +205,7 @@ private fun RecipeCard(match: RecipeMatch, today: LocalDate, onClick: () -> Unit
         modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
     ) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
+        if (recipe.imagePath != null) ProductImage(recipe.imagePath, size = 64.dp, name = recipe.title)
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(recipe.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             val meta = recipeMeta(recipe)

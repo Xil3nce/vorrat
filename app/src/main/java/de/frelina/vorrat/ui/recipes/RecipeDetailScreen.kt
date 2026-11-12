@@ -124,6 +124,7 @@ fun RecipeDetailScreen(
                 Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                RecipePhoto(match.recipe.imagePath)
                 Text(match.recipe.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
                 val meta = recipeMeta(match.recipe)
                 if (meta.isNotEmpty()) {

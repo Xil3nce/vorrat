@@ -237,6 +237,8 @@ data class RecipeEntity(
     val vegetarian: Boolean = false,
     val createdAt: Long,
     val updatedAt: Long,
+    /** Foto (Dateiname im Bildordner, siehe ImageStore). Seit Schema 11. */
+    val imagePath: String? = null,
 )
 
 /**

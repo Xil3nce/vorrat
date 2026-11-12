@@ -62,6 +62,7 @@ data class RecipeDto(
     val vegetarian: Boolean = false,
     val createdAt: Long = 0,
     val updatedAt: Long = 0,
+    val imagePath: String? = null,
 )
 
 @Serializable

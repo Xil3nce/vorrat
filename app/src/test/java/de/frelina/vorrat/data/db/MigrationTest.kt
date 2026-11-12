@@ -362,6 +362,30 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 10 nach 11 ergaenzt Foto an Rezepten`() {
+        createAt(10) {
+            execSQL(
+                "INSERT INTO recipes (id, title, minutes, servings, ingredients, steps, vegetarian, createdAt, updatedAt) " +
+                    "VALUES ('r1', 'Suppe', 20, 2, '[]', 'Kochen', 1, 1, 2)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val recipe = db.recipeDao().getById("r1")!!
+                assertEquals("Suppe", recipe.title)
+                assertNull(recipe.imagePath)
+                db.recipeDao().upsert(recipe.copy(imagePath = "foto.jpg"))
+                assertEquals(listOf("foto.jpg"), db.recipeDao().getAllImagePaths())
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

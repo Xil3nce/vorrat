@@ -1,13 +1,17 @@
 package de.frelina.vorrat.ui.recipes
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.chefkoch.ChefkochResult
 import de.frelina.vorrat.data.chefkoch.ChefkochSource
+import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.domain.ChefkochLink
 import de.frelina.vorrat.domain.IngredientMatcher
@@ -54,6 +58,9 @@ data class EditRecipeState(
     val saved: Boolean = false,
     /** Rezept wird gerade von Chefkoch geladen. */
     val importing: Boolean = false,
+    /** Foto (Dateiname im Bildordner). */
+    val imagePath: String? = null,
+    val imageError: Boolean = false,
 )
 
 @HiltViewModel
@@ -62,11 +69,16 @@ class EditRecipeViewModel @Inject constructor(
     private val repository: RecipeRepository,
     private val messages: UiMessages,
     private val chefkoch: ChefkochSource,
+    private val imageStore: ImageStore,
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<EditRecipeRoute>()
     private val sourceId: String? = route.id
     private var nextKey = 0L
+
+    /** In diesem Editor neu gewähltes Foto, das noch nicht gespeichert ist. */
+    private var pendingImage: String? = null
 
     private val _state = MutableStateFlow(EditRecipeState())
     val state: StateFlow<EditRecipeState> = _state.asStateFlow()
@@ -125,7 +137,34 @@ class EditRecipeViewModel @Inject constructor(
                 IngredientRowState(nextKey++, it.name, it.amount.orEmpty(), it.group, groupManual = it.group != null, optional = it.optional)
             }.ifEmpty { listOf(newRow()) },
             steps = RecipeJson.stepsToText(recipe.steps),
+            // Beim Chefkoch-Import ein schon gewähltes Foto behalten.
+            imagePath = recipe.imagePath ?: _state.value.imagePath,
         )
+    }
+
+    /**
+     * Neues Foto übernehmen. Ein zuvor in diesem Editor gewähltes, noch nicht gespeichertes Foto wird gelöscht;
+     * das gespeicherte alte Foto entfernt erst das Repository beim Speichern (Abbrechen lässt es unverändert).
+     */
+    fun onImagePicked(uri: Uri) = viewModelScope.launch {
+        try {
+            val name = imageStore.importFromUri(context, uri)
+            discardPendingImage()
+            pendingImage = name
+            _state.update { it.copy(imagePath = name, imageError = false) }
+        } catch (_: Exception) {
+            _state.update { it.copy(imageError = true) }
+        }
+    }
+
+    fun removeImage() = viewModelScope.launch {
+        discardPendingImage()
+        _state.update { it.copy(imagePath = null, imageError = false) }
+    }
+
+    private suspend fun discardPendingImage() {
+        pendingImage?.let { imageStore.delete(it) }
+        pendingImage = null
     }
 
     private fun newRow() = IngredientRowState(nextKey++)
@@ -190,8 +229,10 @@ class EditRecipeViewModel @Inject constructor(
             ingredients = ingredients,
             steps = RecipeJson.textToSteps(s.steps),
             vegetarian = s.vegetarian,
+            imagePath = s.imagePath,
         )
         repository.save(recipe)
+        pendingImage = null
         messages.show(UiMessage(R.string.recipe_saved))
         _state.update { it.copy(saved = true) }
     }

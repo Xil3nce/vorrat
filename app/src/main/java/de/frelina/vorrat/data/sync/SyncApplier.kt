@@ -34,6 +34,7 @@ class SyncApplier(private val db: VorratDatabase) {
     data class Applied(
         val products: List<ProductEntity> = emptyList(),
         val history: List<HistoryEventEntity> = emptyList(),
+        val recipes: List<RecipeEntity> = emptyList(),
     )
 
     private sealed interface Pending {
@@ -113,6 +114,7 @@ class SyncApplier(private val db: VorratDatabase) {
     /** Alle zurückgestellten Änderungen versuchen: Upserts Eltern → Kinder, Löschungen Kinder → Eltern. */
     private suspend fun flush(): Applied {
         val products = mutableListOf<ProductEntity>()
+        val recipes = mutableListOf<RecipeEntity>()
         val history = mutableListOf<HistoryEventEntity>()
         for (collection in RemoteCollection.DATA) {
             val queue = pending.getValue(collection)
@@ -121,6 +123,7 @@ class SyncApplier(private val db: VorratDatabase) {
                 val op = it.next().value as? Pending.Upsert ?: continue
                 if (tryUpsert(op.entity)) {
                     if (op.entity is ProductEntity) products += op.entity
+                    if (op.entity is RecipeEntity) recipes += op.entity
                     if (op.entity is HistoryEventEntity) history += op.entity
                     it.remove()
                 }
@@ -134,7 +137,7 @@ class SyncApplier(private val db: VorratDatabase) {
                 if (op == Pending.Delete && tryDelete(collection, id)) it.remove()
             }
         }
-        return Applied(products, history)
+        return Applied(products, history, recipes)
     }
 
     private suspend fun tryUpsert(entity: Any): Boolean = when (entity) {

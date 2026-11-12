@@ -48,6 +48,7 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.domain.ConsumeListLogic
 import de.frelina.vorrat.ui.components.GlassCard
 import de.frelina.vorrat.ui.components.GlassIconButton
+import de.frelina.vorrat.ui.components.OpenedBadge
 import de.frelina.vorrat.ui.components.ProductImage
 import de.frelina.vorrat.ui.purchase.SwipeToDelete
 import de.frelina.vorrat.ui.scan.ConsumeDialog
@@ -177,13 +178,17 @@ private fun ConsumeRowCard(row: ConsumeRow, onClick: () -> Unit, onAdjust: (Int)
                     )
                     val place = item.locationName ?: stringResource(R.string.location_none)
                     val expiry = item.effectiveExpiry
-                    Text(
-                        if (expiry == null) place else stringResource(R.string.consume_list_sub, place, ConsumeListLogic.shortDate(expiry)),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.textSecondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            if (expiry == null) place else stringResource(R.string.consume_list_sub, place, ConsumeListLogic.shortDate(expiry)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colors.textSecondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false),
+                        )
+                        item.openedAt?.let { opened -> OpenedBadge(opened, Modifier.padding(start = 8.dp)) }
+                    }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     FilledTonalIconButton(

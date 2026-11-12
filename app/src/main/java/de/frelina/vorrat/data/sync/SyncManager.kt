@@ -1,7 +1,6 @@
 package de.frelina.vorrat.data.sync
 
 import android.util.Log
-import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.household.Household
 import de.frelina.vorrat.data.household.HouseholdStore
@@ -99,7 +98,7 @@ class SyncManager @Inject constructor(
                 e.snapshot.changes,
                 if (e.full) e.snapshot.allIds else null,
             )
-            fetchMissingImages(e.hid, applied.products)
+            fetchMissingImages(e.hid, applied.products.mapNotNull { it.imagePath } + applied.recipes.mapNotNull { it.imagePath })
             notices.onIncoming(applied.history)
             // Hat der Haushalt noch keine Abteilungen (z. B. nach dem Update), die Standard-Abteilungen anlegen.
             if (e.full && e.collection == RemoteCollection.DEPARTMENTS) departments.ensureDefaults()
@@ -109,8 +108,8 @@ class SyncManager @Inject constructor(
         }
     }
 
-    private fun fetchMissingImages(hid: String, products: List<ProductEntity>) {
-        val missing = products.mapNotNull { it.imagePath }.filter { imageStore.fileOrNull(it) == null }
+    private fun fetchMissingImages(hid: String, images: List<String>) {
+        val missing = images.distinct().filter { imageStore.fileOrNull(it) == null }
         if (missing.isEmpty()) return
         scope.launch {
             missing.forEach { name ->

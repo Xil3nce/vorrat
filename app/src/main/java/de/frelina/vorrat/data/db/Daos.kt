@@ -355,6 +355,9 @@ interface RecipeDao {
     @Query("SELECT id FROM recipes")
     suspend fun getIds(): List<String>
 
+    @Query("SELECT imagePath FROM recipes WHERE imagePath IS NOT NULL")
+    suspend fun getAllImagePaths(): List<String>
+
     @Query("DELETE FROM recipes")
     suspend fun deleteAll()
 }

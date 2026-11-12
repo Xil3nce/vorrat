@@ -25,6 +25,7 @@ class VorratApp : Application(), Configuration.Provider {
     @Inject lateinit var imageStore: ImageStore
     @Inject lateinit var productDao: ProductDao
     @Inject lateinit var lookupCacheDao: LookupCacheDao
+    @Inject lateinit var recipeDao: de.frelina.vorrat.data.db.RecipeDao
     @Inject lateinit var syncManager: SyncManager
     @Inject lateinit var householdNotices: de.frelina.vorrat.reminder.HouseholdNotices
     @Inject lateinit var historyRepository: de.frelina.vorrat.data.repo.HistoryRepository
@@ -63,7 +64,7 @@ class VorratApp : Application(), Configuration.Provider {
         appScope.launch {
             runCatching {
                 val referenced = productDao.getAllImagePaths().toSet() + lookupCacheDao.getAllImagePaths().toSet() +
-                    purchaseDrafts.imagePaths()
+                    purchaseDrafts.imagePaths() + recipeDao.getAllImagePaths()
                 imageStore.deleteUnreferenced(referenced)
             }
         }

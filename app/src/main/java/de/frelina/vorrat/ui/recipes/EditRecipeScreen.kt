@@ -107,6 +107,13 @@ fun EditRecipeScreen(
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
             }
+            RecipePhotoPicker(
+                imagePath = state.imagePath,
+                title = state.title,
+                imageError = state.imageError,
+                onImagePicked = viewModel::onImagePicked,
+                onRemoveImage = viewModel::removeImage,
+            )
             OutlinedTextField(
                 value = state.title,
                 onValueChange = viewModel::setTitle,

@@ -31,7 +31,7 @@ class RecipeDataTest : DbTestBase() {
         ingredients = listOf(RecipeIngredient("Nudeln", "200 g", "pasta", false)),
         steps = listOf("Kochen"),
     )
-    private val repo get() = RecipeRepository(db.recipeDao(), writer, BuiltinRecipeSource { listOf(builtinRecipe) })
+    private val repo get() = RecipeRepository(db.recipeDao(), writer, images, BuiltinRecipeSource { listOf(builtinRecipe) })
 
     private fun own(title: String = "Mein Rezept") = Recipe(
         id = "", title = title, minutes = 20, servings = 4,
@@ -70,6 +70,29 @@ class RecipeDataTest : DbTestBase() {
         assertNull(db.recipeDao().getById(id))
         assertNull(remote.doc(RemoteCollection.RECIPES, id))
         assertNotNull(repo.get("builtin:test"))
+    }
+
+    @Test fun `Rezeptfoto wird mitsynchronisiert, ersetzt und beim Loeschen entfernt`() = runBlocking {
+        val first = images.saveBytes(byteArrayOf(1, 2, 3))
+        val id = repo.save(own().copy(imagePath = first))
+        assertEquals(first, repo.get(id)!!.imagePath)
+        assertEquals(first, remote.doc(RemoteCollection.RECIPES, id)!!["imagePath"])
+        assertEquals(listOf(first), db.recipeDao().getAllImagePaths())
+
+        val second = images.saveBytes(byteArrayOf(4, 5, 6))
+        repo.save(repo.get(id)!!.copy(imagePath = second))
+        assertNull(images.fileOrNull(first))
+        assertNotNull(images.fileOrNull(second))
+
+        repo.delete(id)
+        assertNull(images.fileOrNull(second))
+        assertTrue(db.recipeDao().getAllImagePaths().isEmpty())
+    }
+
+    @Test fun `RemoteMapper uebernimmt nur sichere Bildnamen am Rezept`() {
+        val base = mapOf<String, Any?>("title" to "X", "ingredients" to "[]")
+        assertEquals("abc.jpg", RemoteMapper.recipe("r", base + ("imagePath" to "abc.jpg"))!!.imagePath)
+        assertNull(RemoteMapper.recipe("r", base + ("imagePath" to "../boese.jpg"))!!.imagePath)
     }
 
     @Test fun `SyncApplier uebernimmt Rezepte und loescht sie`() = runBlocking {

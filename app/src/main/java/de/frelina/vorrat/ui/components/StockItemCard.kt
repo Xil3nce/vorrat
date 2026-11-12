@@ -164,7 +164,7 @@ fun StockItemCard(
 
 /** Kleine Plakette "Geöffnet 10.11." neben dem Ablaufdatum. */
 @Composable
-private fun OpenedBadge(openedAt: LocalDate, modifier: Modifier = Modifier) {
+fun OpenedBadge(openedAt: LocalDate, modifier: Modifier = Modifier) {
     val color = MaterialTheme.colorScheme.tertiary
     val label = stringResource(R.string.opened_badge, openedAt.format(SHORT_DATE))
     Text(

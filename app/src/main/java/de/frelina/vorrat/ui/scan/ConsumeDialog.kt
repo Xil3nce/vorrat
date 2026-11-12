@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.domain.ConsumeLogic
+import de.frelina.vorrat.ui.components.OpenedBadge
 import de.frelina.vorrat.ui.components.expiryText
 import de.frelina.vorrat.ui.components.locationText
 import java.time.LocalDate
@@ -91,7 +92,14 @@ fun ConsumeDialog(
                                     locationText(item) + " – " +
                                         stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
                                 )
-                                Text(expiryText(item, today, leadDays), style = MaterialTheme.typography.bodySmall)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        expiryText(item, today, leadDays, mentionOpened = item.openedAt == null),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.weight(1f, fill = false),
+                                    )
+                                    item.openedAt?.let { opened -> OpenedBadge(opened, Modifier.padding(start = 8.dp)) }
+                                }
                             }
                         }
                     }

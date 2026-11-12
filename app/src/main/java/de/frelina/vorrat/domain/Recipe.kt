@@ -24,6 +24,8 @@ data class Recipe(
     val ingredients: List<RecipeIngredient> = emptyList(),
     val steps: List<String> = emptyList(),
     val vegetarian: Boolean = false,
+    /** Foto eines eigenen Rezepts (Dateiname im Bildordner); eingebaute Rezepte haben keins. */
+    val imagePath: String? = null,
 ) {
     val builtin: Boolean get() = id.startsWith(BUILTIN_PREFIX)
 

@@ -42,7 +42,16 @@ class RemoteWriter @Inject constructor(
 
     suspend fun putShopping(s: ShoppingItemEntity) = set(RemoteCollection.SHOPPING, s.id, RemoteMapper.toMap(s))
 
-    suspend fun putRecipe(e: RecipeEntity) = set(RemoteCollection.RECIPES, e.id, RemoteMapper.toMap(e))
+    /** Rezept schreiben; das Foto wie bei [putProduct] vorher hochladen, ein ersetztes [previousImage] entfernen. */
+    suspend fun putRecipe(e: RecipeEntity, previousImage: String? = null) {
+        val hid = household.currentId() ?: return
+        val newImage = e.imagePath?.takeIf { it != previousImage }
+        newImage?.let { name -> imageDoc(name)?.let { doc -> safely { remote.set(hid, RemoteCollection.IMAGES, name, doc) } } }
+        safely { remote.set(hid, RemoteCollection.RECIPES, e.id, RemoteMapper.toMap(e)) }
+        if (previousImage != null && previousImage != e.imagePath) {
+            safely { remote.delete(hid, RemoteCollection.IMAGES, previousImage) }
+        }
+    }
 
     suspend fun putDepartment(e: DepartmentEntity) = set(RemoteCollection.DEPARTMENTS, e.id, RemoteMapper.toMap(e))
 
@@ -83,7 +92,7 @@ class RemoteWriter @Inject constructor(
 
     /** Ersteller eines Haushalts: alle lokalen Daten inkl. Bilder hochladen (Batches ≤ 500 Operationen). */
     suspend fun uploadAll(householdId: String, db: VorratDatabase) {
-        val ops = imageOps(db.productDao().getAllImagePaths().distinct()) + dataOps(db)
+        val ops = imageOps(allImagePaths(db).distinct()) + dataOps(db)
         chunk(ops).forEach { remote.commit(householdId, it) }
     }
 
@@ -99,10 +108,13 @@ class RemoteWriter @Inject constructor(
             val existing = runCatching { remote.listIds(hid, c) }.getOrDefault(emptySet())
             (existing - newIds[c].orEmpty()).map { RemoteOp.Delete(c, it) }
         }
-        val images = db.productDao().getAllImagePaths().toSet()
+        val images = allImagePaths(db).toSet()
         val imageDeletes = (previousImages - images).map { RemoteOp.Delete(RemoteCollection.IMAGES, it) }
         chunk(deletes + imageDeletes + imageOps(images.toList()) + sets).forEach { remote.commit(hid, it) }
     }
+
+    private suspend fun allImagePaths(db: VorratDatabase): List<String> =
+        db.productDao().getAllImagePaths() + db.recipeDao().getAllImagePaths()
 
     /** Fehlendes Bild aus `images/{name}` laden und lokal ablegen. */
     suspend fun downloadImage(householdId: String, name: String): Boolean {

@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import de.frelina.vorrat.data.db.RecipeDao
 import de.frelina.vorrat.data.db.RecipeEntity
 import de.frelina.vorrat.data.db.newId
+import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
@@ -37,6 +38,7 @@ class AssetRecipeSource @Inject constructor(
 class RecipeRepository @Inject constructor(
     private val dao: RecipeDao,
     private val remote: RemoteWriter,
+    private val imageStore: ImageStore,
     builtinSource: BuiltinRecipeSource,
 ) {
     val builtin: List<Recipe> by lazy { builtinSource.load() }
@@ -71,16 +73,23 @@ class RecipeRepository @Inject constructor(
             vegetarian = recipe.vegetarian,
             createdAt = existing?.createdAt ?: now,
             updatedAt = now,
+            imagePath = recipe.imagePath,
         )
         dao.upsert(entity)
-        remote.putRecipe(entity)
+        remote.putRecipe(entity, previousImage = existing?.imagePath)
+        if (existing?.imagePath != null && existing.imagePath != entity.imagePath) imageStore.delete(existing.imagePath)
         return entity.id
     }
 
     suspend fun delete(id: String) {
         if (id.startsWith(Recipe.BUILTIN_PREFIX)) return
+        val image = dao.getById(id)?.imagePath
         dao.deleteById(id)
         remote.delete(RemoteCollection.RECIPES, id)
+        if (image != null) {
+            remote.delete(RemoteCollection.IMAGES, image)
+            imageStore.delete(image)
+        }
     }
 
     private fun toRecipe(e: RecipeEntity) = Recipe(
@@ -91,5 +100,6 @@ class RecipeRepository @Inject constructor(
         ingredients = RecipeJson.decodeIngredients(e.ingredients),
         steps = RecipeJson.textToSteps(e.steps),
         vegetarian = e.vegetarian,
+        imagePath = e.imagePath,
     )
 }

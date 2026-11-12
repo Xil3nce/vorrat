@@ -67,7 +67,7 @@ class BackupManager @Inject constructor(
             zip.putNextEntry(ZipEntry(JSON_NAME))
             zip.write(json.encodeToString(BackupData.serializer(), data).toByteArray(Charsets.UTF_8))
             zip.closeEntry()
-            data.products.mapNotNull { it.imagePath }.distinct().forEach { name ->
+            (data.products.mapNotNull { it.imagePath } + data.recipes.mapNotNull { it.imagePath }).distinct().forEach { name ->
                 val file = imageStore.fileOrNull(name) ?: return@forEach
                 zip.putNextEntry(ZipEntry("$IMAGES_PREFIX$name"))
                 file.inputStream().use { it.copyTo(zip) }
@@ -126,7 +126,10 @@ class BackupManager @Inject constructor(
             )
         },
         recipes = db.recipeDao().getAll().map {
-            RecipeDto(it.id, it.title, it.minutes, it.servings, it.ingredients, it.steps, it.vegetarian, it.createdAt, it.updatedAt)
+            RecipeDto(
+                it.id, it.title, it.minutes, it.servings, it.ingredients, it.steps, it.vegetarian, it.createdAt, it.updatedAt,
+                imagePath = it.imagePath?.takeIf { name -> imageStore.fileOrNull(name) != null },
+            )
         },
         departments = db.departmentDao().getAll().map { DepartmentDto(it.id, it.name, it.position) },
         departmentAssignments = db.departmentAssignmentDao().getAll()
@@ -196,7 +199,7 @@ class BackupManager @Inject constructor(
     suspend fun replaceAll(parsed: ParsedBackup) = withContext(Dispatchers.IO) {
         val d = parsed.data
         try {
-            val previousImages = db.productDao().getAllImagePaths().toSet()
+            val previousImages = db.productDao().getAllImagePaths().toSet() + db.recipeDao().getAllImagePaths()
             db.withTransaction {
                 db.shoppingDao().deleteAll()
                 db.recipeDao().deleteAll()
@@ -286,6 +289,7 @@ class BackupManager @Inject constructor(
                             vegetarian = it.vegetarian,
                             createdAt = it.createdAt,
                             updatedAt = it.updatedAt,
+                            imagePath = it.imagePath?.takeIf { n -> File(parsed.stagingDir, n).exists() },
                         )
                     },
                 )
@@ -322,7 +326,7 @@ class BackupManager @Inject constructor(
                 f.copyTo(imageStore.file(f.name), overwrite = true)
             }
             val referenced = db.productDao().getAllImagePaths().toSet() +
-                db.lookupCacheDao().getAllImagePaths().toSet()
+                db.lookupCacheDao().getAllImagePaths().toSet() + db.recipeDao().getAllImagePaths().toSet()
             imageStore.deleteUnreferenced(referenced)
             remote.replaceAll(db, previousImages)
         } finally {

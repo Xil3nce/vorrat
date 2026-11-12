@@ -101,6 +101,7 @@ object RemoteMapper {
         "vegetarian" to r.vegetarian,
         "createdAt" to r.createdAt,
         "updatedAt" to r.updatedAt,
+        "imagePath" to r.imagePath,
     )
 
     fun toMap(d: DepartmentEntity): Map<String, Any?> = mapOf(
@@ -243,6 +244,7 @@ object RemoteMapper {
             vegetarian = m["vegetarian"] as? Boolean ?: false,
             createdAt = m.long("createdAt") ?: 0,
             updatedAt = m.long("updatedAt") ?: 0,
+            imagePath = m.str("imagePath")?.takeIf(::isSafeFileName),
         )
     }
 
