@@ -144,7 +144,7 @@ fun RecipeDetailScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                     OutlinedButton(
                         onClick = { missingDialog = true },
-                        enabled = match.missing.isNotEmpty(),
+                        enabled = match.missing.isNotEmpty() || match.missingOptional.isNotEmpty(),
                         modifier = Modifier.weight(1f),
                     ) {
                         Icon(Icons.Outlined.AddShoppingCart, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -234,9 +234,12 @@ fun RecipeDetailScreen(
     }
 }
 
-/** Fehlende Zutaten als Einträge der Einkaufsliste: Name, Notiz "Menge · Rezept" (Menge auf die Personenzahl umgerechnet). */
+/**
+ * Fehlende Zutaten (auch optionale) als Einträge der Einkaufsliste: Name, Notiz "Menge · Rezept"
+ * (Menge auf die Personenzahl umgerechnet). Unerwünschte lassen sich im Dialog wegwischen.
+ */
 private fun missingLines(match: RecipeMatch, factor: Double): List<MissingLine> =
-    match.missing
+    (match.missing + match.missingOptional)
         .filter { it.name.isNotBlank() }
         .distinctBy { it.name.trim().lowercase() }
         .map { ingredient ->
