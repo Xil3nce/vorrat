@@ -235,7 +235,7 @@ fun RecipeDetailScreen(
 }
 
 /**
- * Fehlende Zutaten (auch optionale) als Einträge der Einkaufsliste: Name, Notiz "Menge · Rezept"
+ * Fehlende Zutaten (auch optionale) als Einträge der Einkaufsliste: Name, Menge und Rezept
  * (Menge auf die Personenzahl umgerechnet). Unerwünschte lassen sich im Dialog wegwischen.
  */
 private fun missingLines(match: RecipeMatch, factor: Double): List<MissingLine> =
@@ -244,7 +244,7 @@ private fun missingLines(match: RecipeMatch, factor: Double): List<MissingLine> 
         .distinctBy { it.name.trim().lowercase() }
         .map { ingredient ->
             val amount = AmountScaler.scale(ingredient.amount, factor)?.takeIf(String::isNotBlank)
-            MissingLine(ingredient.name.trim(), listOfNotNull(amount, match.recipe.title).joinToString(" · "))
+            MissingLine(ingredient.name.trim(), amount, match.recipe.title)
         }
 
 @Composable

@@ -12,6 +12,8 @@ import de.frelina.vorrat.data.db.UnitDao
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.domain.ShoppingAmount
+import de.frelina.vorrat.domain.ShoppingRecipes
 import de.frelina.vorrat.domain.Shortage
 import de.frelina.vorrat.domain.ShoppingLogic
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,20 @@ import javax.inject.Singleton
 
 /** Manueller Listeneintrag samt verknüpftem Produkt (falls lokal bekannt). */
 data class ShoppingEntry(val item: ShoppingItemEntity, val product: ProductEntity?)
+
+/** Geplante Zutat: Menge als Text ("700g", "3 Stück") und die Rezepte, für die sie gebraucht wird. */
+data class PlannedItem(val name: String, val amount: String?, val recipes: List<String>)
+
+/** Neue Werte eines Listeneintrags aus dem Bearbeiten-Sheet. */
+data class ShoppingItemUpdate(
+    val name: String,
+    val quantity: Int,
+    val packageSize: BigDecimal?,
+    val unitSymbol: String?,
+    val note: String?,
+    val recipes: List<String>,
+    val productId: String?,
+)
 
 /** Einkaufsliste: berechnete Einträge unter Mindestbestand + manuell hinzugefügte. */
 data class ShoppingList(val shortages: List<Shortage>, val items: List<ShoppingEntry>) {
@@ -89,19 +105,23 @@ class ShoppingRepository @Inject constructor(
     }
 
     /**
-     * Zutaten aus dem Wochenplan (Name, Notiz mit Menge und Rezepten) auf die Liste setzen – ohne Duplikate wie
-     * bei [addMissing]. Liefert die Anzahl neuer Einträge.
+     * Zutaten aus dem Wochenplan bzw. Rezept auf die Liste setzen – ohne Duplikate wie bei [addMissing]. Eine Menge
+     * wie "700g" wird zur Packungsgröße, jede andere ("3 Stück") bleibt als Notiz; die Rezepte werden gemerkt.
+     * Liefert die Anzahl neuer Einträge.
      */
-    suspend fun addPlanned(items: List<Pair<String, String?>>): Int {
+    suspend fun addPlanned(items: List<PlannedItem>): Int {
         var added = 0
         val known = shoppingDao.getAll().map { it.name.trim().lowercase() }.toMutableSet()
-        for ((raw, note) in items) {
-            val name = raw.trim()
+        for (planned in items) {
+            val name = planned.name.trim()
             if (name.isEmpty() || name.lowercase() in known) continue
             val product = ShoppingLogic.matchProduct(name, productDao.getAll())
             if (product != null && isOnList(product.id)) continue
-            val item = addText(name) ?: continue
-            if (note != null) save(item.copy(note = note.take(RemoteMapper.MAX_PLAN_NOTE)))
+            val parsed = ShoppingAmount.parse(planned.amount)
+            val item = addText(name, 1, parsed?.size, parsed?.unitSymbol) ?: continue
+            val note = if (parsed == null) planned.amount?.trim()?.take(RemoteMapper.MAX_PLAN_NOTE)?.takeIf { it.isNotEmpty() } else null
+            val recipes = ShoppingRecipes.join(planned.recipes, RemoteMapper.MAX_PLAN_NOTE)
+            if (note != null || recipes != null) save(item.copy(note = note, recipes = recipes))
             known += name.lowercase()
             added++
         }
@@ -154,9 +174,15 @@ class ShoppingRepository @Inject constructor(
         packageSize: BigDecimal? = null,
         unitSymbol: String? = null,
     ): ShoppingItemEntity? {
-        productDao.getByBarcode(found.barcode)?.let { return addProduct(it, quantity, packageSize, unitSymbol) }
+        val product = ensureProduct(found, imageBytes) ?: return null
+        return addProduct(product, quantity, packageSize, unitSymbol)
+    }
+
+    /** Produkt zu einem OFF-Treffer: bekannter Barcode bzw. gleichnamiges Produkt wiederverwenden, sonst anlegen. */
+    suspend fun ensureProduct(found: LookedUpProduct, imageBytes: ByteArray?): ProductEntity? {
+        productDao.getByBarcode(found.barcode)?.let { return it }
         val name = found.name?.trim()?.take(RemoteMapper.MAX_TEXT)?.takeIf { it.isNotEmpty() } ?: return null
-        ShoppingLogic.matchProduct(name, productDao.getAll())?.let { return addProduct(it, quantity, packageSize, unitSymbol) }
+        ShoppingLogic.matchProduct(name, productDao.getAll())?.let { return it }
         val now = System.currentTimeMillis()
         val product = ProductEntity(
             barcode = found.barcode,
@@ -172,7 +198,7 @@ class ShoppingRepository @Inject constructor(
         )
         productDao.insert(product)
         remote.putProduct(product)
-        return addProduct(product, quantity, packageSize, unitSymbol)
+        return product
     }
 
     /** Produkt hinzufügen; steht es schon (manuell) auf der Liste, wird die Menge erhöht. */
@@ -221,16 +247,19 @@ class ShoppingRepository @Inject constructor(
         save(item.copy(quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT)))
     }
 
-    /** Name, Anzahl und Packungsgröße eines Eintrags ändern ("2× 500 g"); ein leerer Name wird nicht übernommen. */
-    suspend fun updateDetails(id: String, name: String, quantity: Int, packageSize: BigDecimal?, unitSymbol: String?) {
+    /** Alle Angaben eines Eintrags ändern ("2× 500 g", Notiz, Rezepte, Produkt); ein leerer Name wird nicht übernommen. */
+    suspend fun updateDetails(id: String, update: ShoppingItemUpdate) {
         val item = shoppingDao.getById(id) ?: return
-        val newName = name.trim().take(RemoteMapper.MAX_TEXT).takeIf { it.isNotEmpty() } ?: return
+        val newName = update.name.trim().take(RemoteMapper.MAX_TEXT).takeIf { it.isNotEmpty() } ?: return
         save(
             item.copy(
+                productId = update.productId?.takeIf { it.isNotBlank() },
                 name = newName,
-                quantity = quantity.coerceIn(1, RemoteMapper.MAX_COUNT),
-                packageSize = packageSize?.takeIf { it.signum() > 0 },
-                unitSymbol = unitSymbol?.trim()?.take(RemoteMapper.MAX_UNIT)?.takeIf { it.isNotEmpty() },
+                quantity = update.quantity.coerceIn(1, RemoteMapper.MAX_COUNT),
+                note = update.note?.trim()?.take(RemoteMapper.MAX_PLAN_NOTE)?.takeIf { it.isNotEmpty() },
+                packageSize = update.packageSize?.takeIf { it.signum() > 0 },
+                unitSymbol = update.unitSymbol?.trim()?.take(RemoteMapper.MAX_UNIT)?.takeIf { it.isNotEmpty() },
+                recipes = ShoppingRecipes.join(update.recipes, RemoteMapper.MAX_PLAN_NOTE),
             ),
         )
     }

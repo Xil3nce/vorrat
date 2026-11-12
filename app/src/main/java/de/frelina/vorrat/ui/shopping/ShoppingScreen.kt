@@ -21,6 +21,18 @@ import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.repo.ShoppingList
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.domain.ShoppingLogic
+import de.frelina.vorrat.domain.ShoppingRecipes
+import de.frelina.vorrat.domain.DepartmentResolver
+import de.frelina.vorrat.data.repo.ShoppingItemUpdate
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import de.frelina.vorrat.domain.Validated
 import de.frelina.vorrat.domain.Validation
 import de.frelina.vorrat.ui.components.AmountBadge
@@ -132,7 +144,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
  * Einkaufsliste: oben Eingabe, darunter die Einträge – standardmäßig nach Abteilungen gruppiert (Reihenfolge wie
  * im Laden, im Haushalt gespeichert), sonst "Nachkaufen" (unter Mindestbestand, automatisch) und die manuell
  * hinzugefügten Einträge. Karten im Stil der Bestandsliste mit Produktbild. Antippen öffnet das Bearbeiten
- * (Name, Anzahl, Packung), nach rechts wischen ("Gekauft") das Erfassen (ein Ort ist dabei nicht nötig), nach
+ * (Bottom-Sheet mit allen Angaben des Eintrags), nach rechts wischen ("Gekauft") das Erfassen (ein Ort ist dabei nicht nötig), nach
  * links wischen hakt ab. Gruppiert lassen
  * sich Einträge per langem Drücken in eine andere Abteilung ziehen und Abteilungen am Griff verschieben.
  */
@@ -246,13 +258,37 @@ fun ShoppingScreen(
     }
 
     editTarget?.let { entry ->
-        ShoppingItemDialog(
-            item = entry.item,
+        val addSearch by viewModel.addSearch.collectAsStateWithLifecycle()
+        val departmentIds = state.departments.map { it.id }.toSet()
+        ShoppingItemSheet(
+            entry = entry,
             unitSymbols = state.units.values.distinct().sorted(),
-            onDismiss = { editTarget = null },
-            onSave = { name, quantity, size, unit ->
+            departments = state.departments,
+            currentDepartmentId = DepartmentResolver.resolve(
+                entry.item.productId ?: entry.product?.id,
+                entry.item.name,
+                entry.product?.category,
+                entry.product?.ingredientGroup,
+                state.assignments,
+                departmentIds,
+            ),
+            search = addSearch,
+            onQueryChange = viewModel::setAddQuery,
+            onSearchOnline = viewModel::searchOnline,
+            onResetSearch = viewModel::resetAddSearch,
+            onDismiss = {
                 editTarget = null
-                viewModel.updateDetails(entry.item.id, name, quantity, size, unit)
+                viewModel.resetAddSearch()
+            },
+            onDelete = {
+                editTarget = null
+                viewModel.resetAddSearch()
+                viewModel.delete(entry.item.id)
+            },
+            onSave = { update, pick, departmentId ->
+                editTarget = null
+                viewModel.resetAddSearch()
+                viewModel.saveEntry(entry.item.id, update, pick, departmentId)
             },
         )
     }
@@ -641,6 +677,13 @@ private fun ItemRow(
             name = entry.item.name,
             brand = entry.product?.brand,
             detail = {
+                // Packung · Rezepte in einer Zeile, darunter die Notiz.
+                listOfNotNull(
+                    ShoppingLogic.packageLabel(entry.item.packageSize, entry.item.unitSymbol),
+                    ShoppingRecipes.label(entry.item.recipes),
+                ).joinToString(" · ").takeIf { it.isNotEmpty() }?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall)
+                }
                 entry.item.note?.takeIf { it.isNotBlank() }?.let {
                     Text(it, style = MaterialTheme.typography.bodySmall)
                 }
@@ -1104,98 +1147,301 @@ private fun searchErrorText(kind: LookupErrorKind): Int = when (kind) {
     LookupErrorKind.SERVER -> R.string.shopping_add_search_error_server
 }
 
-/** Anzahl, Packungsgröße und Einheit eines Listeneintrags pflegen (wie im Bestand-Formular). */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Eintrag bearbeiten (Bottom-Sheet): Name, Anzahl, Packung, Abteilung, Rezepte, Notiz und Produkt-Verknüpfung eines
+ * manuellen Listeneintrags. Gespeichert wird erst mit "Speichern"; das Papierkorb-Symbol löscht den Eintrag
+ * (mit Rückgängig).
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-private fun ShoppingItemDialog(
-    item: ShoppingItemEntity,
+private fun ShoppingItemSheet(
+    entry: ShoppingEntry,
     unitSymbols: List<String>,
+    departments: List<DepartmentEntity>,
+    currentDepartmentId: String,
+    search: AddSearchState,
+    onQueryChange: (String) -> Unit,
+    onSearchOnline: () -> Unit,
+    onResetSearch: () -> Unit,
     onDismiss: () -> Unit,
-    onSave: (name: String, quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
+    onDelete: () -> Unit,
+    onSave: (update: ShoppingItemUpdate, pick: AddPick?, departmentId: String?) -> Unit,
 ) {
+    val item = entry.item
     var name by rememberSaveable { mutableStateOf(item.name) }
     var quantity by rememberSaveable { mutableIntStateOf(item.quantity) }
     var size by rememberSaveable { mutableStateOf(item.packageSize?.toPlainString()?.replace('.', ',').orEmpty()) }
     var unit by rememberSaveable { mutableStateOf(item.unitSymbol.orEmpty()) }
+    var department by rememberSaveable { mutableStateOf(currentDepartmentId) }
+    var recipes by rememberSaveable { mutableStateOf(item.recipes.orEmpty()) }
+    var note by rememberSaveable { mutableStateOf(item.note.orEmpty()) }
+    var linkedId by rememberSaveable { mutableStateOf(item.productId) }
+    var searching by rememberSaveable { mutableStateOf(false) }
+    var pick by remember { mutableStateOf<AddPick?>(null) }
     var unitOpen by remember { mutableStateOf(false) }
+    var departmentOpen by remember { mutableStateOf(false) }
     val sizeResult = Validation.optionalPositiveDecimal(size)
     val sizeError = (sizeResult as? Validated.Error)?.error
-    val options = (unitSymbols + listOfNotNull(item.unitSymbol)).distinct()
-    AlertDialog(
+    val unitOptions = (unitSymbols + listOfNotNull(item.unitSymbol)).distinct()
+    val recipeTitles = ShoppingRecipes.split(recipes)
+    val linked = pick != null || linkedId != null
+    val departmentName = departments.firstOrNull { it.id == department }?.name
+        ?: DepartmentDefaults.nameOf(department).orEmpty()
+
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.shopping_edit_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it.take(RemoteMapper.MAX_TEXT) },
-                    label = { Text(stringResource(R.string.shopping_edit_name)) },
-                    isError = name.isBlank(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
-                    modifier = Modifier.fillMaxWidth(),
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                ProductImage(entry.product?.imagePath, 40.dp, name = name.ifBlank { item.name })
+                Text(
+                    stringResource(R.string.shopping_edit_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(1f).semantics { heading() },
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
-                    IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
-                        Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease))
-                    }
-                    Text(
-                        stringResource(R.string.shopping_quantity, quantity),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    IconButton(onClick = { quantity++ }, enabled = quantity < RemoteMapper.MAX_COUNT) {
-                        Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.action_increase))
-                    }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.shopping_edit_delete))
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            }
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it.take(RemoteMapper.MAX_TEXT) },
+                label = { Text(stringResource(R.string.shopping_edit_name), maxLines = 1) },
+                isError = name.isBlank(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
+                IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
+                    Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease))
+                }
+                Text(
+                    stringResource(R.string.shopping_quantity, quantity),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                IconButton(onClick = { quantity++ }, enabled = quantity < RemoteMapper.MAX_COUNT) {
+                    Icon(Icons.Outlined.Add, contentDescription = stringResource(R.string.action_increase))
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = size,
+                    onValueChange = { size = it },
+                    label = { Text(stringResource(R.string.shopping_edit_package), maxLines = 1) },
+                    isError = sizeError != null,
+                    supportingText = sizeError?.let { e -> { Text(validationMessage(e)) } },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next),
+                    modifier = Modifier.weight(1.1f),
+                )
+                ExposedDropdownMenuBox(
+                    expanded = unitOpen,
+                    onExpandedChange = { unitOpen = it },
+                    modifier = Modifier.weight(1f),
+                ) {
                     OutlinedTextField(
-                        value = size,
-                        onValueChange = { size = it },
-                        label = { Text(stringResource(R.string.shopping_edit_package)) },
-                        isError = sizeError != null,
-                        supportingText = sizeError?.let { e -> { Text(validationMessage(e)) } },
+                        value = unit.ifEmpty { stringResource(R.string.shopping_edit_unit_none) },
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.shopping_edit_unit), maxLines = 1) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitOpen) },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Done),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
                     )
-                    ExposedDropdownMenuBox(
-                        expanded = unitOpen,
-                        onExpandedChange = { unitOpen = it },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        OutlinedTextField(
-                            value = unit.ifEmpty { stringResource(R.string.shopping_edit_unit_none) },
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.shopping_edit_unit)) },
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitOpen) },
-                            singleLine = true,
-                            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
+                    ExposedDropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
+                            onClick = { unit = ""; unitOpen = false },
                         )
-                        ExposedDropdownMenu(expanded = unitOpen, onDismissRequest = { unitOpen = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
-                                onClick = { unit = ""; unitOpen = false },
-                            )
-                            options.forEach { symbol ->
-                                DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
-                            }
+                        unitOptions.forEach { symbol ->
+                            DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
                         }
                     }
                 }
             }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    val value = if (sizeResult is Validated.Ok) sizeResult.value else null
-                    onSave(name, quantity, value, unit.ifEmpty { null })
-                },
-                enabled = sizeError == null && name.isNotBlank(),
-            ) { Text(stringResource(R.string.action_save)) }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
-    )
+
+            de.frelina.vorrat.ui.components.SectionLabel(stringResource(R.string.shopping_edit_section_place), Modifier.padding(top = 4.dp))
+            ExposedDropdownMenuBox(expanded = departmentOpen, onExpandedChange = { departmentOpen = it }) {
+                OutlinedTextField(
+                    value = departmentName,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(R.string.shopping_edit_department), maxLines = 1) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = departmentOpen) },
+                    singleLine = true,
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                )
+                ExposedDropdownMenu(expanded = departmentOpen, onDismissRequest = { departmentOpen = false }) {
+                    departments.forEach { d ->
+                        DropdownMenuItem(text = { Text(d.name) }, onClick = { department = d.id; departmentOpen = false })
+                    }
+                }
+            }
+
+            if (recipeTitles.isNotEmpty()) {
+                de.frelina.vorrat.ui.components.SectionLabel(stringResource(R.string.shopping_edit_section_recipes), Modifier.padding(top = 4.dp))
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    recipeTitles.forEach { title ->
+                        val remove = stringResource(R.string.shopping_edit_recipe_remove, title)
+                        InputChip(
+                            selected = false,
+                            onClick = { recipes = recipeTitles.filter { it != title }.joinToString("\n") },
+                            label = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                            trailingIcon = {
+                                Icon(Icons.Outlined.Close, contentDescription = remove, modifier = Modifier.size(18.dp))
+                            },
+                        )
+                    }
+                }
+            }
+
+            de.frelina.vorrat.ui.components.SectionLabel(stringResource(R.string.shopping_edit_section_note), Modifier.padding(top = 4.dp))
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it.take(RemoteMapper.MAX_PLAN_NOTE) },
+                label = { Text(stringResource(R.string.shopping_edit_note), maxLines = 1) },
+                placeholder = { Text(stringResource(R.string.shopping_edit_note_hint)) },
+                minLines = 2,
+                maxLines = 4,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            de.frelina.vorrat.ui.components.SectionLabel(stringResource(R.string.shopping_edit_section_product), Modifier.padding(top = 4.dp))
+            if (linked) {
+                val picked = pick
+                val product = entry.product?.takeIf { it.id == linkedId }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    when (picked) {
+                        is AddPick.Local -> ProductImage(picked.product.imagePath, 40.dp, name = picked.product.name)
+                        is AddPick.Remote -> RemoteImage(picked.product.imageUrl, picked.product.name)
+                        null -> ProductImage(product?.imagePath, 40.dp, name = product?.name ?: item.name)
+                    }
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            when (picked) {
+                                is AddPick.Local -> picked.product.name
+                                is AddPick.Remote -> picked.product.name.orEmpty()
+                                null -> product?.name ?: item.name
+                            },
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        val brand = when (picked) {
+                            is AddPick.Local -> picked.product.brand
+                            is AddPick.Remote -> picked.product.brand
+                            null -> product?.brand
+                        }
+                        if (!brand.isNullOrBlank()) {
+                            Text(
+                                brand,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    TextButton(onClick = { pick = null; linkedId = null }) {
+                        Text(stringResource(R.string.shopping_edit_unlink))
+                    }
+                }
+            } else if (searching) {
+                var query by rememberSaveable { mutableStateOf(name) }
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it.take(RemoteMapper.MAX_TEXT); onQueryChange(query) },
+                    label = { Text(stringResource(R.string.shopping_edit_link_search), maxLines = 1) },
+                    supportingText = { Text(stringResource(R.string.shopping_add_search_hint)) },
+                    trailingIcon = {
+                        IconButton(onClick = { searching = false; onResetSearch() }) {
+                            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.action_close))
+                        }
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { if (search.canSearchOnline) onSearchOnline() }),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                AddSearchResults(
+                    search = search,
+                    onSearchOnline = onSearchOnline,
+                    onPickLocal = { p ->
+                        pick = AddPick.Local(p)
+                        linkedId = p.id
+                        name = p.name
+                        searching = false
+                        onResetSearch()
+                    },
+                    // OFF-Treffer: Name und Packungsgröße vorbelegen (bleiben änderbar); angelegt wird das Produkt beim Speichern.
+                    onPickRemote = { p ->
+                        pick = AddPick.Remote(p)
+                        linkedId = null
+                        name = p.name.orEmpty().take(RemoteMapper.MAX_TEXT)
+                        val packageSize = p.packageSize
+                        if (packageSize != null && packageSize.signum() > 0) {
+                            size = packageSize.stripTrailingZeros().toPlainString().replace('.', ',')
+                            unit = p.unitSymbol.orEmpty()
+                        }
+                        searching = false
+                        onResetSearch()
+                    },
+                )
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        stringResource(R.string.shopping_free_text),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                    )
+                    OutlinedButton(onClick = { searching = true; onQueryChange(name) }) {
+                        Text(stringResource(R.string.shopping_edit_link))
+                    }
+                }
+            }
+
+            Row(
+                Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                Button(
+                    onClick = {
+                        val value = if (sizeResult is Validated.Ok) sizeResult.value else null
+                        onSave(
+                            ShoppingItemUpdate(
+                                name = name,
+                                quantity = quantity,
+                                packageSize = value,
+                                unitSymbol = unit.ifEmpty { null },
+                                note = note,
+                                recipes = recipeTitles,
+                                productId = linkedId,
+                            ),
+                            pick,
+                            department.takeIf { it != currentDepartmentId },
+                        )
+                    },
+                    enabled = sizeError == null && name.isNotBlank(),
+                ) { Text(stringResource(R.string.action_save)) }
+            }
+        }
+    }
 }

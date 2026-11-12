@@ -89,6 +89,7 @@ object RemoteMapper {
         "createdAt" to s.createdAt,
         "packageSize" to s.packageSize?.toPlainString(),
         "unitSymbol" to s.unitSymbol,
+        "recipes" to s.recipes,
     )
 
     fun toMap(r: RecipeEntity): Map<String, Any?> = mapOf(
@@ -225,6 +226,7 @@ object RemoteMapper {
             createdAt = m.long("createdAt") ?: 0,
             packageSize = m.str("packageSize")?.toBigDecimalOrNull()?.takeIf { it.signum() > 0 },
             unitSymbol = m.str("unitSymbol")?.trim()?.take(MAX_UNIT)?.takeIf(String::isNotBlank),
+            recipes = m.str("recipes")?.take(MAX_PLAN_NOTE)?.takeIf(String::isNotBlank),
         )
     }
 

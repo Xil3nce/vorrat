@@ -13,6 +13,7 @@ import de.frelina.vorrat.data.off.SearchResult
 import de.frelina.vorrat.data.repo.ProductSearchRepository
 import de.frelina.vorrat.data.repo.DepartmentRepository
 import de.frelina.vorrat.data.repo.ShoppingEntry
+import de.frelina.vorrat.data.repo.ShoppingItemUpdate
 import de.frelina.vorrat.data.repo.ShoppingList
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.CatalogRepository
@@ -61,6 +62,8 @@ data class ShoppingUiState(
     val departments: List<DepartmentEntity> = emptyList(),
     /** Einheiten-ID → Symbol (Packungsgröße der Produkte). */
     val units: Map<String, String> = emptyMap(),
+    /** Gemerkte Zuordnungen "Artikel → Abteilung" (Schlüssel wie in DepartmentResolver). */
+    val assignments: Map<String, String> = emptyMap(),
     /** Flache Liste aus Überschriften und Einträgen. */
     val rows: List<BoardRow<ShoppingPayload>> = emptyList(),
 )
@@ -151,6 +154,7 @@ class ShoppingViewModel @Inject constructor(
             grouped = grouped,
             departments = departments,
             units = units.associate { it.id to it.symbol },
+            assignments = assignments,
             rows = if (grouped) ShoppingBoard.build(departments, assignments, inputs(list)) else emptyList(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
@@ -193,9 +197,27 @@ class ShoppingViewModel @Inject constructor(
             }
         }
 
-    /** Name, Anzahl und Packungsgröße aus dem Bearbeiten-Dialog. */
-    fun updateDetails(id: String, name: String, quantity: Int, packageSize: java.math.BigDecimal?, unitSymbol: String?) =
-        viewModelScope.launch { repository.updateDetails(id, name, quantity, packageSize, unitSymbol) }
+    /**
+     * Alles aus dem Bearbeiten-Sheet speichern. Ein neu gewählter Treffer ([pick]) bestimmt das Produkt (OFF-Treffer
+     * werden samt Bild als Produkt angelegt); [departmentId] ist die gewählte Abteilung (null = unverändert) und wird
+     * wie beim Ziehen als Zuordnung des Artikels gemerkt.
+     */
+    fun saveEntry(id: String, update: ShoppingItemUpdate, pick: AddPick?, departmentId: String?) =
+        viewModelScope.launch {
+            val productId = when (pick) {
+                null -> update.productId
+                is AddPick.Local -> pick.product.id
+                is AddPick.Remote -> repository.ensureProduct(pick.product, pick.product.imageUrl?.let { search.downloadImage(it) })?.id
+            }
+            repository.updateDetails(id, update.copy(productId = productId))
+            val name = update.name.trim()
+            if (departmentId != null && name.isNotEmpty()) {
+                DepartmentResolver.assignmentKey(productId, name)?.let { departmentRepository.assign(it, departmentId) }
+            }
+        }
+
+    /** Eintrag aus dem Bearbeiten-Sheet entfernen (mit Rückgängig wie beim Abhaken). */
+    fun delete(id: String) = check(id)
 
     fun setQuantity(id: String, quantity: Int) = viewModelScope.launch {
         if (quantity >= 1) repository.setQuantity(id, quantity)

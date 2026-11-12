@@ -215,6 +215,9 @@ data class ShoppingItemEntity(
     /** Packungsgröße (z. B. 500) samt Einheit ("g"); beides optional. Seit Schema 9. */
     val packageSize: BigDecimal? = null,
     val unitSymbol: String? = null,
+    /** Rezepttitel, für die der Eintrag gebraucht wird, durch "
+" getrennt (siehe ShoppingRecipes). Seit Schema 10. */
+    val recipes: String? = null,
 )
 
 /**

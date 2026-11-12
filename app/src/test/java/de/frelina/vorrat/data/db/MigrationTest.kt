@@ -338,6 +338,30 @@ class MigrationTest {
         }
     }
 
+    @Test fun `Migration 9 nach 10 ergaenzt Rezepte in der Einkaufsliste`() {
+        createAt(9) {
+            execSQL(
+                "INSERT INTO shopping_items (id, productId, name, quantity, note, createdAt, packageSize, unitSymbol) " +
+                    "VALUES ('s1', NULL, 'Mehl', 2, '700g · Suppe', 3, NULL, NULL)",
+            )
+        }
+        val db = Room.databaseBuilder(context, VorratDatabase::class.java, DB)
+            .addMigrations(*VorratDatabase.MIGRATIONS)
+            .allowMainThreadQueries()
+            .build()
+        try {
+            runBlocking {
+                val item = db.shoppingDao().getById("s1")!!
+                assertEquals("700g · Suppe", item.note)
+                assertNull(item.recipes)
+                db.shoppingDao().upsert(item.copy(recipes = "Suppe\nGulasch"))
+                assertEquals("Suppe\nGulasch", db.shoppingDao().getById("s1")!!.recipes)
+            }
+        } finally {
+            db.close()
+        }
+    }
+
     private companion object {
         const val DB = "migration-test.db"
 

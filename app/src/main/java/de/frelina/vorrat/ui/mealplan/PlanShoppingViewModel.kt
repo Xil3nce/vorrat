@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.repo.MealPlanRepository
+import de.frelina.vorrat.data.repo.PlannedItem
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StapleRepository
@@ -97,7 +98,7 @@ class PlanShoppingViewModel @Inject constructor(
     /** Abgehakte Zeilen auf die Einkaufsliste setzen (ohne Dubletten) und zurück zum Wochenplan. */
     fun apply(onDone: () -> Unit) = viewModelScope.launch {
         val chosen = state.value.lines.filter { it.checked }.map { it.line }
-        val added = shopping.addPlanned(chosen.map { it.name to it.note() })
+        val added = shopping.addPlanned(chosen.map { PlannedItem(it.name, it.amount, it.recipes) })
         messages.show(
             if (added > 0) {
                 UiMessage(R.plurals.planshop_done, pluralCount = added)

@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.frelina.vorrat.R
 import de.frelina.vorrat.data.repo.MealPlanRepository
+import de.frelina.vorrat.data.repo.PlannedItem
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
@@ -57,9 +58,9 @@ class RecipeDetailViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipeDetailUiState())
 
-    /** Ausgewählte fehlende Zutaten (mit Notiz "Menge · Rezept") auf die Einkaufsliste – ohne Duplikate gleichen Namens. */
+    /** Ausgewählte fehlende Zutaten (Menge und Rezept werden getrennt gespeichert) auf die Einkaufsliste – ohne Duplikate gleichen Namens. */
     fun addMissingToShopping(lines: List<MissingLine>) = viewModelScope.launch {
-        val added = shopping.addPlanned(lines.map { it.name to it.note })
+        val added = shopping.addPlanned(lines.map { PlannedItem(it.name, it.amount, listOf(it.recipe)) })
         messages.show(
             if (added > 0) UiMessage(R.string.recipe_missing_added) else UiMessage(R.string.recipe_missing_none_added, tone = MessageTone.INFO),
         )

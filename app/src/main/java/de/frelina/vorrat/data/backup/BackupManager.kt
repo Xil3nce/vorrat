@@ -122,7 +122,7 @@ class BackupManager @Inject constructor(
         shoppingItems = db.shoppingDao().getAll().map {
             ShoppingItemDto(
                 it.id, it.productId, it.name, it.quantity, it.note, it.createdAt,
-                it.packageSize?.toPlainString(), it.unitSymbol,
+                it.packageSize?.toPlainString(), it.unitSymbol, it.recipes,
             )
         },
         recipes = db.recipeDao().getAll().map {
@@ -270,6 +270,7 @@ class BackupManager @Inject constructor(
                             createdAt = it.createdAt,
                             packageSize = it.packageSize?.toBigDecimalOrNull()?.takeIf { s -> s.signum() > 0 },
                             unitSymbol = it.unitSymbol?.trim()?.takeIf(String::isNotEmpty),
+                            recipes = it.recipes?.take(RemoteMapper.MAX_PLAN_NOTE)?.takeIf(String::isNotBlank),
                         )
                     },
                 )

@@ -52,8 +52,11 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.ui.shopping.ShoppingCard
 import de.frelina.vorrat.ui.theme.vorratBackground
 
-/** Zutat, wie sie auf der Einkaufsliste landen würde: Name und Notiz (Menge · Rezept). */
-data class MissingLine(val name: String, val note: String?)
+/** Zutat, wie sie auf der Einkaufsliste landen würde: Name, Menge (Text) und Rezepttitel. */
+data class MissingLine(val name: String, val amount: String?, val recipe: String) {
+    /** Vorschauzeile "Menge · Rezept". */
+    val note: String? get() = listOfNotNull(amount, recipe).joinToString(" · ").ifEmpty { null }
+}
 
 /**
  * Auswahl "Fehlendes auf die Einkaufsliste": die fehlenden Zutaten als Karten wie auf der Einkaufsliste.

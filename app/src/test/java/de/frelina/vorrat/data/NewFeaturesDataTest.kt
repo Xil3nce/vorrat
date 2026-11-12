@@ -2,7 +2,9 @@ package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.db.StockEntryEntity
 import de.frelina.vorrat.data.off.LookedUpProduct
+import de.frelina.vorrat.data.repo.PlannedItem
 import de.frelina.vorrat.data.repo.ProductPrefill
+import de.frelina.vorrat.data.repo.ShoppingItemUpdate
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
 import de.frelina.vorrat.data.sync.RemoteChange
@@ -137,7 +139,7 @@ class NewFeaturesDataTest : DbTestBase() {
 
     @Test fun `Umbenennen und Packung aendern wird gespeichert und synchronisiert`() = runBlocking {
         val item = shopping.addText("Mehl")!!
-        shopping.updateDetails(item.id, "  Dinkelmehl ", 3, "1.5".toBigDecimal(), "kg")
+        shopping.updateDetails(item.id, ShoppingItemUpdate("  Dinkelmehl ", 3, "1.5".toBigDecimal(), "kg", null, emptyList(), null))
         val saved = db.shoppingDao().getById(item.id)!!
         assertEquals("Dinkelmehl", saved.name)
         assertEquals(3, saved.quantity)
@@ -145,8 +147,56 @@ class NewFeaturesDataTest : DbTestBase() {
         assertEquals("Dinkelmehl", remote.doc(RemoteCollection.SHOPPING, item.id)!!["name"])
         assertEquals("Dinkelmehl", shopping.observe().first().items.single().item.name)
         // Leerer Name wird nicht übernommen
-        shopping.updateDetails(item.id, "   ", 1, null, null)
+        shopping.updateDetails(item.id, ShoppingItemUpdate("   ", 1, null, null, "x", listOf("R"), null))
         assertEquals(saved, db.shoppingDao().getById(item.id))
+    }
+
+    @Test fun `Alle Angaben eines Eintrags werden gespeichert und synchronisiert`() = runBlocking {
+        val p = product(name = "Hack")
+        val item = shopping.addText("Fleisch")!!
+        shopping.updateDetails(
+            item.id,
+            ShoppingItemUpdate("Fleisch", 2, null, null, "  Bio, vom Metzger ", listOf("Suppe", "Gulasch, scharf", "Suppe"), p),
+        )
+        val saved = db.shoppingDao().getById(item.id)!!
+        assertEquals("Bio, vom Metzger", saved.note)
+        assertEquals("Suppe\nGulasch, scharf", saved.recipes)
+        assertEquals(p, saved.productId)
+        assertEquals("Suppe\nGulasch, scharf", remote.doc(RemoteCollection.SHOPPING, item.id)!!["recipes"])
+        // Verknüpfung lösen, Notiz und Rezepte leeren
+        shopping.updateDetails(item.id, ShoppingItemUpdate("Fleisch", 1, null, null, " ", emptyList(), null))
+        val cleared = db.shoppingDao().getById(item.id)!!
+        assertNull(cleared.productId)
+        assertNull(cleared.note)
+        assertNull(cleared.recipes)
+    }
+
+    @Test fun `Geplante Zutaten - Menge wird Packung, sonst Notiz, Rezepte getrennt`() = runBlocking {
+        val added = shopping.addPlanned(
+            listOf(
+                PlannedItem("Hackfleisch", "700g", listOf("Käse-Hack-Lauch Suppe", "Gulasch")),
+                PlannedItem("Eier", "3 Stück", listOf("Kuchen")),
+                PlannedItem("Salz", null, emptyList()),
+                PlannedItem("Milch", "1,5 l", listOf("Pudding")),
+            ),
+        )
+        assertEquals(4, added)
+        val byName = db.shoppingDao().getAll().associateBy { it.name }
+        val hack = byName.getValue("Hackfleisch")
+        assertEquals(0, "700".toBigDecimal().compareTo(hack.packageSize))
+        assertEquals("g", hack.unitSymbol)
+        assertNull(hack.note)
+        assertEquals("Käse-Hack-Lauch Suppe\nGulasch", hack.recipes)
+        val eggs = byName.getValue("Eier")
+        assertNull(eggs.packageSize)
+        assertEquals("3 Stück", eggs.note)
+        assertEquals("Kuchen", eggs.recipes)
+        val salt = byName.getValue("Salz")
+        assertNull(salt.note)
+        assertNull(salt.recipes)
+        assertEquals("l", byName.getValue("Milch").unitSymbol)
+        // Zweiter Durchgang: alles steht schon auf der Liste
+        assertEquals(0, shopping.addPlanned(listOf(PlannedItem("hackfleisch", "1 kg", listOf("X")))))
     }
 
     @Test fun `Hinzufuegen mit Packung - eigene Angabe gewinnt, sonst Produktpackung`() = runBlocking {

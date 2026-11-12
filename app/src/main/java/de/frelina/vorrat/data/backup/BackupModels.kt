@@ -75,6 +75,8 @@ data class ShoppingItemDto(
     /** Seit schemaVersion 9. */
     val packageSize: String? = null,
     val unitSymbol: String? = null,
+    /** Seit schemaVersion 10. */
+    val recipes: String? = null,
 )
 
 @Serializable
