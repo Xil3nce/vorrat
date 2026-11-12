@@ -90,7 +90,7 @@ fun RecipeDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(match?.recipe?.title ?: stringResource(R.string.recipes_title), maxLines = 1, fontWeight = FontWeight.SemiBold) },
+                title = {},
                 navigationIcon = {
                     GlassIconButton(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.action_back), onBack, Modifier.padding(start = 8.dp))
                 },

@@ -50,6 +50,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import de.frelina.vorrat.R
 import de.frelina.vorrat.ui.shopping.ShoppingCard
+import de.frelina.vorrat.ui.theme.vorratBackground
 
 /** Zutat, wie sie auf der Einkaufsliste landen würde: Name und Notiz (Menge · Rezept). */
 data class MissingLine(val name: String, val note: String?)
@@ -73,7 +74,8 @@ fun MissingToShoppingDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
-        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+        // Deckender App-Hintergrund: colorScheme.surface ist im Glas-Theme transparent
+        Surface(Modifier.fillMaxSize().vorratBackground(), color = Color.Transparent) {
             Scaffold(
                 topBar = {
                     TopAppBar(

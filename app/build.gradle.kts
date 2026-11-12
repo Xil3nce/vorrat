@@ -10,8 +10,8 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
-// Release-Signatur: Schlüssel liegt außerhalb des Repos (Standard: ../vorrat-signing/keystore.properties,
-// überschreibbar mit -PvorratKeystoreProps=<Pfad>). Fehlt die Datei, bleibt der Release-Build unsigniert.
+// Release-Signatur: SchlÃ¼ssel liegt auÃŸerhalb des Repos (Standard: ../vorrat-signing/keystore.properties,
+// Ã¼berschreibbar mit -PvorratKeystoreProps=<Pfad>). Fehlt die Datei, bleibt der Release-Build unsigniert.
 val keystorePropsFile = rootProject.file(
     (findProperty("vorratKeystoreProps") as String?) ?: "../vorrat-signing/keystore.properties",
 )
@@ -27,16 +27,16 @@ android {
         applicationId = "de.frelina.vorrat"
         minSdk = 34
         targetSdk = 37
-        // Für ein Update beide erhöhen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
-        versionCode = 24
-        versionName = "2.5.0"
+        // FÃ¼r ein Update beide erhÃ¶hen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
+        versionCode = 25
+        versionName = "2.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Kontaktadresse für den Open-Food-Facts-User-Agent (Pflicht laut OFF-API-Doku).
+        // Kontaktadresse fÃ¼r den Open-Food-Facts-User-Agent (Pflicht laut OFF-API-Doku).
         buildConfigField("String", "OFF_CONTACT", "\"xil3nce@gmail.com\"")
 
-        // Selbst-Update: öffentliches GitHub-Repo, dessen neuestes Release die APK enthält.
+        // Selbst-Update: Ã¶ffentliches GitHub-Repo, dessen neuestes Release die APK enthÃ¤lt.
         buildConfigField("String", "UPDATE_REPO", "\"Xil3nce/vorrat\"")
     }
 
