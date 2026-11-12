@@ -81,6 +81,25 @@ class ScanViewModel @Inject constructor(
         viewModelScope.launch { settingsRepository.setScanLocationId(id) }
     }
 
+    /** In "+ Bestand" gewählte Ebene/Fach (nur gültig, wenn der gewählte Ort so viele hat). */
+    val purchaseSlots: StateFlow<Pair<Int?, Int?>> = combine(
+        purchaseLocationId,
+        locations,
+        settingsRepository.scanLevel,
+        settingsRepository.scanShelf,
+    ) { id, list, level, shelf ->
+        val location = list.firstOrNull { it.id == id }
+        PurchaseLogic.resolveSlot(level, location?.levels) to PurchaseLogic.resolveSlot(shelf, location?.shelves)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null to null)
+
+    fun setPurchaseLevel(level: Int?) {
+        viewModelScope.launch { settingsRepository.setScanLevel(level) }
+    }
+
+    fun setPurchaseShelf(shelf: Int?) {
+        viewModelScope.launch { settingsRepository.setScanShelf(shelf) }
+    }
+
     /** Zuletzt gescannter Barcode ("+ Bestand"/"Entnehmen") – kurz danach nicht gleich noch einmal erkennen. */
     private var lastPurchase: Pair<String, Long>? = null
 
@@ -192,6 +211,15 @@ class ScanViewModel @Inject constructor(
         val remote = outcome.remote.takeIf { local == null }
         // Bekanntes Produkt: Ort und Menge-Art wie beim vorhandenen Bestand vorschlagen.
         val match = outcome.exactMatches.firstOrNull()
+        val scanLocationId = PurchaseLogic.resolveLocation(settingsRepository.scanLocationId.first(), locations.map { it.id })
+        val locationId = scanLocationId ?: match?.locationId ?: locations.singleOrNull()?.id
+        val location = locations.firstOrNull { it.id == locationId }
+        // Ebene/Fach: im Scanner gewählt, sonst wie beim vorhandenen Bestand am selben Ort.
+        val sameAsMatch = match != null && match.locationId == locationId
+        val level = PurchaseLogic.resolveSlot(settingsRepository.scanLevel.first(), location?.levels)
+            ?: match?.level?.takeIf { sameAsMatch }
+        val shelf = PurchaseLogic.resolveSlot(settingsRepository.scanShelf.first(), location?.shelves)
+            ?: match?.shelf?.takeIf { sameAsMatch }
         val remoteUnit = remote?.unitSymbol?.let { catalogRepository.findUnitIdBySymbol(it) }
         return PurchaseDraft(
             barcode = outcome.barcode,
@@ -205,10 +233,9 @@ class ScanViewModel @Inject constructor(
             imagePath = local?.imagePath ?: remote?.imagePath,
             imageFromCache = local == null && remote?.imagePath != null,
             fromOff = remote != null,
-            locationId = PurchaseLogic.resolveLocation(settingsRepository.scanLocationId.first(), locations.map { it.id })
-                ?: match?.locationId ?: locations.singleOrNull()?.id,
-            level = match?.level?.toString().orEmpty(),
-            shelf = match?.shelf?.toString().orEmpty(),
+            locationId = locationId,
+            level = level?.toString().orEmpty(),
+            shelf = shelf?.toString().orEmpty(),
             expiry = expiry?.let(Validation::formatDate).orEmpty(),
             quantityTypeId = match?.quantityTypeId ?: types.firstOrNull()?.id,
         )

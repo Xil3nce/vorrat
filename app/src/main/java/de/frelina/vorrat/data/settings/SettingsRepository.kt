@@ -64,8 +64,27 @@ class SettingsRepository @Inject constructor(
     /** Im Scanner-Modus "+ Bestand" gewählter Ort für neue Artikel (pro Gerät); null = kein Ort. */
     val scanLocationId: Flow<String?> = dataStore.data.map { p -> p[SCAN_LOCATION] }
 
+    /** Setzt den Ort; bei einem anderen Ort werden Ebene und Fach zurückgesetzt. */
     suspend fun setScanLocationId(id: String?) = dataStore.edit {
+        if (it[SCAN_LOCATION] != id) {
+            it.remove(SCAN_LEVEL)
+            it.remove(SCAN_SHELF)
+        }
         if (id == null) it.remove(SCAN_LOCATION) else it[SCAN_LOCATION] = id
+    }
+
+    /** Im Scanner-Modus "+ Bestand" gewählte Ebene (pro Gerät, gehört zum gewählten Ort); null = keine. */
+    val scanLevel: Flow<Int?> = dataStore.data.map { p -> p[SCAN_LEVEL] }
+
+    suspend fun setScanLevel(level: Int?) = dataStore.edit {
+        if (level == null) it.remove(SCAN_LEVEL) else it[SCAN_LEVEL] = level
+    }
+
+    /** Im Scanner-Modus "+ Bestand" gewähltes Fach (pro Gerät, gehört zum gewählten Ort); null = keins. */
+    val scanShelf: Flow<Int?> = dataStore.data.map { p -> p[SCAN_SHELF] }
+
+    suspend fun setScanShelf(shelf: Int?) = dataStore.edit {
+        if (shelf == null) it.remove(SCAN_SHELF) else it[SCAN_SHELF] = shelf
     }
 
     suspend fun setMyName(name: String) = dataStore.edit { it[MY_NAME] = name.trim().take(40) }
@@ -105,6 +124,8 @@ class SettingsRepository @Inject constructor(
         val RECEIVE_NOTICES = booleanPreferencesKey("household_receive_notices")
         val NOTICES_SEEN_UNTIL = longPreferencesKey("household_notices_seen_until")
         val SCAN_LOCATION = androidx.datastore.preferences.core.stringPreferencesKey("scan_purchase_location")
+        val SCAN_LEVEL = intPreferencesKey("scan_purchase_level")
+        val SCAN_SHELF = intPreferencesKey("scan_purchase_shelf")
         val SHOPPING_BY_DEPARTMENT = booleanPreferencesKey("shopping_by_department")
     }
 }

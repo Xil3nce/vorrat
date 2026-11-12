@@ -145,15 +145,24 @@ class PurchaseDraftStore(private val file: File) {
 
 /** Reine Regeln für die Einkaufsliste des Mehrfachscans. */
 object PurchaseLogic {
-    /** Index eines unbearbeiteten Artikels mit gleichem Barcode, Ablaufdatum und Ort, sonst -1. */
+    /** Index eines unbearbeiteten Artikels mit gleichem Barcode, Ablaufdatum, Ort, Ebene und Fach, sonst -1. */
     fun twinIndex(list: List<PurchaseDraft>, scanned: PurchaseDraft): Int {
         val barcode = scanned.barcode ?: return -1
-        return list.indexOfFirst { !it.edited && it.barcode == barcode && it.expiry == scanned.expiry && it.locationId == scanned.locationId }
+        return list.indexOfFirst {
+            !it.edited && it.barcode == barcode && it.expiry == scanned.expiry && it.locationId == scanned.locationId &&
+                it.level == scanned.level && it.shelf == scanned.shelf
+        }
     }
 
     /** Gespeicherter Ort für neue Artikel, nur wenn es ihn noch gibt (gelöschter Ort → kein Ort). */
     fun resolveLocation(savedId: String?, existingIds: Collection<String>): String? =
         savedId?.takeIf { it in existingIds }
+
+    /**
+     * Gespeicherte Ebene bzw. gespeichertes Fach, nur wenn der Ort so viele hat ([max] = Anzahl Ebenen/Fächer des
+     * Orts; null = Ort ohne Ebenen/Fächer).
+     */
+    fun resolveSlot(saved: Int?, max: Int?): Int? = saved?.takeIf { max != null && it in 1..max }
 
     fun increment(draft: PurchaseDraft): PurchaseDraft {
         val n = draft.quantity.trim().toIntOrNull() ?: 0

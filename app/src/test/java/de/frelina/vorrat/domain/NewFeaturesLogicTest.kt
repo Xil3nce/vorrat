@@ -101,6 +101,15 @@ class NewFeaturesLogicTest {
         assertNull(ExpiryDateParser.parse("Mainz 2027", today)) // kein Monatsname
     }
 
+    @Test fun `Barilla-Aufdruck mit abgelaufenem MHD`() {
+        // Text wie ML Kit ihn aus dem Zielrahmen (plus Rand) liefert; MHD liegt gut zwei Monate zurück
+        val text = "MINDESTENS HALTBAR BIS /\nÀ CONSOMMER DE PRÉFÉRENCE AVANT LE\n01/09/2026 IB8224164\n03:34\n22\n" +
+            "TEIGWAREN AUS HARTWEIZENGRIESS /"
+        assertEquals(LocalDate.of(2026, 9, 1), ExpiryDateParser.parse(text, LocalDate.of(2026, 11, 12)))
+        // auch ohne Stichwort
+        assertEquals(LocalDate.of(2026, 9, 1), ExpiryDateParser.parse("01/09/2026 IB8224164\n03:34\n22", LocalDate.of(2026, 11, 12)))
+    }
+
     @Test fun `ISO und Komma als Trenner`() {
         assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("2027-03-12", today))
         assertEquals(LocalDate.of(2027, 3, 12), ExpiryDateParser.parse("12,03,27", today))

@@ -85,6 +85,7 @@
     <string name="opened_split_hint">Bei mehreren Packungen wird eine als eigener, geöffneter Eintrag abgetrennt.</string>
     <string name="opened_clear">Nicht geöffnet</string>
     <string name="opened_since">Geöffnet am %1$s</string>
+    <string name="opened_badge">Geöffnet %1$s</string>
     <string name="opened_done">Als geöffnet markiert</string>
     <string name="opened_split_done">Eine Packung als geöffnet abgetrennt</string>
     <string name="shopping_added">Auf die Einkaufsliste gesetzt</string>
@@ -266,6 +267,10 @@
     <string name="scan_location_none">Ort</string>
     <string name="scan_location_menu_none">Kein Ort</string>
     <string name="scan_location_cd">Ort für neue Artikel wählen</string>
+    <string name="scan_level_menu_none">Keine Ebene</string>
+    <string name="scan_level_cd">Ebene für neue Artikel wählen</string>
+    <string name="scan_shelf_menu_none">Kein Fach</string>
+    <string name="scan_shelf_cd">Fach für neue Artikel wählen</string>
     <string name="purchase_added">%1$s zum Einkauf hinzugefügt</string>
     <string name="purchase_added_more">%1$s: jetzt %2$d× im Einkauf</string>
     <string name="purchase_title">Einkauf</string>

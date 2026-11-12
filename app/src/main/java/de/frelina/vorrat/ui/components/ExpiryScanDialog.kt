@@ -51,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -69,6 +70,7 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.domain.ExpiryDateParser
 import de.frelina.vorrat.domain.ExpiryDateStabilizer
 import de.frelina.vorrat.domain.Validation
+import de.frelina.vorrat.ui.theme.vorratBackground
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.time.LocalDate
 import java.util.concurrent.Executors
@@ -103,7 +105,8 @@ fun ExpiryScanDialog(
     val frameHeightPx = with(LocalDensity.current) { FRAME_HEIGHT.toPx() }
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
-        Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+        // Deckender App-Hintergrund: colorScheme.surface ist im Glas-Theme transparent
+        Surface(Modifier.fillMaxSize().vorratBackground(), color = Color.Transparent) {
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onDismiss) {

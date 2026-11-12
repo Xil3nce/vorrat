@@ -142,4 +142,31 @@ class ConsumeListDataTest : DbTestBase() {
             scope.cancel()
         }
     }
+
+    @Test
+    fun purchaseLevelAndShelf_resetOnOtherLocation_andOnlyValidForLocation() = runBlocking {
+        val prefs = File(context.cacheDir, "settings-${UUID.randomUUID()}.preferences_pb")
+        val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.SupervisorJob())
+        try {
+            val settings = SettingsRepository(PreferenceDataStoreFactory.create(scope = scope) { prefs })
+            settings.setScanLocationId("loc-1")
+            settings.setScanLevel(2)
+            settings.setScanShelf(3)
+            // gleicher Ort erneut gewählt → bleibt
+            settings.setScanLocationId("loc-1")
+            assertEquals(2, settings.scanLevel.first())
+            assertEquals(3, settings.scanShelf.first())
+            // anderer Ort → zurückgesetzt
+            settings.setScanLocationId("loc-2")
+            assertNull(settings.scanLevel.first())
+            assertNull(settings.scanShelf.first())
+
+            assertEquals(2, PurchaseLogic.resolveSlot(2, 4))
+            assertNull(PurchaseLogic.resolveSlot(5, 4)) // Ort hat nur 4 Ebenen
+            assertNull(PurchaseLogic.resolveSlot(2, null)) // Ort ohne Ebenen
+            assertNull(PurchaseLogic.resolveSlot(null, 4))
+        } finally {
+            scope.cancel()
+        }
+    }
 }

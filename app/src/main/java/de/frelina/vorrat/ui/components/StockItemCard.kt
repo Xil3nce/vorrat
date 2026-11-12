@@ -1,11 +1,14 @@
 package de.frelina.vorrat.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AcUnit
 import androidx.compose.material.icons.outlined.ErrorOutline
@@ -18,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +33,7 @@ import de.frelina.vorrat.domain.ExpiryLogic
 import de.frelina.vorrat.domain.ExpiryStatus
 import de.frelina.vorrat.domain.Validation
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 /** "Keller · Ebene 2 · Fach 3" */
 @Composable
@@ -38,11 +43,17 @@ fun locationText(item: StockItem): String = buildList {
     item.shelf?.let { add(stringResource(R.string.shelf_label, it)) }
 }.joinToString(" · ")
 
+/**
+ * Ablauftext, z. B. "Ablauf: 01.09.2026 – abgelaufen". Mit [mentionOpened] = false (Karte zeigt "Geöffnet" als
+ * eigene Plakette) heißt es bei geöffneten Packungen "Verbrauchen bis …" statt "Geöffnet – verbrauchen bis …".
+ */
 @Composable
-fun expiryText(item: StockItem, today: LocalDate, leadDays: Int): String {
+fun expiryText(item: StockItem, today: LocalDate, leadDays: Int, mentionOpened: Boolean = true): String {
     val date = item.effectiveExpiry ?: return stringResource(R.string.expiry_none)
     val opened = item.openedAt != null && date != item.expiryDate
-    val base = if (opened) {
+    val base = if (opened && !mentionOpened) {
+        stringResource(R.string.opened_use_by, Validation.formatDate(date))
+    } else if (opened) {
         stringResource(R.string.expiry_opened_label, Validation.formatDate(date))
     } else {
         stringResource(R.string.expiry_label, Validation.formatDate(date))
@@ -131,11 +142,15 @@ fun StockItemCard(
                             )
                         }
                         Text(
-                            expiryText(item, today, leadDays),
+                            expiryText(item, today, leadDays, mentionOpened = false),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (status == ExpiryStatus.EXPIRED || status == ExpiryStatus.SOON) color
                             else VorratTheme.colors.textTertiary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false),
                         )
+                        item.openedAt?.let { opened -> OpenedBadge(opened, Modifier.padding(start = 8.dp)) }
                     }
                 }
                 CountCircle(stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol))
@@ -146,3 +161,24 @@ fun StockItemCard(
         }
     }
 }
+
+/** Kleine Plakette "Geöffnet 10.11." neben dem Ablaufdatum. */
+@Composable
+private fun OpenedBadge(openedAt: LocalDate, modifier: Modifier = Modifier) {
+    val color = MaterialTheme.colorScheme.tertiary
+    val label = stringResource(R.string.opened_badge, openedAt.format(SHORT_DATE))
+    Text(
+        label,
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = FontWeight.SemiBold,
+        color = color,
+        maxLines = 1,
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color.copy(alpha = 0.14f))
+            .border(1.dp, color.copy(alpha = 0.35f), RoundedCornerShape(8.dp))
+            .padding(horizontal = 6.dp, vertical = 1.dp),
+    )
+}
+
+private val SHORT_DATE: DateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.")

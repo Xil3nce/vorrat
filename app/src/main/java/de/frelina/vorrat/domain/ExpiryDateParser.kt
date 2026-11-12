@@ -24,7 +24,8 @@ import java.time.YearMonth
  * Plausibel: höchstens [MAX_PAST_DAYS] Tage in der Vergangenheit und höchstens [MAX_FUTURE_YEARS] Jahre in der Zukunft.
  */
 object ExpiryDateParser {
-    const val MAX_PAST_DAYS = 60L
+    /** Großzügig, weil Trockenware oft lange nach dem MHD noch erfasst wird (Herstellungsdaten verlieren ohnehin). */
+    const val MAX_PAST_DAYS = 730L
     const val MAX_FUTURE_YEARS = 15L
 
     private const val D = "[0-9OoIlSsBZz|]"

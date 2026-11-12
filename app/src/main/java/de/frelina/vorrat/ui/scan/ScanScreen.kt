@@ -98,6 +98,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -141,6 +143,7 @@ fun ScanScreen(
     val consumeCount by viewModel.consumeCount.collectAsStateWithLifecycle()
     val locations by viewModel.locations.collectAsStateWithLifecycle()
     val purchaseLocationId by viewModel.purchaseLocationId.collectAsStateWithLifecycle()
+    val purchaseSlots by viewModel.purchaseSlots.collectAsStateWithLifecycle()
     var consumeFor by remember { mutableStateOf<ScanOutcome?>(null) }
 
     var hasPermission by remember {
@@ -277,25 +280,45 @@ fun ScanScreen(
             )
         }
 
-        // ---------------- Scan-Liste ("+ Bestand": mit Ort daneben, "Entnehmen": volle Breite)
+        // ---------------- "+ Bestand": Ort (50 %), Ebene, Fach (je 25 %), darunter die Scan-Liste in voller Breite
         if (purchase) {
+            val selectedLocation = locations.firstOrNull { it.id == purchaseLocationId }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = onOpenPurchase,
-                    enabled = purchaseCount > 0,
-                    contentPadding = PaddingValues(horizontal = 12.dp),
-                    modifier = Modifier.weight(1f).height(52.dp),
-                ) {
-                    Icon(Icons.Outlined.ShoppingBag, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.scan_list_show, purchaseCount), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
                 LocationPicker(
                     locations = locations,
                     selectedId = purchaseLocationId,
                     onSelect = viewModel::setPurchaseLocation,
+                    modifier = Modifier.weight(2f).height(52.dp),
+                )
+                SlotPicker(
+                    count = selectedLocation?.levels,
+                    selected = purchaseSlots.first,
+                    placeholder = stringResource(R.string.field_level),
+                    noneLabel = stringResource(R.string.scan_level_menu_none),
+                    itemLabel = { stringResource(R.string.level_label, it) },
+                    contentDescription = stringResource(R.string.scan_level_cd),
+                    onSelect = viewModel::setPurchaseLevel,
                     modifier = Modifier.weight(1f).height(52.dp),
                 )
+                SlotPicker(
+                    count = selectedLocation?.shelves,
+                    selected = purchaseSlots.second,
+                    placeholder = stringResource(R.string.field_shelf),
+                    noneLabel = stringResource(R.string.scan_shelf_menu_none),
+                    itemLabel = { stringResource(R.string.shelf_label, it) },
+                    contentDescription = stringResource(R.string.scan_shelf_cd),
+                    onSelect = viewModel::setPurchaseShelf,
+                    modifier = Modifier.weight(1f).height(52.dp),
+                )
+            }
+            Button(
+                onClick = onOpenPurchase,
+                enabled = purchaseCount > 0,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+            ) {
+                Icon(Icons.Outlined.ShoppingBag, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.scan_list_show, purchaseCount), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         } else if (consume) {
             Button(
@@ -414,6 +437,69 @@ private fun LocationPicker(
                     text = { Text(location.name) },
                     trailingIcon = { if (location.id == selected?.id) Icon(Icons.Outlined.Check, contentDescription = null) },
                     onClick = { open = false; onSelect(location.id) },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Ebene oder Fach für neue Artikel im Modus "+ Bestand" (Auswahl 1 … [count]). Gesperrt, wenn der gewählte Ort
+ * keine Ebenen/Fächer hat ([count] = null) oder kein Ort gewählt ist.
+ */
+@Composable
+private fun SlotPicker(
+    count: Int?,
+    selected: Int?,
+    placeholder: String,
+    noneLabel: String,
+    itemLabel: @Composable (Int) -> String,
+    contentDescription: String,
+    onSelect: (Int?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var open by remember { mutableStateOf(false) }
+    val enabled = count != null && count > 0
+    val primary = MaterialTheme.colorScheme.primary
+    val active = selected != null
+    Box(modifier) {
+        OutlinedButton(
+            onClick = { open = true },
+            enabled = enabled,
+            contentPadding = PaddingValues(horizontal = 6.dp),
+            colors = if (active) {
+                ButtonDefaults.outlinedButtonColors(containerColor = primary.copy(alpha = 0.16f), contentColor = primary)
+            } else {
+                ButtonDefaults.outlinedButtonColors(contentColor = VorratTheme.colors.textSecondary)
+            },
+            border = BorderStroke(
+                1.dp,
+                when {
+                    active -> primary
+                    enabled -> VorratTheme.colors.glassBorder
+                    else -> VorratTheme.colors.glassBorder.copy(alpha = 0.4f)
+                },
+            ),
+            modifier = Modifier.fillMaxSize().semantics { this.contentDescription = contentDescription },
+        ) {
+            Text(
+                if (selected != null) itemLabel(selected) else placeholder,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            DropdownMenuItem(
+                text = { Text(noneLabel) },
+                trailingIcon = { if (selected == null) Icon(Icons.Outlined.Check, contentDescription = null) },
+                onClick = { open = false; onSelect(null) },
+            )
+            HorizontalDivider()
+            (1..(count ?: 0)).forEach { n ->
+                DropdownMenuItem(
+                    text = { Text(itemLabel(n)) },
+                    trailingIcon = { if (n == selected) Icon(Icons.Outlined.Check, contentDescription = null) },
+                    onClick = { open = false; onSelect(n) },
                 )
             }
         }
