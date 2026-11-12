@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.outlined.Restaurant
 import androidx.compose.material.icons.outlined.Badge
+import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.RemoveShoppingCart
@@ -110,6 +111,7 @@ fun SettingsScreen(
     onOpenRecipes: () -> Unit,
     onOpenMealPlan: () -> Unit,
     onOpenDepartments: () -> Unit,
+    onOpenHousehold: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     updates: UpdateViewModel = hiltViewModel(),
 ) {
@@ -185,6 +187,8 @@ fun SettingsScreen(
                     color = VorratTheme.colors.textSecondary,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
                 )
+                RowDivider()
+                NavItem(Icons.Outlined.ManageAccounts, R.string.household_manage_title, R.string.household_manage_summary, onOpenHousehold)
                 RowDivider()
                 ListItem(
                     colors = itemColors,

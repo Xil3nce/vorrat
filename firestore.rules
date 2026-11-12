@@ -5,12 +5,13 @@ rules_version = '2';
 //
 // Struktur:
 //   invites/{code}                         {householdId, createdBy}
-//   households/{hid}                       {ownerUid, createdAt}
+//   households/{hid}                       {ownerUid, createdAt, code}   (code = aktueller Einladungscode)
 //   households/{hid}/members/{uid}         {code, joinedAt}
 //   households/{hid}/{locations|units|quantityTypes|products|entries|images|shopping|recipes|departments|departmentAssignments|mealPlan|staples|history}/{id}
 //
 // Grundsatz: Alles, was hier nicht ausdrücklich erlaubt ist, ist verboten. Nur Mitglieder eines Haushalts
 // sehen und ändern dessen Daten; Mitglied wird man als Ersteller oder mit einem gültigen Einladungscode.
+// Jedes Mitglied darf den Code erneuern (alte Einladung löschen) und andere Mitglieder entfernen.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -33,16 +34,24 @@ service cloud.firestore {
         && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.householdId is string
         && existsAfter(/databases/$(database)/documents/households/$(request.resource.data.householdId)/members/$(request.auth.uid));
-      allow update, delete: if false;
+      allow update: if false;
+      // Code erneuern: ein Mitglied des Haushalts löscht die alte Einladung – der alte Code ist damit ungültig.
+      allow delete: if signedIn() && (resource == null || isMember(resource.data.householdId));
     }
 
     match /households/{hid} {
       allow get: if isMember(hid);
       allow list: if false;
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['ownerUid', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['ownerUid', 'createdAt', 'code'])
         && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if false;
+      // Ein Mitglied darf nur den aktuellen Einladungscode eintragen – und nur einen, dessen Einladung (nach
+      // diesem Schreibvorgang) auf genau diesen Haushalt zeigt.
+      allow update: if isMember(hid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['code'])
+        && request.resource.data.code is string
+        && getAfter(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.householdId == hid;
+      allow delete: if false;
 
       // Mitgliedschaften: jeder trägt nur sich selbst ein – als Ersteller des Haushalts oder mit einem
       // Einladungscode, der auf genau diesen Haushalt zeigt.
@@ -57,7 +66,8 @@ service cloud.firestore {
             || get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.householdId == hid
           );
         allow update: if false;
-        allow delete: if signedIn() && uid == request.auth.uid;
+        // Verlassen (sich selbst) oder Mitglied entfernen (jedes Mitglied darf andere entfernen).
+        allow delete: if signedIn() && (uid == request.auth.uid || isMember(hid));
       }
 
       // Haushaltsdaten: lesen und schreiben nur für Mitglieder, nur in den bekannten Sammlungen

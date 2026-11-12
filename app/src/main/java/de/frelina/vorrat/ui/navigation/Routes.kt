@@ -15,6 +15,8 @@ import kotlinx.serialization.Serializable
 // Unterseiten
 @Serializable data class EntryDetailRoute(val entryId: String)
 @Serializable data object HistoryRoute
+/** Haushalt verwalten: Code erneuern, Mitglieder entfernen, verlassen. */
+@Serializable data object HouseholdRoute
 
 // Rezepte ("Was koche ich heute?"): Liste, Details, Editor (id = null → neues Rezept; "builtin:…" → Kopie davon;
 // importText = geteilter Text/Link → Rezept von Chefkoch laden und vorbelegen)

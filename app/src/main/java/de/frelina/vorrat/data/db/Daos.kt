@@ -299,8 +299,14 @@ interface ShoppingDao {
     suspend fun deleteAll()
 }
 
+/** Wer wann etwas im Verlauf eingetragen hat (für die Mitgliederliste des Haushalts). */
+data class AuthorActivity(val authorUid: String, val authorName: String?, val createdAt: Long)
+
 @Dao
 interface HistoryDao {
+    @Query("SELECT authorUid, authorName, createdAt FROM history_events WHERE authorUid IS NOT NULL")
+    fun observeAuthorActivity(): Flow<List<AuthorActivity>>
+
     @Query("SELECT * FROM history_events ORDER BY createdAt DESC, id LIMIT :limit")
     fun observeRecent(limit: Int): Flow<List<HistoryEventEntity>>
 

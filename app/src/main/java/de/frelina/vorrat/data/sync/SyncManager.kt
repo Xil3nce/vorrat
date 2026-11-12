@@ -3,6 +3,7 @@ package de.frelina.vorrat.data.sync
 import android.util.Log
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.household.Household
+import de.frelina.vorrat.data.household.HouseholdRepository
 import de.frelina.vorrat.data.household.HouseholdStore
 import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.repo.DepartmentRepository
@@ -11,8 +12,10 @@ import de.frelina.vorrat.reminder.HouseholdNotices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -34,6 +37,7 @@ class SyncManager @Inject constructor(
     private val imageStore: ImageStore,
     private val notices: HouseholdNotices,
     private val departments: DepartmentRepository,
+    private val households: HouseholdRepository,
     @param:ApplicationScope private val scope: CoroutineScope,
 ) {
     private val applier = SyncApplier(db)
@@ -47,7 +51,8 @@ class SyncManager @Inject constructor(
     fun start() {
         if (!started.compareAndSet(false, true)) return
         scope.launch {
-            household.household.collectLatest { h ->
+            // Nur ein anderer Haushalt bzw. eine andere Mitgliedschaft hängt die Listener neu an – nicht ein neuer Code.
+            household.household.distinctUntilChangedBy { it?.id to it?.uid }.collectLatest { h ->
                 serverSynced.value = emptySet()
                 if (h != null) listen(h)
             }
@@ -70,12 +75,20 @@ class SyncManager @Inject constructor(
         } ?: false
     }
 
-    private suspend fun listen(h: Household) {
+    private suspend fun listen(h: Household): Nothing = coroutineScope {
         ensureMembership(h)
+        // Von einem anderen Handy entfernt? Beim Start prüfen und sobald der Server einen Listener abweist.
+        val denied = Channel<Unit>(Channel.CONFLATED)
+        launch {
+            checkRemoved()
+            for (signal in denied) checkRemoved()
+        }
+        // Vom anderen Handy erneuerten Einladungscode übernehmen.
+        launch { remote.observeInviteCode(h.id).collect { households.adoptCode(h.id, it) } }
         val events = Channel<Event>(Channel.UNLIMITED)
         val registrations = RemoteCollection.DATA.map { collection ->
             var reconciled = false
-            remote.listen(h.id, collection) { snapshot ->
+            remote.listen(h.id, collection, onDenied = { denied.trySend(Unit) }) { snapshot ->
                 // Erster Server-Stand → vollständiger Abgleich (lokal gelöschte Altlasten entfernen).
                 val full = !snapshot.fromCache && !reconciled
                 if (full) reconciled = true
@@ -89,6 +102,11 @@ class SyncManager @Inject constructor(
             registrations.forEach { it.remove() }
             events.close()
         }
+    }
+
+    /** Nicht mehr Mitglied (entfernt worden): Zuordnung lösen – die App zeigt wieder "Haushalt anlegen/beitreten". */
+    private suspend fun checkRemoved() {
+        if (households.dropIfRemoved()) Log.i(TAG, "Nicht mehr Mitglied des Haushalts – Zuordnung entfernt")
     }
 
     private suspend fun process(e: Event) {

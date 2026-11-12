@@ -5,13 +5,18 @@ import androidx.room.withTransaction
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.sync.RemoteStore
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.domain.HouseholdMember
+import de.frelina.vorrat.domain.HouseholdMembers
 import de.frelina.vorrat.domain.InviteCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,7 +33,7 @@ sealed interface HouseholdResult {
     data object Failed : HouseholdResult
 }
 
-/** Haushalt anlegen oder beitreten (braucht eine Internetverbindung). */
+/** Haushalt anlegen, beitreten und verwalten (braucht eine Internetverbindung). */
 @Singleton
 class HouseholdRepository @Inject constructor(
     private val remote: RemoteStore,
@@ -38,10 +43,25 @@ class HouseholdRepository @Inject constructor(
 ) {
     val household: Flow<Household?> = store.household
 
+    /** Mitglieder des Haushalts (dieses Handy zuerst); null ohne Haushalt. */
     @OptIn(ExperimentalCoroutinesApi::class)
-    val memberCount: Flow<Int?> = store.household.flatMapLatest { h ->
-        if (h == null) flowOf(null) else remote.observeMemberCount(h.id)
+    val members: Flow<List<HouseholdMember>?> = store.household.flatMapLatest { h ->
+        if (h == null) {
+            flowOf(null)
+        } else {
+            combine(remote.observeMembers(h.id), db.historyDao().observeAuthorActivity()) { members, activity ->
+                HouseholdMembers.build(members, h.uid, activity)
+            }
+        }
     }
+
+    val memberCount: Flow<Int?> = members.map { it?.size }
+
+    /** Code des zuletzt verlassenen Haushalts (Vorbelegung für "Haushalt beitreten"). */
+    val lastCode: Flow<String?> = store.lastCode
+
+    /** Dieses Handy wurde aus seinem Haushalt entfernt (Hinweis im Onboarding). */
+    val removedNotice: Flow<Boolean> = store.removedNotice
 
     /** Neuer Haushalt: bestehende lokale Daten werden hochgeladen. */
     suspend fun create(): HouseholdResult = guarded {
@@ -68,6 +88,59 @@ class HouseholdRepository @Inject constructor(
             store.set(Household(hid, code, uid))
         }
         return if (unknown) HouseholdResult.UnknownCode else result
+    }
+
+    /**
+     * Haushalt verlassen: eigene Mitgliedschaft löschen, Zuordnung auf diesem Handy entfernen. Die lokalen Daten
+     * bleiben (danach: neuen Haushalt anlegen oder einem beitreten). Der Haushalt selbst bleibt bestehen.
+     */
+    suspend fun leave(): HouseholdResult = guarded {
+        val h = store.current() ?: return@guarded
+        withTimeout(TIMEOUT_MS) { remote.leaveHousehold(h.id, h.uid) }
+        store.clear()
+    }
+
+    /** Neuen Einladungscode erzeugen; der alte ist danach ungültig. Mitglieder bleiben Mitglieder. */
+    suspend fun renewCode(): HouseholdResult = replaceInvite(removeUid = null)
+
+    /**
+     * Mitglied entfernen. Der Einladungscode wird dabei immer erneuert – sonst könnte das entfernte Handy mit dem
+     * ihm bekannten Code einfach wieder beitreten. Sich selbst entfernen = [leave].
+     */
+    suspend fun removeMember(uid: String): HouseholdResult =
+        if (uid == store.current()?.uid) leave() else replaceInvite(removeUid = uid)
+
+    private suspend fun replaceInvite(removeUid: String?): HouseholdResult = guarded {
+        val h = store.current() ?: error("kein Haushalt")
+        val newCode = InviteCode.generate()
+        withTimeout(TIMEOUT_MS) { remote.replaceInvite(h.id, h.uid, h.code, newCode, removeUid) }
+        store.setCode(h.id, newCode)
+    }
+
+    /**
+     * Prüft am Server, ob dieses Handy noch Mitglied ist (wurde es entfernt, verweigert der Server alles).
+     * Nur bei eindeutigem "nein" wird die Zuordnung entfernt – offline oder bei anderen Fehlern passiert nichts.
+     * Liefert true, wenn die Zuordnung entfernt wurde.
+     */
+    suspend fun dropIfRemoved(): Boolean {
+        val h = store.current() ?: return false
+        // Andere Anmeldung als die der Mitgliedschaft: darum kümmert sich die Wiederanmeldung im SyncManager.
+        if (h.uid.isBlank() || remote.currentUid() != h.uid) return false
+        val member = try {
+            withTimeoutOrNull(TIMEOUT_MS) { remote.isMember(h.id, h.uid) }
+        } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
+            null
+        }
+        if (member != false) return false
+        store.clear(removed = true)
+        return true
+    }
+
+    /** Anderes Handy hat den Code erneuert: hier übernehmen. */
+    suspend fun adoptCode(householdId: String, code: String) {
+        val normalized = InviteCode.normalize(code) ?: return
+        if (store.current()?.let { it.id == householdId && it.code != normalized } == true) store.setCode(householdId, normalized)
     }
 
     private suspend fun clearLocalData() = db.withTransaction {

@@ -24,7 +24,7 @@ die App funktioniert auch offline. Open Food Facts erhält nur Barcodes.
 | **Wochenplan** | Rezepte für die Woche planen (Mo–So, Wochenwechsel, heute hervorgehoben): „+“ je Tag wählt ein Rezept (Vorschläge aus dem Vorrat, Suche), Wischen oder Menü entfernt (mit Rückgängig) oder verschiebt auf einen anderen Tag, Antippen öffnet das Rezept mit der geplanten Personenzahl. Rezept gelöscht → „Rezept nicht mehr vorhanden“, Eintrag lässt sich löschen. Im Haushalt synchronisiert und im Backup. „Zutaten auf die Einkaufsliste“ (ganze Woche oder ab heute bis Sonntag) öffnet die Prüfseite: Mengen werden auf die Personenzahl umgerechnet, gleiche Zutaten zusammengefasst (gleiche Gruppe oder gleicher Name, gleiche Einheiten summiert, sonst „a + b“), Haken vorausgewählt für alles, was nicht im Vorrat ist, nicht zum Grundvorrat gehört, nicht auf „Immer zuhause“ steht, nicht schon auf der Liste steht und nicht optional ist. Je Zeile „Immer zuhause“; „Alle“/„Keine“; „Übernehmen (N)“ legt Einträge ohne Dubletten an (Menge und Rezepte in der Notiz). „Immer zuhause“ lässt sich im Wochenplan-Menü verwalten. Einstieg: Rezepte, Einstellungen, Rezept-Detail. |
 | **Rezepte** („Was koche ich heute?“) | Rezeptvorschläge aus bald ablaufenden Produkten: Jedes Produkt gehört zu einer Zutatengruppe (ca. 80 Gruppen, automatisch aus Name/OFF-Kategorie erkannt, im Produktformular unter „Zutat für Rezepte“ änderbar). Etwa 140 eingebaute Alltagsrezepte (`assets/recipes.json`) plus eigene Rezepte (Haushalt-synchronisiert, im Backup). Bewertung: Zutaten, die bald ablaufen, zählen mehr (abgelaufen/≤ 1 Tag ×3, ≤ 3 Tage ×2, ≤ 7 Tage ×1,5), fehlende Pflichtzutaten −1,5; Rezepte mit mehr als 2 fehlenden Zutaten werden ausgeblendet; Salz, Öl, Wasser und Gewürze gelten als vorhanden. Filter (Alle/Eigene/Vegetarisch), Suche, Chips der ablaufenden Zutaten, „Fehlendes auf die Einkaufsliste“, „Gekocht“ entnimmt die Zutaten aus dem Bestand. Einstieg: Symbol im Bestand, Banner bei bald ablaufenden Produkten, Einstellungen. Neu: „Zum Wochenplan“ im Rezept (Tag und Personenzahl). |
 | **Orte** (in Einstellungen) | Anlegen, umbenennen, löschen (Löschschutz). Beim Erfassen Auswahl aus der Liste + direktes Neuanlegen. |
-| **Haushalt** | Erststart: „Haushalt anlegen“ (vorhandene lokale Daten werden hochgeladen) oder „Haushalt beitreten“ per Einladungscode (lokale Daten werden nach Warnung ersetzt). Einstellungen → Haushalt: Code `XXXXX-XXXXX` anzeigen/teilen, Mitgliederzahl. |
+| **Haushalt** | Erststart: „Haushalt anlegen“ (vorhandene lokale Daten werden hochgeladen) oder „Haushalt beitreten“ per Einladungscode (lokale Daten werden nach Warnung ersetzt). Einstellungen → Haushalt: Code `XXXXX-XXXXX` anzeigen/teilen, Mitgliederzahl. **Haushalt verwalten**: „Code erneuern“ (alter Code wird ungültig, Mitglieder bleiben, die anderen Handys übernehmen den neuen Code von selbst), Mitgliederliste (dieses Handy zuerst; Name und letzte Aktivität aus dem Verlauf, „dabei seit“) mit „Entfernen“ – dabei wird immer auch der Code erneuert, damit das entfernte Handy nicht wieder beitreten kann –, und „Haushalt verlassen“ (lokale Daten bleiben, die App zeigt wieder „Haushalt anlegen/beitreten“ mit dem letzten Code als Vorschlag). Ein entferntes Handy merkt das beim Start bzw. sobald der Server einen Listener abweist, löst die Zuordnung und zeigt im Onboarding einen Hinweis. Jedes Mitglied darf Code erneuern und andere entfernen (Mitgliedschaften sind anonym; nach einer Neuinstallation bleibt der alte Eintrag als Karteileiche stehen und lässt sich so entfernen). |
 | **Einstellungen** | Haushalt, Packungseinheiten & Menge-Arten (mit Löschschutz), Erinnerungen (an/aus, Uhrzeit, Vorlauf – pro Gerät), Backup (Export/Import), Über (Version, OFF-Attribution, Datenschutz). |
 
 ## Architektur
@@ -89,9 +89,9 @@ Firestore-Struktur und Regeln (`firestore.rules` im Repo):
 
 | Pfad | Inhalt | Zugriff |
 |---|---|---|
-| `invites/{code}` | householdId, createdBy | `get` für Angemeldete, kein `list`; anlegen nur durch Mitglied des Haushalts |
-| `households/{hid}` | ownerUid, createdAt | lesen nur Mitglieder; anlegen nur mit eigener `ownerUid` |
-| `households/{hid}/members/{uid}` | code, joinedAt | lesen Mitglieder; anlegen nur für sich selbst als Besitzer oder mit Code, der auf `hid` zeigt |
+| `invites/{code}` | householdId, createdBy | `get` für Angemeldete, kein `list`; anlegen und löschen nur durch Mitglied des Haushalts |
+| `households/{hid}` | ownerUid, createdAt, code (aktueller Einladungscode, erst ab dem ersten Erneuern) | lesen nur Mitglieder; anlegen nur mit eigener `ownerUid`; ändern nur `code` durch Mitglieder und nur auf eine Einladung dieses Haushalts |
+| `households/{hid}/members/{uid}` | code, joinedAt | lesen Mitglieder; anlegen nur für sich selbst als Besitzer oder mit Code, der auf `hid` zeigt; löschen: sich selbst (verlassen) oder als Mitglied ein anderes Mitglied (entfernen) |
 | `households/{hid}/{locations,units,quantityTypes,products,entries,images,shopping,recipes,history}/{id}` | Datensätze (Felder wie Room, Datum/Dezimal als Text) | lesen/schreiben nur Mitglieder |
 
 Alles andere ist verboten (insbesondere jeder Zugriff von Nicht-Mitgliedern).
@@ -290,13 +290,19 @@ Kategorien – eine Übereinstimmung mit OFF-Produkten entsteht nur, wenn diesel
 Die Firestore-Regeln wurden zusätzlich mit dem Firestore-Emulator geprüft (firebase-tools 15.34.0,
 `@firebase/rules-unit-testing` 6.0.0, Projekt `demo-vorrat`, ohne Login): Anlegen im Batch, Beitritt mit
 gültigem/falschem Code, kein Auflisten der Einladungen, kein Zugriff für Nicht-Mitglieder.
+Für „Haushalt verwalten“ (Version 2.15.0) erneut mit firebase-tools 15.36.0 geprüft (37 Fälle): Code erneuern im
+Batch (auch ohne `code`-Feld und ohne alte Einladung), alter Code danach ungültig, Entfernen samt neuem Code,
+Entfernte lesen/schreiben nichts mehr und kommen nicht wieder rein, Verlassen und Wiederbeitritt, Nicht-Mitglieder
+dürfen weder Einladungen löschen noch den Haushalt ändern noch jemanden entfernen.
 
 ## Offene Punkte
 
 - Sync mit echtem Firebase-Projekt auf zwei Geräten noch nicht getestet (nur Fake + Regel-Emulator).
 - Keine Instrumentierungs-/UI-Tests (Compose-Tests).
-- Haushalt verlassen / Mitglied entfernen / Code erneuern gibt es noch nicht. Wer den Code kennt, kann
-  beitreten (31^10 Möglichkeiten, Einladungen nicht auflistbar).
+- Wer den Einladungscode kennt, kann beitreten (31^10 Möglichkeiten, Einladungen nicht auflistbar) und hat dann
+  dieselben Rechte wie alle – auch Code erneuern und andere entfernen. Es gibt keine Besitzer-Rolle, weil anonyme
+  Mitgliedschaften nach einer Neuinstallation verloren gehen. Verlässt das letzte Mitglied den Haushalt, bleiben
+  die Daten in Firestore liegen (Wiederbeitritt mit dem Code möglich); „Haushalt löschen“ gibt es nicht.
 - Snapshot-Listener bleiben aktiv, solange der App-Prozess lebt (auch nach einem Erinnerungs-Lauf im
   Hintergrund); Android beendet den Prozess später selbst.
 - Wird eine Anzahl auf einem Handy auf 0 gesetzt, während das andere sie gleichzeitig erhöht, gewinnt

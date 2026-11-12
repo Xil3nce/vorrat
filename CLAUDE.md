@@ -30,6 +30,10 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
 - Verlauf (`history`): `StockRepository` protokolliert über `HistoryRecorder` (Tests ohne Verlauf: `HistoryRecorder.NONE`).
   Hinweise ans andere Handy ohne Server: `SyncManager` → `HouseholdNotices`; im Hintergrund `HouseholdSyncWorker` (15 min).
   Der Verlauf ist nicht in `RemoteCollection.BULK` (kein Upload beim Anlegen, kein Ersetzen beim Backup-Import).
+- Haushalt verwalten (`HouseholdRepository`): `leave`, `renewCode`, `removeMember` (erneuert immer auch den Code).
+  Der aktuelle Code steht nach dem ersten Erneuern in `households/{hid}.code`; `SyncManager` übernimmt ihn und prüft
+  per `dropIfRemoved`, ob das Handy entfernt wurde (nur bei eindeutiger Server-Antwort). Regeländerungen immer mit
+  dem Firestore-Emulator prüfen und danach in der Firebase-Konsole veröffentlichen.
 - NFC: Chips enthalten `vorrat://entry/{id}` (`NfcLink`); maßgeblich ist die Chip-Kennung `nfcTagId` am Eintrag.
 
 ## Konventionen

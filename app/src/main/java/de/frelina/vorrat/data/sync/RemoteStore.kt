@@ -72,6 +72,9 @@ sealed interface RemoteOp {
     data class Delete(override val collection: RemoteCollection, override val id: String) : RemoteOp
 }
 
+/** Mitglied eines Haushalts: UID der Mitgliedschaft und Beitrittszeit (ms; null, solange der Server sie noch nicht gesetzt hat). */
+data class RemoteMember(val uid: String, val joinedAt: Long?)
+
 fun interface RemoteRegistration {
     fun remove()
 }
@@ -100,7 +103,29 @@ interface RemoteStore {
     /** Trägt [uid] als Mitglied ein (Regeln prüfen den Code) und wartet auf den Server. */
     suspend fun joinHousehold(householdId: String, uid: String, code: String)
 
-    fun observeMemberCount(householdId: String): Flow<Int>
+    /** Mitglieder des Haushalts (nur für Mitglieder lesbar; ohne Zugriff kommt nichts). */
+    fun observeMembers(householdId: String): Flow<List<RemoteMember>>
+
+    /**
+     * Aktueller Einladungscode aus dem Haushalt-Dokument – nur Werte vom Server, und nur wenn dort einer steht
+     * (Haushalte von vor "Code erneuern" haben keinen; dann gilt der beim Anlegen/Beitreten gespeicherte).
+     */
+    fun observeInviteCode(householdId: String): Flow<String>
+
+    /**
+     * Ist [uid] laut Server Mitglied? false auch, wenn der Server das Lesen verweigert (dann ist man keins);
+     * null = unbekannt (offline, anderer Fehler).
+     */
+    suspend fun isMember(householdId: String, uid: String): Boolean?
+
+    /** Eigene Mitgliedschaft löschen und auf den Server warten. */
+    suspend fun leaveHousehold(householdId: String, uid: String)
+
+    /**
+     * Einladungscode austauschen – in EINEM Batch: neue Einladung [newCode] anlegen, sie im Haushalt-Dokument
+     * eintragen, alte Einladung [oldCode] löschen und optional das Mitglied [removeUid] entfernen. Wartet auf den Server.
+     */
+    suspend fun replaceInvite(householdId: String, uid: String, oldCode: String, newCode: String, removeUid: String? = null)
 
     fun set(householdId: String, collection: RemoteCollection, id: String, data: Map<String, Any?>)
 
@@ -118,7 +143,13 @@ interface RemoteStore {
     /** Einzelnes Dokument (Server, offline aus dem Cache) oder null. */
     suspend fun getDocument(householdId: String, collection: RemoteCollection, id: String): Map<String, Any?>?
 
-    fun listen(householdId: String, collection: RemoteCollection, onSnapshot: (RemoteSnapshot) -> Unit): RemoteRegistration
+    /** [onDenied]: der Server verweigert das Lesen (z. B. nicht mehr Mitglied); der Listener ist dann beendet. */
+    fun listen(
+        householdId: String,
+        collection: RemoteCollection,
+        onDenied: () -> Unit = {},
+        onSnapshot: (RemoteSnapshot) -> Unit,
+    ): RemoteRegistration
 
     companion object {
         /** Firestore: höchstens 500 Schreiboperationen pro Batch. */

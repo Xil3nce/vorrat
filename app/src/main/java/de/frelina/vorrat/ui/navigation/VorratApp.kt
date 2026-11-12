@@ -294,7 +294,11 @@ fun VorratRoot(
                     onOpenRecipes = { navController.navigate(RecipesRoute) },
                     onOpenMealPlan = { navController.navigate(MealPlanRoute) },
                     onOpenDepartments = { navController.navigate(DepartmentsRoute) },
+                    onOpenHousehold = { navController.navigate(HouseholdRoute) },
                 )
+            }
+            composable<HouseholdRoute> {
+                de.frelina.vorrat.ui.household.HouseholdManageScreen(onBack = { navController.popBackStack() })
             }
             composable<EntryDetailRoute> {
                 EntryDetailScreen(

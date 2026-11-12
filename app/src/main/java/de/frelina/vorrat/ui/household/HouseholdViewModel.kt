@@ -29,6 +29,12 @@ class HouseholdViewModel @Inject constructor(
     private val repository: HouseholdRepository,
 ) : ViewModel() {
 
+    /** Code des zuletzt verlassenen Haushalts (Vorbelegung des Code-Felds). */
+    val lastCode: StateFlow<String?> = repository.lastCode.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Dieses Handy wurde aus seinem Haushalt entfernt. */
+    val removedNotice: StateFlow<Boolean> = repository.removedNotice.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     val root: StateFlow<RootState> = repository.household
         .map { if (it == null) RootState.NEEDS_HOUSEHOLD else RootState.READY }
         .stateIn(viewModelScope, SharingStarted.Eagerly, RootState.LOADING)

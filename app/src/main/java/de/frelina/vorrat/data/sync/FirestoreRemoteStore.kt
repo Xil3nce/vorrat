@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +16,7 @@ import javax.inject.Singleton
 
 /**
  * Firestore-Struktur (siehe firestore.rules im Repo):
- * - `households/{hid}` {ownerUid, createdAt}
+ * - `households/{hid}` {ownerUid, createdAt, code} (code = aktueller Einladungscode)
  * - `households/{hid}/members/{uid}` {code, joinedAt}
  * - `invites/{code}` {householdId, createdBy}
  * - `households/{hid}/{locations|units|quantityTypes|products|entries|images}/{id}`
@@ -41,6 +42,8 @@ class FirestoreRemoteStore @Inject constructor() : RemoteStore {
     override suspend fun createHousehold(uid: String, code: String): String {
         val ref = firestore.collection(HOUSEHOLDS).document()
         firestore.batch()
+            // Ohne "code": Der beim Anlegen vergebene Code steht in der Mitgliedschaft und auf dem Gerät; das Feld
+            // kommt erst beim Erneuern dazu (so funktioniert das Anlegen auch mit älteren Regeln).
             .set(ref, mapOf("ownerUid" to uid, "createdAt" to FieldValue.serverTimestamp()))
             .set(ref.collection(MEMBERS).document(uid), mapOf("code" to code, "joinedAt" to FieldValue.serverTimestamp()))
             .set(firestore.collection(INVITES).document(code), mapOf("householdId" to ref.id, "createdBy" to uid))
@@ -60,15 +63,48 @@ class FirestoreRemoteStore @Inject constructor() : RemoteStore {
             .await()
     }
 
-    override fun observeMemberCount(householdId: String): Flow<Int> = callbackFlow {
+    override fun observeMembers(householdId: String): Flow<List<RemoteMember>> = callbackFlow {
         val registration = household(householdId).collection(MEMBERS).addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.w(TAG, "Mitglieder nicht lesbar", error)
                 return@addSnapshotListener
             }
-            if (snapshot != null) trySend(snapshot.size())
+            if (snapshot != null) {
+                trySend(snapshot.documents.map { RemoteMember(it.id, it.getTimestamp("joinedAt")?.toDate()?.time) })
+            }
         }
         awaitClose { registration.remove() }
+    }
+
+    override fun observeInviteCode(householdId: String): Flow<String> = callbackFlow {
+        val registration = household(householdId).addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.w(TAG, "Haushalt nicht lesbar", error)
+                return@addSnapshotListener
+            }
+            if (snapshot == null || snapshot.metadata.isFromCache || snapshot.metadata.hasPendingWrites()) return@addSnapshotListener
+            snapshot.getString(CODE)?.takeIf { it.isNotBlank() }?.let { trySend(it) }
+        }
+        awaitClose { registration.remove() }
+    }
+
+    override suspend fun isMember(householdId: String, uid: String): Boolean? = try {
+        household(householdId).collection(MEMBERS).document(uid).get(Source.SERVER).await().exists()
+    } catch (e: FirebaseFirestoreException) {
+        if (e.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) false else null
+    }
+
+    override suspend fun leaveHousehold(householdId: String, uid: String) {
+        household(householdId).collection(MEMBERS).document(uid).delete().await()
+    }
+
+    override suspend fun replaceInvite(householdId: String, uid: String, oldCode: String, newCode: String, removeUid: String?) {
+        val batch = firestore.batch()
+            .set(firestore.collection(INVITES).document(newCode), mapOf("householdId" to householdId, "createdBy" to uid))
+            .update(household(householdId), CODE, newCode)
+        if (oldCode.isNotBlank() && oldCode != newCode) batch.delete(firestore.collection(INVITES).document(oldCode))
+        if (removeUid != null) batch.delete(household(householdId).collection(MEMBERS).document(removeUid))
+        batch.commit().await()
     }
 
     override fun set(householdId: String, collection: RemoteCollection, id: String, data: Map<String, Any?>) {
@@ -110,11 +146,13 @@ class FirestoreRemoteStore @Inject constructor() : RemoteStore {
     override fun listen(
         householdId: String,
         collection: RemoteCollection,
+        onDenied: () -> Unit,
         onSnapshot: (RemoteSnapshot) -> Unit,
     ): RemoteRegistration {
         val registration = collection(householdId, collection).addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.w(TAG, "Listener ${collection.path} beendet", error)
+                if (error.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) onDenied()
                 return@addSnapshotListener
             }
             if (snapshot == null) return@addSnapshotListener
@@ -145,5 +183,6 @@ class FirestoreRemoteStore @Inject constructor() : RemoteStore {
         const val HOUSEHOLDS = "households"
         const val MEMBERS = "members"
         const val INVITES = "invites"
+        const val CODE = "code"
     }
 }

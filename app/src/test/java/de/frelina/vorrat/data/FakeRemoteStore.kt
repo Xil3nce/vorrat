@@ -1,12 +1,15 @@
 package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.sync.RemoteCollection
+import de.frelina.vorrat.data.sync.RemoteMember
 import de.frelina.vorrat.data.sync.RemoteOp
 import de.frelina.vorrat.data.sync.RemoteRegistration
 import de.frelina.vorrat.data.sync.RemoteSnapshot
 import de.frelina.vorrat.data.sync.RemoteStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 /** In-Memory-Ersatz für Firestore: speichert Dokumente und protokolliert Schreibaufrufe. */
 class FakeRemoteStore : RemoteStore {
@@ -35,6 +38,7 @@ class FakeRemoteStore : RemoteStore {
     override suspend fun createHousehold(uid: String, code: String): String {
         val hid = "hh-${++households}"
         invites[code] = hid
+        codes[hid] = code
         members.getOrPut(hid) { mutableSetOf() } += uid
         return hid
     }
@@ -46,7 +50,43 @@ class FakeRemoteStore : RemoteStore {
         members.getOrPut(householdId) { mutableSetOf() } += uid
     }
 
-    override fun observeMemberCount(householdId: String): Flow<Int> = flowOf(members[householdId]?.size ?: 0)
+    /** Aktueller Code je Haushalt (Feld im Haushalt-Dokument). */
+    val codes = mutableMapOf<String, String>()
+
+    /** Feste Antwort von [isMember]; null = aus [members] ableiten. */
+    var memberAnswer: Boolean? = null
+
+    /** [isMember] weiß es nicht (offline). */
+    var memberAnswerUnknown = false
+
+    /** Schreibvorgänge am Haushalt schlagen fehl (z. B. von den Regeln abgelehnt). */
+    var failHouseholdWrites = false
+
+    private val membersTick = MutableStateFlow(0)
+    val inviteCodes = MutableSharedFlow<String>(extraBufferCapacity = 8)
+
+    override fun observeMembers(householdId: String): Flow<List<RemoteMember>> =
+        membersTick.map { members[householdId].orEmpty().mapIndexed { i, uid -> RemoteMember(uid, 1_000L * (i + 1)) } }
+
+    override fun observeInviteCode(householdId: String): Flow<String> = inviteCodes
+
+    override suspend fun isMember(householdId: String, uid: String): Boolean? =
+        if (memberAnswerUnknown) null else memberAnswer ?: (members[householdId]?.contains(uid) == true)
+
+    override suspend fun leaveHousehold(householdId: String, uid: String) {
+        check(!failHouseholdWrites) { "PERMISSION_DENIED" }
+        members[householdId]?.remove(uid)
+        membersTick.value++
+    }
+
+    override suspend fun replaceInvite(householdId: String, uid: String, oldCode: String, newCode: String, removeUid: String?) {
+        check(!failHouseholdWrites && members[householdId]?.contains(uid) == true) { "PERMISSION_DENIED" }
+        invites[newCode] = householdId
+        codes[householdId] = newCode
+        invites.remove(oldCode)
+        removeUid?.let { members[householdId]?.remove(it) }
+        membersTick.value++
+    }
 
     override fun set(householdId: String, collection: RemoteCollection, id: String, data: Map<String, Any?>) {
         calls += Call.Set(collection, id, data)
@@ -84,6 +124,7 @@ class FakeRemoteStore : RemoteStore {
     override fun listen(
         householdId: String,
         collection: RemoteCollection,
+        onDenied: () -> Unit,
         onSnapshot: (RemoteSnapshot) -> Unit,
     ): RemoteRegistration = RemoteRegistration { }
 }

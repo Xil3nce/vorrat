@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,12 +39,20 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
+import de.frelina.vorrat.domain.InviteCode
 
 /** Erststart ohne Haushalt: neuen Haushalt anlegen oder mit Einladungscode beitreten. */
 @Composable
 fun OnboardingScreen(viewModel: HouseholdViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val lastCode by viewModel.lastCode.collectAsStateWithLifecycle()
+    val removed by viewModel.removedNotice.collectAsStateWithLifecycle()
     var code by rememberSaveable { mutableStateOf("") }
+    var codeTouched by rememberSaveable { mutableStateOf(false) }
+    // Zuletzt verlassener Haushalt: Code vorschlagen (nach dem Entfernen ist er ungültig – dann nicht).
+    LaunchedEffect(lastCode, removed) {
+        if (!codeTouched) code = lastCode?.takeIf { !removed }?.let(InviteCode::format).orEmpty()
+    }
     var confirmJoin by rememberSaveable { mutableStateOf(false) }
 
     Scaffold { padding ->
@@ -64,6 +73,13 @@ fun OnboardingScreen(viewModel: HouseholdViewModel) {
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
             Text(stringResource(R.string.onboarding_text))
+            if (removed) {
+                Text(
+                    stringResource(R.string.household_removed_notice),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
 
             Button(onClick = viewModel::create, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.onboarding_create))
@@ -84,6 +100,7 @@ fun OnboardingScreen(viewModel: HouseholdViewModel) {
                 value = code,
                 onValueChange = {
                     code = it.take(MAX_INPUT)
+                    codeTouched = true
                     viewModel.clearError()
                 },
                 label = { Text(stringResource(R.string.onboarding_code_label)) },
