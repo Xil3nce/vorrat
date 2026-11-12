@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Sort
@@ -46,6 +47,7 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.material.icons.outlined.Check
@@ -111,6 +113,11 @@ fun StockScreen(
     var sortMenu by remember { mutableStateOf(false) }
     var dialOpen by rememberSaveable { mutableStateOf(false) }
     var searchOpen by rememberSaveable { mutableStateOf(state.query.isNotEmpty()) }
+    val listState = rememberLazyListState()
+    // Lupe: Liste nach oben scrollen und das Suchfeld fokussieren (auch wenn weit unten gescrollt war).
+    var searchRequest by remember { mutableIntStateOf(0) }
+    var focusPending by remember { mutableStateOf(false) }
+    LaunchedEffect(searchRequest) { if (searchRequest > 0) listState.scrollToItem(0) }
     BackHandler(enabled = dialOpen) { dialOpen = false }
     BackHandler(enabled = searchOpen && !dialOpen) { searchOpen = false; viewModel.setQuery("") }
 
@@ -128,8 +135,15 @@ fun StockScreen(
                 actions = {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(end = 8.dp)) {
                     GlassIconButton(Icons.Outlined.Search, stringResource(R.string.stock_search), {
-                        if (searchOpen) viewModel.setQuery("")
-                        searchOpen = !searchOpen
+                        if (searchOpen && listState.firstVisibleItemIndex == 0) {
+                            viewModel.setQuery("")
+                            searchOpen = false
+                        } else {
+                            // Zu oder offen, aber weggescrollt: hochscrollen und fokussieren.
+                            searchOpen = true
+                            focusPending = true
+                            searchRequest++
+                        }
                     })
                     GlassIconButton(Icons.Outlined.Nfc, stringResource(R.string.nfc_read_title), onReadNfc)
                     GlassIconButton(Icons.Outlined.Restaurant, stringResource(R.string.recipes_title), onOpenRecipes)
@@ -192,13 +206,20 @@ fun StockScreen(
                 CircularProgressIndicator()
             }
             else -> LazyColumn(
+                state = listState,
                 modifier = Modifier.padding(padding).fillMaxSize(),
                 contentPadding = PaddingValues(top = 4.dp, bottom = 64.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 if (searchOpen) {
                     item(key = "search") {
-                        SearchField(state.query, viewModel::setQuery, onClose = { searchOpen = false; viewModel.setQuery("") })
+                        SearchField(
+                            state.query,
+                            viewModel::setQuery,
+                            focusPending = focusPending,
+                            onFocused = { focusPending = false },
+                            onClose = { searchOpen = false; viewModel.setQuery("") },
+                        )
                     }
                 }
                 if (state.totalCount > 0 && state.query.isBlank()) {
@@ -257,9 +278,20 @@ fun StockScreen(
 
 /** Suchfeld unter der Kopfzeile (Lupe); durchsucht den gefilterten Bestand. */
 @Composable
-private fun SearchField(query: String, onQuery: (String) -> Unit, onClose: () -> Unit) {
+private fun SearchField(
+    query: String,
+    onQuery: (String) -> Unit,
+    focusPending: Boolean,
+    onFocused: () -> Unit,
+    onClose: () -> Unit,
+) {
     val focus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { if (query.isEmpty()) focus.requestFocus() }
+    LaunchedEffect(focusPending) {
+        if (focusPending) {
+            focus.requestFocus()
+            onFocused()
+        }
+    }
     OutlinedTextField(
         value = query,
         onValueChange = onQuery,
