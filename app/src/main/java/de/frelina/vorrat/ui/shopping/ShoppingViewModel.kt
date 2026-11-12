@@ -90,6 +90,29 @@ data class AddSearchState(
     val canSearchOnline: Boolean = false,
 )
 
+/** Einträge der Einkaufsliste für die Gruppierung nach Abteilungen (Liste und Einkaufsmodus). */
+internal fun shoppingInputs(list: ShoppingList): List<BoardInput<ShoppingPayload>> =
+    list.shortages.map { s ->
+        BoardInput<ShoppingPayload>(
+            key = "s-" + s.product.id,
+            name = s.product.name,
+            productId = s.product.id,
+            category = s.product.category,
+            manualGroup = s.product.ingredientGroup,
+            payload = ShoppingPayload.Short(s),
+        )
+    } + list.items.map { e ->
+        val payload = ShoppingPayload.Item(e)
+        BoardInput<ShoppingPayload>(
+            key = "i-" + e.item.id,
+            name = e.item.name,
+            productId = payload.productId,
+            category = e.product?.category,
+            manualGroup = e.product?.ingredientGroup,
+            payload = payload,
+        )
+    }
+
 @HiltViewModel
 class ShoppingViewModel @Inject constructor(
     private val repository: ShoppingRepository,
@@ -155,31 +178,9 @@ class ShoppingViewModel @Inject constructor(
             departments = departments,
             units = units.associate { it.id to it.symbol },
             assignments = assignments,
-            rows = if (grouped) ShoppingBoard.build(departments, assignments, inputs(list)) else emptyList(),
+            rows = if (grouped) ShoppingBoard.build(departments, assignments, shoppingInputs(list)) else emptyList(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
-
-    private fun inputs(list: ShoppingList): List<BoardInput<ShoppingPayload>> =
-        list.shortages.map { s ->
-            BoardInput<ShoppingPayload>(
-                key = "s-" + s.product.id,
-                name = s.product.name,
-                productId = s.product.id,
-                category = s.product.category,
-                manualGroup = s.product.ingredientGroup,
-                payload = ShoppingPayload.Short(s),
-            )
-        } + list.items.map { e ->
-            val payload = ShoppingPayload.Item(e)
-            BoardInput<ShoppingPayload>(
-                key = "i-" + e.item.id,
-                name = e.item.name,
-                productId = payload.productId,
-                category = e.product?.category,
-                manualGroup = e.product?.ingredientGroup,
-                payload = payload,
-            )
-        }
 
     /** Neuer Artikel aus dem Hinzufügen-Dialog (Name passt zu Produkt → verknüpft; steht schon drauf → Menge erhöht). */
     fun add(name: String, quantity: Int = 1, packageSize: java.math.BigDecimal? = null, unitSymbol: String? = null) =

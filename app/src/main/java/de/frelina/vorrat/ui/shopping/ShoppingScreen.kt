@@ -70,6 +70,7 @@ import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.DragHandle
 import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.AlertDialog
 import de.frelina.vorrat.ui.components.GlassCard
@@ -155,6 +156,7 @@ fun ShoppingScreen(
     onBought: (productId: String?, shoppingItemId: String?, name: String) -> Unit,
     onOpenDepartments: () -> Unit,
     onOpenMealPlan: () -> Unit,
+    onOpenShopMode: () -> Unit,
     viewModel: ShoppingViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -167,6 +169,11 @@ fun ShoppingScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.shopping_title)) },
                 actions = {
+                    if (!state.list.isEmpty) {
+                        IconButton(onClick = onOpenShopMode) {
+                            Icon(Icons.Outlined.Storefront, contentDescription = stringResource(R.string.shop_mode_start))
+                        }
+                    }
                     ShoppingMenu(
                         grouped = state.grouped,
                         onToggleGrouped = { viewModel.setGrouped(!state.grouped) },
@@ -774,7 +781,7 @@ private fun SwipeBackground(direction: SwipeToDismissBoxValue, checkLabel: Strin
 
 /** Text der Plakette: "750 g", "2× 500 g", "3×" bzw. "1×". */
 @Composable
-private fun shoppingAmountText(item: ShoppingItemEntity): String {
+internal fun shoppingAmountText(item: ShoppingItemEntity): String {
     val pack = ShoppingLogic.packageLabel(item.packageSize, item.unitSymbol)
     return when {
         pack == null -> stringResource(R.string.shopping_quantity, item.quantity)

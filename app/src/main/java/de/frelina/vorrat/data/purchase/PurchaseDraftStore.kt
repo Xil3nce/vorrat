@@ -52,6 +52,13 @@ data class PurchaseDraft(
     val nfcTagId: String? = null,
     /** Vom Nutzer im Formular geprüft/ergänzt. */
     val edited: Boolean = false,
+    /**
+     * Im Einkaufsmodus abgehakt: Schlüssel des Eintrags der Einkaufsliste ("s-<Produkt>" unter Mindestbestand,
+     * "i-<Listeneintrag>" manuell). null = per Scan erfasst.
+     */
+    val shoppingKey: String? = null,
+    /** Wie oft ein abgehakter Artikel danach gescannt wurde (0 = nur abgehakt, noch ohne Scan-Angaben). */
+    val scans: Int = 0,
 )
 
 /**
@@ -79,13 +86,24 @@ class PurchaseDraftStore(private val file: File) {
      * erhöht nur die Anzahl des vorhandenen Artikels. Liefert den betroffenen Artikel.
      */
     suspend fun addScanned(draft: PurchaseDraft): PurchaseDraft = modify { list ->
-        val index = PurchaseLogic.twinIndex(list, draft)
+        // Im Einkaufsmodus abgehakt und jetzt zum ersten Mal gescannt: Artikel ergänzen statt verdoppeln.
+        val checked = PurchaseLogic.checkedIndex(list, draft)
+        val index = if (checked >= 0) checked else PurchaseLogic.twinIndex(list, draft)
         if (index < 0) {
             (list + draft) to draft
         } else {
-            val merged = PurchaseLogic.increment(list[index])
+            val merged = if (checked >= 0) PurchaseLogic.fillChecked(list[index], draft) else PurchaseLogic.increment(list[index])
             list.toMutableList().also { it[index] = merged } to merged
         }
+    }
+
+    /**
+     * Eintrag der Einkaufsliste im Einkaufsmodus abhaken: Artikel anlegen, falls für diesen Eintrag noch keiner da ist
+     * (doppeltes Antippen). Liefert true, wenn er neu angelegt wurde.
+     */
+    suspend fun addChecked(draft: PurchaseDraft): Boolean = modify { list ->
+        if (draft.shoppingKey == null || list.any { it.shoppingKey == draft.shoppingKey }) list to false
+        else (list + draft) to true
     }
 
     suspend fun update(draft: PurchaseDraft) = modify { list ->
@@ -164,10 +182,45 @@ object PurchaseLogic {
      */
     fun resolveSlot(saved: Int?, max: Int?): Int? = saved?.takeIf { max != null && it in 1..max }
 
+    /**
+     * Weiterer Scan desselben Artikels: Anzahl + 1. Bei einem abgehakten Artikel zählt die Anzahl von der
+     * Einkaufsliste, bis mehr Packungen gescannt wurden ("2×" abgehakt: zwei Scans bleiben 2, der dritte ergibt 3).
+     */
     fun increment(draft: PurchaseDraft): PurchaseDraft {
         val n = draft.quantity.trim().toIntOrNull() ?: 0
+        if (draft.shoppingKey != null && draft.scans > 0) {
+            val scans = draft.scans + 1
+            return draft.copy(scans = scans, quantity = maxOf(n, scans).coerceAtMost(MAX_QUANTITY).toString())
+        }
         return draft.copy(quantity = (n + 1).coerceAtMost(MAX_QUANTITY).toString())
     }
+
+    /**
+     * Index eines im Einkaufsmodus abgehakten, noch nicht gescannten oder bearbeiteten Artikels zum gescannten
+     * Produkt (gleiches Produkt oder gleicher Barcode), sonst -1.
+     */
+    fun checkedIndex(list: List<PurchaseDraft>, scanned: PurchaseDraft): Int = list.indexOfFirst {
+        it.shoppingKey != null && it.scans == 0 && !it.edited &&
+            ((it.productId != null && it.productId == scanned.productId) || (it.barcode != null && it.barcode == scanned.barcode))
+    }
+
+    /**
+     * Abgehakten Artikel mit den Angaben des Scans ergänzen (Barcode, Produktdaten, Ablaufdatum, Ort);
+     * ID, Bezug zur Einkaufsliste und die Anzahl von der Liste bleiben.
+     */
+    fun fillChecked(checked: PurchaseDraft, scanned: PurchaseDraft): PurchaseDraft = scanned.copy(
+        id = checked.id,
+        shoppingKey = checked.shoppingKey,
+        scans = 1,
+        quantity = checked.quantity,
+        productId = scanned.productId ?: checked.productId,
+        name = scanned.name.ifBlank { checked.name },
+        quantityTypeId = scanned.quantityTypeId ?: checked.quantityTypeId,
+    )
+
+    /** Artikel, die zum Eintrag [key] der Einkaufsliste gehören: dort abgehakt oder dasselbe Produkt gescannt. */
+    fun forShoppingEntry(list: List<PurchaseDraft>, key: String, productId: String?): List<PurchaseDraft> =
+        list.filter { it.shoppingKey == key || (productId != null && it.productId == productId) }
 
     private const val MAX_QUANTITY = 999
 }

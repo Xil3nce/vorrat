@@ -7,6 +7,7 @@ import de.frelina.vorrat.data.purchase.PurchaseDraftStore
 import de.frelina.vorrat.data.repo.ProductRepository
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
+import de.frelina.vorrat.domain.ShopMode
 import de.frelina.vorrat.ui.product.toEntryForm
 import de.frelina.vorrat.ui.product.toProductForm
 import javax.inject.Inject
@@ -61,6 +62,8 @@ class PurchaseCommitter @Inject constructor(
             product.id
         }
         shoppingRepository.removeForProduct(productId)
+        // Im Einkaufsmodus abgehakt: der Listeneintrag ist erledigt, auch wenn sein Name nicht zum Produkt passt.
+        draft.shoppingKey?.let(ShopMode::itemId)?.let { shoppingRepository.remove(it) }
         return true
     }
 }

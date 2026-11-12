@@ -272,6 +272,13 @@ fun VorratRoot(
                     },
                     onOpenDepartments = { navController.navigate(DepartmentsRoute) },
                     onOpenMealPlan = { navController.navigate(MealPlanRoute) },
+                    onOpenShopMode = { navController.navigate(ShopModeRoute) },
+                )
+            }
+            composable<ShopModeRoute> {
+                de.frelina.vorrat.ui.shopping.ShopModeScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenPurchase = { navController.navigate(PurchaseRoute) },
                 )
             }
             composable<LocationsRoute> {

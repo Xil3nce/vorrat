@@ -289,6 +289,16 @@
         <item quantity="one">%1$d Artikel in den Bestand übernommen</item>
         <item quantity="other">%1$d Artikel in den Bestand übernommen</item>
     </plurals>
+    <string name="shop_mode_title">Einkaufsmodus</string>
+    <string name="shop_mode_start">Einkaufsmodus starten</string>
+    <string name="shop_mode_progress" tools:ignore="PluralsCandidate">%1$d von %2$d im Wagen</string>
+    <string name="shop_mode_all_done">Alles im Wagen</string>
+    <string name="shop_mode_hint">Antippen legt den Artikel in den Einkauf. Am Ende alles gesammelt in den Bestand übernehmen.</string>
+    <string name="shop_mode_in_cart">Im Wagen</string>
+    <string name="shop_mode_state_open">Offen</string>
+    <string name="shop_mode_unchecked">„%1$s“ wieder auf der Liste</string>
+    <string name="shop_mode_open_purchase">Einkauf anzeigen (%1$d)</string>
+    <string name="shop_mode_empty">Die Einkaufsliste ist leer.</string>
     <string name="scan_hint_consume">Entnehmen: Artikel nacheinander scannen und danach gesammelt ausbuchen.</string>
     <string name="consume_list_added">%1$s zur Scan-Liste hinzugefügt · aus %2$s</string>
     <string name="consume_list_added_short">%1$s zur Scan-Liste hinzugefügt</string>

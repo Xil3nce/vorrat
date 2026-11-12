@@ -50,6 +50,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class BoughtScanRoute(val shoppingItemId: String, val name: String)
 /** Einkauf ("+ Bestand"): gescannte Artikel prüfen und in den Bestand übernehmen. */
 @Serializable data object PurchaseRoute
+/** Einkaufsmodus: Einkaufsliste im Laden abhaken; Abgehaktes landet im Einkauf. */
+@Serializable data object ShopModeRoute
 /** Entnehmen: im Scanner vorgemerkte Entnahmen prüfen und gesammelt ausbuchen. */
 @Serializable data object ConsumeRoute
 @Serializable data class EditEntryRoute(val editEntryId: String)
