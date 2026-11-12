@@ -5,6 +5,7 @@ import de.frelina.vorrat.data.off.LookedUpProduct
 import de.frelina.vorrat.data.off.LookupErrorKind
 import de.frelina.vorrat.data.off.LookupResult
 import de.frelina.vorrat.data.off.ProductLookupSource
+import de.frelina.vorrat.data.off.SearchResult
 import de.frelina.vorrat.data.repo.ScanRepository
 import de.frelina.vorrat.data.db.LookupCacheEntity
 import de.frelina.vorrat.domain.Nutrition
@@ -28,6 +29,7 @@ class ScanRepositoryTest : DbTestBase() {
             calls++
             return result
         }
+        override suspend fun search(query: String): SearchResult = SearchResult.Hits(emptyList())
         override suspend fun downloadImage(url: String): ByteArray = byteArrayOf(1, 2, 3)
     }
 

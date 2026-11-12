@@ -4,6 +4,7 @@ import de.frelina.vorrat.data.db.ProductDao
 import de.frelina.vorrat.data.db.ProductEntity
 import de.frelina.vorrat.data.db.ProductSource
 import de.frelina.vorrat.data.image.ImageStore
+import de.frelina.vorrat.data.off.LookedUpProduct
 import de.frelina.vorrat.data.db.ShoppingDao
 import de.frelina.vorrat.data.db.ShoppingItemEntity
 import de.frelina.vorrat.data.db.StockEntryDao
@@ -139,6 +140,39 @@ class ShoppingRepository @Inject constructor(
         productDao.insert(product)
         remote.putProduct(product)
         return addProduct(product)
+    }
+
+    /**
+     * Treffer der Open-Food-Facts-Suche auf die Liste setzen. Wie bei [addScanned] wird ein lokal unbekanntes
+     * Produkt angelegt (Barcode, Marke, Kategorie, Bild aus [imageBytes]); ein bekannter Barcode bzw. ein
+     * gleichnamiges Produkt wird wiederverwendet.
+     */
+    suspend fun addLookedUp(
+        found: LookedUpProduct,
+        imageBytes: ByteArray?,
+        quantity: Int = 1,
+        packageSize: BigDecimal? = null,
+        unitSymbol: String? = null,
+    ): ShoppingItemEntity? {
+        productDao.getByBarcode(found.barcode)?.let { return addProduct(it, quantity, packageSize, unitSymbol) }
+        val name = found.name?.trim()?.take(RemoteMapper.MAX_TEXT)?.takeIf { it.isNotEmpty() } ?: return null
+        ShoppingLogic.matchProduct(name, productDao.getAll())?.let { return addProduct(it, quantity, packageSize, unitSymbol) }
+        val now = System.currentTimeMillis()
+        val product = ProductEntity(
+            barcode = found.barcode,
+            name = name,
+            brand = found.brand?.trim()?.take(RemoteMapper.MAX_TEXT)?.takeIf { it.isNotEmpty() },
+            category = found.category?.trim()?.takeIf { it.isNotEmpty() },
+            packageSize = null,
+            unitId = null,
+            imagePath = imageBytes?.let { imageStore.saveBytes(it) },
+            source = ProductSource.OPEN_FOOD_FACTS,
+            createdAt = now,
+            updatedAt = now,
+        )
+        productDao.insert(product)
+        remote.putProduct(product)
+        return addProduct(product, quantity, packageSize, unitSymbol)
     }
 
     /** Produkt hinzufügen; steht es schon (manuell) auf der Liste, wird die Menge erhöht. */

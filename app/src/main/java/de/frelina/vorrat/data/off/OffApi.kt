@@ -64,3 +64,49 @@ data class OffProduct(
     val productQuantityText: String?
         get() = (productQuantity as? JsonPrimitive)?.contentOrNull
 }
+
+/**
+ * Volltextsuche über Search-a-licious (Nachfolger der alten /cgi/search.pl; die v2-API hat keine Volltextsuche).
+ * Doku: https://search.openfoodfacts.org/docs (OpenAPI unter /openapi.json, Stand 2026-11-12).
+ * `q` durchsucht Produktname, Gattungsname, Kategorien und Labels (je in `langs`) sowie Marken und erlaubt
+ * Lucene-Filter wie `countries_tags:"en:germany"`.
+ * OFF-Doku: Suchanfragen höchstens 10/min je IP, nicht für Suche beim Tippen geeignet.
+ */
+interface OffSearchApi {
+    @GET("search")
+    suspend fun search(
+        @Query("q") query: String,
+        @Query("langs") langs: String = "de",
+        @Query("page_size") pageSize: Int = PAGE_SIZE,
+        @Query("fields") fields: String = FIELDS,
+        @Query("sort_by") sortBy: String = "-unique_scans_n",
+    ): Response<OffSearchResponse>
+
+    companion object {
+        const val BASE_URL = "https://search.openfoodfacts.org/"
+        const val PAGE_SIZE = 20
+        const val FIELDS =
+            "code,product_name,product_name_de,brands,quantity,product_quantity,product_quantity_unit," +
+                "image_front_small_url,categories_tags"
+    }
+}
+
+@Serializable
+data class OffSearchResponse(
+    val hits: List<OffSearchHit> = emptyList(),
+    val count: Int? = null,
+)
+
+@Serializable
+data class OffSearchHit(
+    val code: String? = null,
+    @SerialName("product_name") val productName: String? = null,
+    @SerialName("product_name_de") val productNameDe: String? = null,
+    /** In Search-a-licious eine Liste, in der Produkt-API ein kommagetrennter Text → JsonElement. */
+    val brands: JsonElement? = null,
+    val quantity: String? = null,
+    @SerialName("product_quantity") val productQuantity: JsonElement? = null,
+    @SerialName("product_quantity_unit") val productQuantityUnit: String? = null,
+    @SerialName("image_front_small_url") val imageFrontSmallUrl: String? = null,
+    @SerialName("categories_tags") val categoriesTags: List<String>? = null,
+)

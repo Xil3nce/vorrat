@@ -109,6 +109,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.frelina.vorrat.R
+import coil3.compose.AsyncImage
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.ui.layout.ContentScale
+import de.frelina.vorrat.data.db.ProductEntity
+import de.frelina.vorrat.data.off.LookedUpProduct
+import de.frelina.vorrat.data.off.LookupErrorKind
 import de.frelina.vorrat.data.db.DepartmentEntity
 import de.frelina.vorrat.data.repo.ShoppingEntry
 import de.frelina.vorrat.domain.BoardRow
@@ -219,12 +226,21 @@ fun ShoppingScreen(
     }
 
     if (addDialog) {
+        val addSearch by viewModel.addSearch.collectAsStateWithLifecycle()
         ShoppingAddDialog(
             unitSymbols = state.units.values.distinct().sorted(),
-            onDismiss = { addDialog = false },
-            onAdd = { name, quantity, size, unit ->
+            search = addSearch,
+            onQueryChange = viewModel::setAddQuery,
+            onSearchOnline = viewModel::searchOnline,
+            onDismiss = {
                 addDialog = false
-                viewModel.add(name, quantity, size, unit)
+                viewModel.resetAddSearch()
+            },
+            onAdd = { name, quantity, size, unit, pick ->
+                addDialog = false
+                viewModel.resetAddSearch()
+                if (pick != null) viewModel.addPicked(pick, quantity, size, unit)
+                else viewModel.add(name, quantity, size, unit)
             },
         )
     }
@@ -779,14 +795,18 @@ private val LIST_BOTTOM_PADDING = 88.dp
 @Composable
 private fun ShoppingAddDialog(
     unitSymbols: List<String>,
+    search: AddSearchState,
+    onQueryChange: (String) -> Unit,
+    onSearchOnline: () -> Unit,
     onDismiss: () -> Unit,
-    onAdd: (name: String, quantity: Int, packageSize: BigDecimal?, unit: String?) -> Unit,
+    onAdd: (name: String, quantity: Int, packageSize: BigDecimal?, unit: String?, pick: AddPick?) -> Unit,
 ) {
     var name by rememberSaveable { mutableStateOf("") }
     var quantity by rememberSaveable { mutableIntStateOf(1) }
     var size by rememberSaveable { mutableStateOf("") }
     var unit by rememberSaveable { mutableStateOf("") }
     var unitOpen by remember { mutableStateOf(false) }
+    var pick by remember { mutableStateOf<AddPick?>(null) }
     val focus = remember { FocusRequester() }
     val sizeResult = Validation.optionalPositiveDecimal(size)
     val sizeError = (sizeResult as? Validated.Error)?.error
@@ -795,15 +815,48 @@ private fun ShoppingAddDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.shopping_add_hint)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState()),
+            ) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it.take(RemoteMapper.MAX_TEXT) },
+                    onValueChange = {
+                        name = it.take(RemoteMapper.MAX_TEXT)
+                        pick = null
+                        onQueryChange(name)
+                    },
                     label = { Text(stringResource(R.string.shopping_edit_name)) },
+                    supportingText = { Text(stringResource(R.string.shopping_add_search_hint)) },
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { if (search.canSearchOnline) onSearchOnline() }),
                     modifier = Modifier.fillMaxWidth().focusRequester(focus),
                 )
+                val chosen = pick
+                if (chosen != null) {
+                    PickedRow(chosen, onClear = { pick = null })
+                } else {
+                    AddSearchResults(
+                        search = search,
+                        onSearchOnline = onSearchOnline,
+                        // Eigenes Produkt: Packungsgröße bleibt leer → beim Hinzufügen gilt die des Produkts.
+                        onPickLocal = { p ->
+                            pick = AddPick.Local(p)
+                            name = p.name
+                        },
+                        // OFF-Treffer: Name und Packungsgröße vorbelegen (bleiben änderbar).
+                        onPickRemote = { p ->
+                            pick = AddPick.Remote(p)
+                            name = p.name.orEmpty()
+                            val packageSize = p.packageSize
+                            if (packageSize != null && packageSize.signum() > 0) {
+                                size = packageSize.stripTrailingZeros().toPlainString().replace('.', ',')
+                                unit = p.unitSymbol.orEmpty()
+                            }
+                        },
+                    )
+                }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.shopping_edit_quantity), modifier = Modifier.weight(1f))
                     IconButton(onClick = { quantity-- }, enabled = quantity > 1) {
@@ -848,7 +901,7 @@ private fun ShoppingAddDialog(
                                 text = { Text(stringResource(R.string.shopping_edit_unit_none)) },
                                 onClick = { unit = ""; unitOpen = false },
                             )
-                            unitSymbols.forEach { symbol ->
+                            (unitSymbols + listOfNotNull(unit.takeIf { it.isNotEmpty() })).distinct().forEach { symbol ->
                                 DropdownMenuItem(text = { Text(symbol) }, onClick = { unit = symbol; unitOpen = false })
                             }
                         }
@@ -860,13 +913,195 @@ private fun ShoppingAddDialog(
             TextButton(
                 onClick = {
                     val value = if (sizeResult is Validated.Ok) sizeResult.value else null
-                    onAdd(name, quantity, value, if (value != null) unit.ifEmpty { null } else null)
+                    onAdd(name, quantity, value, if (value != null) unit.ifEmpty { null } else null, pick)
                 },
                 enabled = sizeError == null && name.isNotBlank(),
             ) { Text(stringResource(R.string.shopping_add)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
+}
+
+/** Vorschläge aus den eigenen Produkten und – auf Knopfdruck – Treffer von Open Food Facts. */
+@Composable
+private fun AddSearchResults(
+    search: AddSearchState,
+    onSearchOnline: () -> Unit,
+    onPickLocal: (ProductEntity) -> Unit,
+    onPickRemote: (LookedUpProduct) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (search.local.isNotEmpty()) {
+            SearchSectionLabel(stringResource(R.string.shopping_add_own_products))
+            search.local.forEach { p ->
+                SuggestionRow(
+                    title = p.name,
+                    subtitle = suggestionSubtitle(p.brand, null, null),
+                    image = { ProductImage(p.imagePath, 40.dp, name = p.name) },
+                    onClick = { onPickLocal(p) },
+                )
+            }
+        }
+        when (val online = search.online) {
+            OnlineSearch.Idle -> if (search.canSearchOnline) {
+                TextButton(onClick = onSearchOnline) {
+                    Icon(Icons.Outlined.Search, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.shopping_add_search_off))
+                }
+            }
+            OnlineSearch.Loading -> Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                Text(stringResource(R.string.shopping_add_search_loading), style = MaterialTheme.typography.bodyMedium)
+            }
+            is OnlineSearch.Done -> {
+                SearchSectionLabel(stringResource(R.string.shopping_add_off_results))
+                if (online.hits.isEmpty()) {
+                    Text(
+                        stringResource(R.string.shopping_add_off_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                online.hits.forEach { p ->
+                    SuggestionRow(
+                        title = p.name.orEmpty(),
+                        subtitle = suggestionSubtitle(p.brand, p.packageSize, p.unitSymbol),
+                        image = { RemoteImage(p.imageUrl, p.name) },
+                        onClick = { onPickRemote(p) },
+                    )
+                }
+            }
+            is OnlineSearch.Failed -> Column {
+                Text(
+                    stringResource(searchErrorText(online.kind)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                TextButton(onClick = onSearchOnline) { Text(stringResource(R.string.shopping_add_search_retry)) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchSectionLabel(text: String) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 4.dp),
+    )
+}
+
+@Composable
+private fun SuggestionRow(title: String, subtitle: String?, image: @Composable () -> Unit, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 4.dp, vertical = 6.dp),
+    ) {
+        image()
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (subtitle != null) {
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+/** Gewählter Treffer; über das X wird die Verknüpfung wieder aufgehoben (dann Freitext). */
+@Composable
+private fun PickedRow(pick: AddPick, onClear: () -> Unit) {
+    val title: String
+    val subtitle: String?
+    when (pick) {
+        is AddPick.Local -> {
+            title = pick.product.name
+            subtitle = pick.product.brand
+        }
+        is AddPick.Remote -> {
+            title = pick.product.name.orEmpty()
+            subtitle = listOfNotNull(pick.product.brand, stringResource(R.string.shopping_add_off_source))
+                .joinToString(" · ")
+        }
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
+    ) {
+        when (pick) {
+            is AddPick.Local -> ProductImage(pick.product.imagePath, 40.dp, name = pick.product.name)
+            is AddPick.Remote -> RemoteImage(pick.product.imageUrl, pick.product.name)
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.shopping_add_picked, title),
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (!subtitle.isNullOrBlank()) {
+                Text(
+                    subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+        IconButton(onClick = onClear) {
+            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.shopping_add_unpick))
+        }
+    }
+}
+
+/** Kleines OFF-Vorschaubild (lokal gespeichert wird es erst beim Hinzufügen); ohne Bild das Kürzel. */
+@Composable
+private fun RemoteImage(url: String?, name: String?) {
+    if (url == null) {
+        ProductImage(null, 40.dp, name = name)
+    } else {
+        AsyncImage(
+            model = url,
+            contentDescription = stringResource(R.string.product_image),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)),
+        )
+    }
+}
+
+private fun suggestionSubtitle(brand: String?, size: BigDecimal?, unit: String?): String? =
+    listOfNotNull(brand?.takeIf { it.isNotBlank() }, ShoppingLogic.packageLabel(size, unit))
+        .joinToString(" · ")
+        .ifEmpty { null }
+
+private fun searchErrorText(kind: LookupErrorKind): Int = when (kind) {
+    LookupErrorKind.NO_NETWORK -> R.string.shopping_add_search_error_network
+    LookupErrorKind.TIMEOUT -> R.string.shopping_add_search_error_timeout
+    LookupErrorKind.RATE_LIMITED -> R.string.shopping_add_search_error_rate_limited
+    LookupErrorKind.SERVER -> R.string.shopping_add_search_error_server
 }
 
 /** Anzahl, Packungsgröße und Einheit eines Listeneintrags pflegen (wie im Bestand-Formular). */

@@ -24,6 +24,7 @@ import de.frelina.vorrat.data.db.StockEntryDao
 import de.frelina.vorrat.data.db.UnitDao
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.off.OffApi
+import de.frelina.vorrat.data.off.OffSearchApi
 import de.frelina.vorrat.data.off.OpenFoodFactsSource
 import de.frelina.vorrat.data.off.ProductLookupSource
 import de.frelina.vorrat.data.sync.FirestoreRemoteStore
@@ -119,6 +120,15 @@ object AppModule {
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(OffApi::class.java)
+
+    @Provides
+    @Singleton
+    fun offSearchApi(client: OkHttpClient, json: Json): OffSearchApi = Retrofit.Builder()
+        .baseUrl(OffSearchApi.BASE_URL)
+        .client(client)
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+        .build()
+        .create(OffSearchApi::class.java)
 
     @Provides
     @Singleton

@@ -1,6 +1,7 @@
 package de.frelina.vorrat.data
 
 import de.frelina.vorrat.data.db.StockEntryEntity
+import de.frelina.vorrat.data.off.LookedUpProduct
 import de.frelina.vorrat.data.repo.ProductPrefill
 import de.frelina.vorrat.data.repo.ShoppingRepository
 import de.frelina.vorrat.data.repo.StockRepository
@@ -54,6 +55,32 @@ class NewFeaturesDataTest : DbTestBase() {
     }
 
     // ---------------------------------------------------------------- Einkaufsliste
+
+    @Test fun `OFF-Suchtreffer wird als Produkt mit Bild angelegt, bekannter Barcode wiederverwendet`() = runBlocking {
+        val found = LookedUpProduct(
+            barcode = "4000000000009", name = "Haferflocken zart", brand = "Kölln", category = "en:oat-flakes",
+            packageSize = "500".toBigDecimal(), unitSymbol = "g", imageUrl = "https://example.org/x.jpg",
+        )
+        val added = shopping.addLookedUp(found, byteArrayOf(1, 2, 3), quantity = 2, packageSize = "500".toBigDecimal(), unitSymbol = "g")!!
+        val product = db.productDao().getByBarcode("4000000000009")!!
+        assertEquals(product.id, added.productId)
+        assertEquals("Kölln", product.brand)
+        assertTrue(images.fileOrNull(product.imagePath) != null)
+        assertEquals(2, added.quantity)
+        assertEquals("500".toBigDecimal(), added.packageSize)
+        assertTrue(remote.doc(RemoteCollection.PRODUCTS, product.id) != null)
+        // Gleicher Treffer erneut → kein zweites Produkt, Menge erhöht
+        shopping.addLookedUp(found, null)
+        assertEquals(1, db.productDao().getAll().count { it.barcode == "4000000000009" })
+        assertEquals(3, db.shoppingDao().getAll().single().quantity)
+    }
+
+    @Test fun `OFF-Suchtreffer mit Namen eines eigenen Produkts verknuepft dieses`() = runBlocking {
+        val own = product(name = "Nutella", barcode = "111")
+        val found = LookedUpProduct("999", "nutella", "Ferrero", null, null, null, null)
+        assertEquals(own, shopping.addLookedUp(found, null)!!.productId)
+        assertNull(db.productDao().getByBarcode("999"))
+    }
 
     @Test fun `Gescanntes unbekanntes Produkt kommt mit Bild auf die Liste`() = runBlocking {
         val offImage = images.saveBytes(byteArrayOf(1, 2, 3))

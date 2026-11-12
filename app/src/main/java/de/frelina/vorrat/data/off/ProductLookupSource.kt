@@ -26,12 +26,21 @@ sealed interface LookupResult {
     data class Failed(val kind: LookupErrorKind) : LookupResult
 }
 
+/** Ergebnis einer Textsuche (Name, Marke, Kategorie). */
+sealed interface SearchResult {
+    data class Hits(val products: List<LookedUpProduct>) : SearchResult
+    data class Failed(val kind: LookupErrorKind) : SearchResult
+}
+
 /**
  * Abstraktion für Barcode-Abfragen. Bewusst gibt es nur Open Food Facts; weitere Quellen
  * können später als zusätzliche Implementierung ergänzt werden.
  */
 interface ProductLookupSource {
     suspend fun lookup(barcode: String): LookupResult
+
+    /** Textsuche über Name, Marke und Kategorie (eingeschränkt auf in Deutschland erhältliche Produkte). */
+    suspend fun search(query: String): SearchResult
 
     /** Lädt ein Produktbild herunter (null bei Fehler). */
     suspend fun downloadImage(url: String): ByteArray?
