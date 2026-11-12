@@ -282,8 +282,6 @@ class ScanViewModel @Inject constructor(
     fun consume(entryId: String, amount: Int) = viewModelScope.launch {
         val entry = stockRepository.getEntry(entryId) ?: return@launch refresh()
         val n = ConsumeLogic.clamp(amount, entry.quantity)
-        val symbol = stockRepository.itemsForProduct(entry.productId)
-            .firstOrNull { it.entryId == entryId }?.quantityTypeSymbol.orEmpty()
         val result = stockRepository.changeQuantity(entryId, -n)
         // Hinweis, wenn der Vorrat dadurch unter den Mindestbestand fällt.
         val nowShort = !shoppingRepository.isOnListManually(entry.productId) &&
@@ -291,7 +289,7 @@ class ScanViewModel @Inject constructor(
         messages.show(
             UiMessage(
                 text = if (nowShort) R.string.consume_done_shopping else R.string.consume_done,
-                args = listOf(n, symbol),
+                args = listOf(n),
                 actionLabel = R.string.action_undo,
                 onAction = {
                     when (result) {

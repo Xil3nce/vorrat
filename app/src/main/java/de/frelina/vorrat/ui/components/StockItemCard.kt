@@ -153,7 +153,7 @@ fun StockItemCard(
                         item.openedAt?.let { opened -> OpenedBadge(opened, Modifier.padding(start = 8.dp)) }
                     }
                 }
-                CountCircle(stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol))
+                CountCircle(stringResource(R.string.quantity_label, item.quantity))
             }
             expiryFraction(item, today)?.let { fraction ->
                 ExpiryBar(fraction, color, Modifier.padding(top = 10.dp))

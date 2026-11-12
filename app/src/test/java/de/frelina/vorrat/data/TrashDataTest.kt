@@ -46,7 +46,7 @@ class TrashDataTest : DbTestBase() {
         assertNull(remote.doc(RemoteCollection.ENTRIES, id))
         val item = store.all().single()
         assertEquals("Nutella", item.title)
-        assertEquals("3 Stck. · Keller", item.detail)
+        assertEquals("3x · Keller", item.detail)
         // Auch nach Neustart (neue Instanz liest die Datei) noch da.
         assertEquals(1, TrashStore(file).all().size)
 

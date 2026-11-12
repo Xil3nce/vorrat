@@ -219,7 +219,7 @@ class StockRepository @Inject constructor(
                     id = entry.id,
                     kind = TrashKind.ENTRY,
                     title = item?.productName.orEmpty(),
-                    detail = item?.let { listOfNotNull("${it.quantity} ${it.quantityTypeSymbol}", it.locationName).joinToString(" · ") },
+                    detail = item?.let { listOfNotNull("${it.quantity}x", it.locationName).joinToString(" · ") },
                     deletedAt = System.currentTimeMillis(),
                     entry = TrashedEntry.of(entry),
                 ),

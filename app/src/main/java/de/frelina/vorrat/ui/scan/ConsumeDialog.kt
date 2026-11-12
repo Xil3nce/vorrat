@@ -90,7 +90,7 @@ fun ConsumeDialog(
                             Column {
                                 Text(
                                     locationText(item) + " – " +
-                                        stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
+                                        stringResource(R.string.quantity_label, item.quantity),
                                 )
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
@@ -107,7 +107,7 @@ fun ConsumeDialog(
                 } else {
                     Text(
                         locationText(selected) + " – " +
-                            stringResource(R.string.quantity_label, selected.quantity, selected.quantityTypeSymbol),
+                            stringResource(R.string.quantity_label, selected.quantity),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -124,7 +124,7 @@ fun ConsumeDialog(
                         modifier = Modifier.size(56.dp),
                     ) { Icon(Icons.Outlined.Remove, contentDescription = stringResource(R.string.action_decrease)) }
                     Text(
-                        stringResource(R.string.quantity_label, amount, selected.quantityTypeSymbol),
+                        stringResource(R.string.quantity_label, amount),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                     FilledTonalIconButton(

@@ -217,7 +217,7 @@ fun EntryDetailScreen(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(stringResource(R.string.detail_quantity), style = MaterialTheme.typography.labelLarge, color = VorratTheme.colors.textSecondary)
                             Text(
-                                stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
+                                stringResource(R.string.quantity_label, item.quantity),
                                 style = MaterialTheme.typography.headlineMedium,
                             )
                         }

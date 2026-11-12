@@ -812,7 +812,7 @@ private fun ExistingEntryDialog(
                         Column {
                             Text(
                                 locationText(item) + " – " +
-                                    stringResource(R.string.quantity_label, item.quantity, item.quantityTypeSymbol),
+                                    stringResource(R.string.quantity_label, item.quantity),
                             )
                             Text(expiryText(item, today, leadDays), style = MaterialTheme.typography.bodySmall)
                         }

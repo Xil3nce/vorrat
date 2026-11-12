@@ -168,7 +168,7 @@ private fun HistoryRow(e: HistoryEventEntity, myUid: String?, onNotify: () -> Un
         else -> e.authorName ?: stringResource(R.string.history_someone)
     }
     val time = Instant.ofEpochMilli(e.createdAt).atZone(ZoneId.systemDefault()).format(TIME_FORMAT)
-    val amount = e.quantity?.let { q -> listOfNotNull(q.toString(), e.quantityTypeSymbol).joinToString(" ") }.orEmpty()
+    val amount = e.quantity?.let { q -> "${q}x" }.orEmpty()
     val headline = when (e.action) {
         HistoryAction.ADDED -> stringResource(R.string.history_added, who, amount, e.productName)
         HistoryAction.REMOVED -> stringResource(R.string.history_removed, who, amount, e.productName)
