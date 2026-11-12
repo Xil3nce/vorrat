@@ -34,6 +34,7 @@ class VorratApp : Application(), Configuration.Provider {
     @Inject lateinit var householdStore: de.frelina.vorrat.data.household.HouseholdStore
     @Inject lateinit var departmentRepository: de.frelina.vorrat.data.repo.DepartmentRepository
     @Inject lateinit var purchaseDrafts: de.frelina.vorrat.data.purchase.PurchaseDraftStore
+    @Inject lateinit var trash: de.frelina.vorrat.data.trash.TrashStore
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -60,11 +61,13 @@ class VorratApp : Application(), Configuration.Provider {
         // Handy die Reihenfolge des Haushalts überschreiben).
         appScope.launch { if (householdStore.currentId() == null) runCatching { departmentRepository.ensureDefaults() } }
         appScope.launch { reminderScheduler.ensureScheduled() }
-        // Verwaiste Bilder (z. B. abgebrochene Erfassung) entfernen.
+        // Papierkorb: nach 30 Tagen endgültig löschen; danach verwaiste Bilder (z. B. abgebrochene Erfassung,
+        // Fotos endgültig gelöschter Rezepte) entfernen.
         appScope.launch {
+            runCatching { trash.purgeExpired() }
             runCatching {
                 val referenced = productDao.getAllImagePaths().toSet() + lookupCacheDao.getAllImagePaths().toSet() +
-                    purchaseDrafts.imagePaths() + recipeDao.getAllImagePaths()
+                    purchaseDrafts.imagePaths() + recipeDao.getAllImagePaths() + trash.imagePaths()
                 imageStore.deleteUnreferenced(referenced)
             }
         }

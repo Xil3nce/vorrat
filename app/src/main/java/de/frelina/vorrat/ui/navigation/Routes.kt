@@ -68,3 +68,6 @@ import kotlinx.serialization.Serializable
     }
 }
 @Serializable data object AboutRoute
+
+/** Papierkorb: gelöschte Bestandseinträge und Rezepte 30 Tage lang wiederherstellen. */
+@Serializable data object TrashRoute

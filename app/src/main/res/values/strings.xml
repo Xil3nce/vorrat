@@ -173,7 +173,7 @@
     <string name="shelf_label">Fach %1$d</string>
     <string name="quantity_label">%1$d %2$s</string>
     <string name="entry_removed">Eintrag entfernt (Anzahl 0)</string>
-    <string name="entry_deleted">Eintrag gelöscht</string>
+    <string name="entry_deleted">Eintrag in den Papierkorb verschoben</string>
     <string name="duplicate_entry_title">Eintrag duplizieren</string>
     <string name="stock_swipe_delete">Löschen</string>
     <string name="stock_swipe_duplicate">Duplizieren</string>
@@ -722,7 +722,7 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
     <string name="recipe_cooked_done">Entnommen – guten Appetit!</string>
     <string name="recipe_copy">Als eigenes Rezept kopieren</string>
     <string name="recipe_delete_title">Rezept löschen?</string>
-    <string name="recipe_delete_text">„%1$s“ wird für alle im Haushalt gelöscht.</string>
+    <string name="recipe_delete_text">„%1$s“ wird für alle im Haushalt gelöscht. Auf diesem Handy bleibt es 30 Tage im Papierkorb.</string>
     <string name="recipe_saved">Rezept gespeichert</string>
     <string name="recipe_new_title">Neues Rezept</string>
     <string name="recipe_edit_title">Rezept bearbeiten</string>
@@ -853,4 +853,49 @@ Neue Anzahl: %1$d + %2$d = %3$d</string>
         <item quantity="other">%d Zutaten übernommen</item>
     </plurals>
     <string name="planshop_nothing_new">Alles Gewählte steht schon auf der Einkaufsliste</string>
+
+    <!-- Schnellkachel -->
+    <string name="tile_scan_label">Vorrat scannen</string>
+    <string name="settings_shortcuts">Schnellzugriff</string>
+    <string name="settings_tile">Schnellkachel hinzufügen</string>
+    <string name="settings_tile_summary">Scanner direkt aus der Statusleiste öffnen</string>
+    <string name="settings_tile_manual">Kachel nicht hinzugefügt – Statusleiste ganz herunterziehen, Stift antippen und „Vorrat scannen“ hineinziehen</string>
+
+    <!-- Papierkorb -->
+    <string name="trash_title">Papierkorb</string>
+    <string name="settings_trash_summary">Gelöschte Einträge und Rezepte 30 Tage wiederherstellen</string>
+    <string name="trash_hint">Gelöschte Bestandseinträge und Rezepte bleiben 30 Tage hier und werden danach endgültig gelöscht. Der Papierkorb gilt nur für dieses Handy.</string>
+    <string name="trash_section_entries">Bestand</string>
+    <string name="trash_section_recipes">Rezepte</string>
+    <string name="trash_untitled">Ohne Namen</string>
+    <string name="trash_deleted_on">Gelöscht am %1$s</string>
+    <plurals name="trash_days_left">
+        <item quantity="one">noch %d Tag</item>
+        <item quantity="other">noch %d Tage</item>
+    </plurals>
+    <string name="trash_restore">Wiederherstellen</string>
+    <string name="trash_restored">„%1$s“ wiederhergestellt</string>
+    <string name="trash_restore_product_missing">Wiederherstellen nicht möglich: das Produkt gibt es nicht mehr</string>
+    <string name="trash_delete_forever">Endgültig löschen</string>
+    <string name="trash_delete_title">Endgültig löschen?</string>
+    <string name="trash_delete_text">„%1$s“ lässt sich danach nicht mehr wiederherstellen.</string>
+    <string name="trash_clear">Papierkorb leeren</string>
+    <string name="trash_clear_title">Papierkorb leeren?</string>
+    <plurals name="trash_clear_text">
+        <item quantity="one">%d Eintrag wird endgültig gelöscht.</item>
+        <item quantity="other">%d Einträge werden endgültig gelöscht.</item>
+    </plurals>
+    <plurals name="trash_cleared">
+        <item quantity="one">%d Eintrag endgültig gelöscht</item>
+        <item quantity="other">%d Einträge endgültig gelöscht</item>
+    </plurals>
+    <string name="trash_empty_title">Der Papierkorb ist leer</string>
+    <string name="trash_empty_text">Was du im Bestand oder bei den Rezepten löschst, landet hier und bleibt 30 Tage wiederherstellbar.</string>
+    <string name="recipe_deleted_trash">Rezept in den Papierkorb verschoben</string>
+
+    <!-- Was ist neu -->
+    <string name="whatsnew_overline">Neu in Vorrat</string>
+    <string name="whatsnew_title">Version %1$s</string>
+    <string name="whatsnew_version">Version %1$s</string>
+    <string name="whatsnew_ok">Los geht’s</string>
 </resources>

@@ -52,3 +52,8 @@ SDK-Pfad steht in `local.properties`, Firebase-Konfiguration in `app/google-serv
 - OFF-Kontaktadresse (User-Agent): `OFF_CONTACT` in `app/build.gradle.kts`.
 - Selbst-Update: `UpdateManager` fragt `releases/latest` von `UPDATE_REPO` ab (Tag `vX.Y.Z`, APK-Asset).
   Release nur mit `scripts/publish-release.ps1`; vorher `versionCode` +1 und `versionName` erhöhen.
+  Release-Notizen als Aufzählung ("- …") schreiben: `WhatsNewManager` zeigt sie nach dem Update einmal in der App.
+- Papierkorb (`TrashStore`, JSON in `filesDir`, nur pro Gerät): `StockRepository.deleteEntry` und
+  `RecipeRepository.delete` legen dort ab; nach 30 Tagen räumt `VorratApp` auf. Rezeptfotos im Papierkorb gelten als
+  referenziert (`TrashStore.imagePaths`).
+- Schnellkachel `tile/ScanTileService` öffnet `MainActivity` mit `OPEN_SCAN` → Scanner.

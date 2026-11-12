@@ -41,6 +41,7 @@ class RecipeDetailViewModel @Inject constructor(
     private val mealPlan: MealPlanRepository,
     private val stockRepository: StockRepository,
     private val messages: UiMessages,
+    private val trash: de.frelina.vorrat.data.repo.TrashRepository,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<RecipeDetailRoute>()
@@ -85,8 +86,18 @@ class RecipeDetailViewModel @Inject constructor(
         messages.show(UiMessage(R.string.mealplan_added, args = listOf(title)))
     }
 
+    /** Löschen → Papierkorb; "Rückgängig" holt das Rezept gleich zurück. */
     fun delete(onDone: () -> Unit) = viewModelScope.launch {
-        recipes.delete(recipeId)
+        val deleted = recipes.delete(recipeId)
         onDone()
+        if (deleted) {
+            messages.show(
+                UiMessage(
+                    text = R.string.recipe_deleted_trash,
+                    actionLabel = R.string.action_undo,
+                    onAction = { trash.restore(de.frelina.vorrat.data.trash.TrashKind.RECIPE, recipeId) },
+                ),
+            )
+        }
     }
 }

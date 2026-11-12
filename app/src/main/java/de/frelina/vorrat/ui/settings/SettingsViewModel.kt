@@ -60,6 +60,9 @@ class SettingsViewModel @Inject constructor(
         de.frelina.vorrat.reminder.HouseholdSyncWorker.schedule(workManager, enabled)
     }
 
+    /** Android hat die Schnellkachel nicht hinzugefügt (abgelehnt oder nicht unterstützt) → Hinweis zum Selbst-Hinzufügen. */
+    fun tileNotAdded() = messages.show(UiMessage(R.string.settings_tile_manual, tone = MessageTone.INFO))
+
     private val _busy = MutableStateFlow(false)
     val busy: StateFlow<Boolean> = _busy.asStateFlow()
 

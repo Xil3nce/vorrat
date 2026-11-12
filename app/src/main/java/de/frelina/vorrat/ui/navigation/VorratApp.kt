@@ -106,6 +106,7 @@ fun VorratRoot(
     messages: UiMessages,
     openSoonFilter: Flow<Unit>,
     openHistory: Flow<Unit>,
+    openScan: Flow<Unit>,
     nfcTags: Flow<de.frelina.vorrat.nfc.NfcTagRead>,
     sharedRecipes: Flow<String>,
     updates: UpdateViewModel = hiltViewModel(),
@@ -148,6 +149,7 @@ fun VorratRoot(
     }
     LaunchedEffect(Unit) { updates.checkAutomatically() }
     UpdateDialog(updates)
+    de.frelina.vorrat.ui.update.WhatsNewDialog()
     LaunchedEffect(Unit) {
         openSoonFilter.collect {
             navController.navigate(StockRoute(filter = de.frelina.vorrat.MainActivity.FILTER_SOON)) {
@@ -160,6 +162,8 @@ fun VorratRoot(
     LaunchedEffect(Unit) {
         openHistory.collect { navController.navigate(HistoryRoute) { launchSingleTop = true } }
     }
+    // Schnellkachel "Scannen": Scanner wie über die Navigationsleiste öffnen.
+    LaunchedEffect(Unit) { openScan.collect { navController.navigateTopLevel(ScanRoute) } }
     LaunchedEffect(Unit) { nfcTags.collect { onChip(it) } }
     LaunchedEffect(Unit) {
         sharedRecipes.collect { text ->
@@ -295,8 +299,10 @@ fun VorratRoot(
                     onOpenMealPlan = { navController.navigate(MealPlanRoute) },
                     onOpenDepartments = { navController.navigate(DepartmentsRoute) },
                     onOpenHousehold = { navController.navigate(HouseholdRoute) },
+                    onOpenTrash = { navController.navigate(TrashRoute) },
                 )
             }
+            composable<TrashRoute> { de.frelina.vorrat.ui.trash.TrashScreen(onBack = { navController.popBackStack() }) }
             composable<HouseholdRoute> {
                 de.frelina.vorrat.ui.household.HouseholdManageScreen(onBack = { navController.popBackStack() })
             }

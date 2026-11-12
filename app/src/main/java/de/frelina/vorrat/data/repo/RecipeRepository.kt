@@ -9,6 +9,10 @@ import de.frelina.vorrat.data.image.ImageStore
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteMapper
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.data.trash.TrashItem
+import de.frelina.vorrat.data.trash.TrashKind
+import de.frelina.vorrat.data.trash.TrashStore
+import de.frelina.vorrat.data.trash.TrashedRecipe
 import de.frelina.vorrat.domain.Recipe
 import de.frelina.vorrat.domain.RecipeJson
 import kotlinx.coroutines.flow.Flow
@@ -40,6 +44,8 @@ class RecipeRepository @Inject constructor(
     private val remote: RemoteWriter,
     private val imageStore: ImageStore,
     builtinSource: BuiltinRecipeSource,
+    /** Papierkorb (null in Tests ohne Papierkorb: dann wird sofort endgültig gelöscht). */
+    private val trash: TrashStore? = null,
 ) {
     val builtin: List<Recipe> by lazy { builtinSource.load() }
 
@@ -81,15 +87,40 @@ class RecipeRepository @Inject constructor(
         return entity.id
     }
 
-    suspend fun delete(id: String) {
-        if (id.startsWith(Recipe.BUILTIN_PREFIX)) return
-        val image = dao.getById(id)?.imagePath
+    /**
+     * Löscht ein eigenes Rezept. Mit Papierkorb bleibt es 30 Tage auf diesem Gerät wiederherstellbar (das Foto bleibt
+     * dafür lokal liegen, nur das synchronisierte Bild verschwindet). Liefert false, wenn es nichts zu löschen gab.
+     */
+    suspend fun delete(id: String): Boolean {
+        if (id.startsWith(Recipe.BUILTIN_PREFIX)) return false
+        val existing = dao.getById(id) ?: return false
+        val image = existing.imagePath
         dao.deleteById(id)
         remote.delete(RemoteCollection.RECIPES, id)
-        if (image != null) {
-            remote.delete(RemoteCollection.IMAGES, image)
+        if (image != null) remote.delete(RemoteCollection.IMAGES, image)
+        if (trash != null) {
+            trash.add(
+                TrashItem(
+                    id = id,
+                    kind = TrashKind.RECIPE,
+                    title = existing.title,
+                    deletedAt = System.currentTimeMillis(),
+                    recipe = TrashedRecipe.of(existing),
+                ),
+            )
+        } else if (image != null) {
             imageStore.delete(image)
         }
+        return true
+    }
+
+    /** Rezept aus dem Papierkorb zurückholen (mit Foto, falls die Datei noch da ist). */
+    suspend fun restoreFromTrash(trashed: TrashedRecipe) {
+        var entity = trashed.toEntity()
+        if (entity.imagePath != null && imageStore.fileOrNull(entity.imagePath) == null) entity = entity.copy(imagePath = null)
+        dao.upsert(entity)
+        remote.putRecipe(entity)
+        trash?.remove(TrashKind.RECIPE, entity.id)
     }
 
     private fun toRecipe(e: RecipeEntity) = Recipe(

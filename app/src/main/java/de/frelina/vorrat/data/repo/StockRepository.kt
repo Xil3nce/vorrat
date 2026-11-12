@@ -10,6 +10,10 @@ import de.frelina.vorrat.data.db.StockItem
 import de.frelina.vorrat.data.db.VorratDatabase
 import de.frelina.vorrat.data.sync.RemoteCollection
 import de.frelina.vorrat.data.sync.RemoteWriter
+import de.frelina.vorrat.data.trash.TrashItem
+import de.frelina.vorrat.data.trash.TrashKind
+import de.frelina.vorrat.data.trash.TrashStore
+import de.frelina.vorrat.data.trash.TrashedEntry
 import de.frelina.vorrat.domain.StockMerge
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.ConcurrentHashMap
@@ -32,6 +36,8 @@ class StockRepository @Inject constructor(
     private val productDao: ProductDao,
     private val remote: RemoteWriter,
     private val history: HistoryRecorder = HistoryRecorder.NONE,
+    /** Papierkorb (null in Tests ohne Papierkorb). */
+    private val trash: TrashStore? = null,
 ) {
     /** Verlaufseintrag der letzten Entnahme/Löschung je Eintrag – "Rückgängig" nimmt ihn zurück. */
     private val removalEvents = ConcurrentHashMap<String, String>()
@@ -195,7 +201,11 @@ class StockRepository @Inject constructor(
         return result
     }
 
+    /** Löschen (Korrektur, nicht verbraucht): Eintrag landet für 30 Tage im Papierkorb dieses Geräts. */
     suspend fun deleteEntry(entryId: String): StockEntryEntity? {
+        val item = stockDao.getById(entryId)?.let { e ->
+            stockDao.getItemsForProduct(e.productId).firstOrNull { it.entryId == entryId }
+        }
         val entry = db.withTransaction {
             val entry = stockDao.getById(entryId)
             if (entry != null) stockDao.deleteById(entryId)
@@ -204,8 +214,52 @@ class StockRepository @Inject constructor(
         if (entry != null) {
             remote.delete(RemoteCollection.ENTRIES, entryId)
             rememberRemoval(entryId, log(HistoryAction.DELETED, entry, entry.quantity))
+            trash?.add(
+                TrashItem(
+                    id = entry.id,
+                    kind = TrashKind.ENTRY,
+                    title = item?.productName.orEmpty(),
+                    detail = item?.let { listOfNotNull("${it.quantity} ${it.quantityTypeSymbol}", it.locationName).joinToString(" · ") },
+                    deletedAt = System.currentTimeMillis(),
+                    entry = TrashedEntry.of(entry),
+                ),
+            )
         }
         return entry
+    }
+
+    sealed interface RestoreResult {
+        data class Restored(val entryId: String) : RestoreResult
+
+        /** Das Produkt gibt es nicht mehr (z. B. per Backup ersetzt) – Wiederherstellen unmöglich. */
+        data object ProductMissing : RestoreResult
+    }
+
+    /**
+     * Eintrag aus dem Papierkorb zurückholen. Ein inzwischen gelöschter Ort entfällt, eine fehlende Menge-Art wird
+     * durch die erste vorhandene ersetzt, ein inzwischen anders verwendeter NFC-Chip bleibt beim anderen Eintrag.
+     */
+    suspend fun restoreFromTrash(
+        trashed: TrashedEntry,
+        quantityTypeIds: List<String>,
+        locationIds: Set<String>,
+    ): RestoreResult {
+        if (productDao.getById(trashed.productId) == null) return RestoreResult.ProductMissing
+        var entry = trashed.toEntity()
+        if (entry.locationId != null && entry.locationId !in locationIds) {
+            entry = entry.copy(locationId = null, level = null, shelf = null)
+        }
+        if (entry.quantityTypeId !in quantityTypeIds) {
+            entry = entry.copy(quantityTypeId = quantityTypeIds.firstOrNull() ?: return RestoreResult.ProductMissing)
+        }
+        val tag = entry.nfcTagId
+        if (tag != null && stockDao.getByNfcTag(tag).any { it.id != entry.id }) entry = entry.copy(nfcTagId = null)
+        stockDao.upsert(entry)
+        remote.putEntry(entry)
+        val event = removalEvents.remove(entry.id)
+        if (event != null) history.discard(event) else log(HistoryAction.ADDED, entry, entry.quantity)
+        trash?.remove(TrashKind.ENTRY, entry.id)
+        return RestoreResult.Restored(entry.id)
     }
 
     /**
@@ -258,5 +312,6 @@ class StockRepository @Inject constructor(
         stockDao.upsert(entry)
         remote.putEntry(entry)
         removalEvents.remove(entry.id)?.let { history.discard(it) }
+        trash?.remove(TrashKind.ENTRY, entry.id)
     }
 }

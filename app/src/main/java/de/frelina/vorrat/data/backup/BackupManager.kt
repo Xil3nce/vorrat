@@ -50,6 +50,8 @@ class BackupManager @Inject constructor(
     @Named("appVersion") private val appVersion: String,
     @Named("cacheDir") private val cacheDir: File,
     private val remote: RemoteWriter,
+    /** Fotos von Rezepten im Papierkorb bleiben beim Import erhalten (null in Tests). */
+    private val trash: de.frelina.vorrat.data.trash.TrashStore? = null,
 ) {
     private val json = Json {
         prettyPrint = true
@@ -326,7 +328,8 @@ class BackupManager @Inject constructor(
                 f.copyTo(imageStore.file(f.name), overwrite = true)
             }
             val referenced = db.productDao().getAllImagePaths().toSet() +
-                db.lookupCacheDao().getAllImagePaths().toSet() + db.recipeDao().getAllImagePaths().toSet()
+                db.lookupCacheDao().getAllImagePaths().toSet() + db.recipeDao().getAllImagePaths().toSet() +
+                (trash?.imagePaths() ?: emptySet())
             imageStore.deleteUnreferenced(referenced)
             remote.replaceAll(db, previousImages)
         } finally {

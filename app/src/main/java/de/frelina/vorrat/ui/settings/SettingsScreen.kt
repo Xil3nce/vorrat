@@ -31,6 +31,8 @@ import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.RemoveShoppingCart
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Info
@@ -112,6 +114,7 @@ fun SettingsScreen(
     onOpenMealPlan: () -> Unit,
     onOpenDepartments: () -> Unit,
     onOpenHousehold: () -> Unit,
+    onOpenTrash: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
     updates: UpdateViewModel = hiltViewModel(),
 ) {
@@ -360,6 +363,8 @@ fun SettingsScreen(
             NavItem(Icons.Outlined.Download, R.string.settings_backup_import, R.string.settings_backup_import_summary) {
                 if (!busy) importLauncher.launch(arrayOf("application/zip", "application/octet-stream", "application/x-zip-compressed"))
             }
+            RowDivider()
+            NavItem(Icons.Outlined.DeleteOutline, R.string.trash_title, R.string.settings_trash_summary, onOpenTrash)
             }
 
             // ---------------- App-Update
@@ -390,8 +395,18 @@ fun SettingsScreen(
             }
 
             // ---------------- Über
+            // ---------------- Schnellkachel
+            SectionHeader(R.string.settings_shortcuts)
             SettingsGroup {
-                NavItem(Icons.Outlined.Info, R.string.settings_about, R.string.settings_about_summary, onOpenAbout)
+                NavItem(Icons.Outlined.QrCodeScanner, R.string.settings_tile, R.string.settings_tile_summary) {
+                    de.frelina.vorrat.tile.ScanTileService.requestAdd(context) { added ->
+                        if (!added) viewModel.tileNotAdded()
+                    }
+                }
+            }
+
+            SettingsGroup {
+                NavItem(Icons.Outlined.Info,R.string.settings_about, R.string.settings_about_summary, onOpenAbout)
             }
         }
     }

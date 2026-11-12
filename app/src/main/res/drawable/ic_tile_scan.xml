@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Schnellkachel "Scannen": Sucher-Ecken mit Barcode-Strichen (einfarbig, Android färbt selbst). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M3,8V5c0,-1.1 0.9,-2 2,-2h3v2H5v3H3zM16,3h3c1.1,0 2,0.9 2,2v3h-2V5h-3V3zM5,16v3h3v2H5c-1.1,0 -2,-0.9 -2,-2v-3h2zM19,16h2v3c0,1.1 -0.9,2 -2,2h-3v-2h3v-3z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M7,7h1.5v10H7zM10,7h1v10h-1zM12.5,7h2v10h-2zM16,7h1v10h-1z" />
+</vector>
