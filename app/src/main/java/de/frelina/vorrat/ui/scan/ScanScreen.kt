@@ -421,7 +421,7 @@ private fun LocationPicker(
 }
 
 @Composable
-private fun PermissionRequest(denied: Boolean, onRequest: () -> Unit, onOpenSettings: () -> Unit) {
+internal fun PermissionRequest(denied: Boolean, onRequest: () -> Unit, onOpenSettings: () -> Unit) {
     Column(
         Modifier.fillMaxSize().padding(24.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
@@ -467,7 +467,7 @@ private fun RowScope.ModeTile(icon: ImageVector, label: String, active: Boolean,
 
 /** Rahmen-Ecken über dem Kamerabild. */
 @Composable
-private fun ScanFrame(modifier: Modifier = Modifier) {
+internal fun ScanFrame(modifier: Modifier = Modifier) {
     val color = MaterialTheme.colorScheme.onSurface
     Canvas(modifier) {
         val len = 38.dp.toPx()
@@ -673,7 +673,7 @@ private fun PlaceRow(item: StockItem, today: LocalDate, leadDays: Int, onClick: 
 }
 
 @Composable
-private fun ManualBarcodeDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+internal fun ManualBarcodeDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var text by rememberSaveable { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,

@@ -63,6 +63,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import de.frelina.vorrat.R
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.locations.LocationsScreen
@@ -237,6 +238,19 @@ fun VorratRoot(
                     onOpenConsume = { navController.navigate(ConsumeRoute) },
                 )
             }
+            composable<BoughtScanRoute> { backStack ->
+                val route = backStack.toRoute<BoughtScanRoute>()
+                // Scanner durch das Formular ersetzen: nach dem Speichern geht es zurück zur Einkaufsliste.
+                fun openForm(barcode: String?) = navController.navigate(
+                    AddStockRoute(barcode = barcode, shoppingItemId = route.shoppingItemId),
+                ) { popUpTo<BoughtScanRoute> { inclusive = true } }
+                de.frelina.vorrat.ui.scan.BoughtScanScreen(
+                    itemName = route.name,
+                    onBack = { navController.popBackStack() },
+                    onBarcode = { openForm(it) },
+                    onManual = { openForm(null) },
+                )
+            }
             composable<ConsumeRoute> {
                 de.frelina.vorrat.ui.consume.ConsumeScreen(onBack = { navController.popBackStack() })
             }
@@ -248,8 +262,13 @@ fun VorratRoot(
             }
             composable<ShoppingRoute> {
                 ShoppingScreen(
-                    onBought = { productId, itemId ->
-                        navController.navigate(AddStockRoute(productId = productId, shoppingItemId = itemId))
+                    onBought = { productId, itemId, name ->
+                        // Bekanntes Produkt → direkt erfassen; Freitext → erst Barcode scannen (Daten aus OFF).
+                        if (productId == null && itemId != null) {
+                            navController.navigate(BoughtScanRoute(shoppingItemId = itemId, name = name))
+                        } else {
+                            navController.navigate(AddStockRoute(productId = productId, shoppingItemId = itemId))
+                        }
                     },
                     onOpenDepartments = { navController.navigate(DepartmentsRoute) },
                     onOpenMealPlan = { navController.navigate(MealPlanRoute) },

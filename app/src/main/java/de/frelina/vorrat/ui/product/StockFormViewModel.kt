@@ -153,9 +153,12 @@ class StockFormViewModel @Inject constructor(
     private suspend fun load() {
         val types = catalogRepository.observeQuantityTypes().first()
         val locs = catalogRepository.observeLocations().first()
+        // Kauf von der Einkaufsliste: Anzahl des Listeneintrags übernehmen (auch nach dem Scan).
+        val shoppingItem = shoppingItemId?.let { shoppingRepository.getById(it) }
         val defaultEntry = EntryForm(
             quantityTypeId = types.firstOrNull()?.id,
             locationId = locs.singleOrNull()?.id,
+            quantity = shoppingItem?.quantity?.toString() ?: "1",
         )
         when {
             draftId != null -> loadDraft(draftId, defaultEntry)
@@ -206,19 +209,12 @@ class StockFormViewModel @Inject constructor(
                 )
             }
             else -> {
-                // Freitext von der Einkaufsliste: Namen vorbelegen.
-                // Freitext von der Einkaufsliste: Name und Packungsgröße vorbelegen.
-                val item = shoppingItemId?.let { shoppingRepository.getById(it) }
-                val unitId = item?.unitSymbol?.let { catalogRepository.findUnitIdBySymbol(it) }
+                // Freitext von der Einkaufsliste ohne Barcode (Button im Kauf-Scanner): nur Name und Anzahl übernehmen.
                 _state.value = StockFormState(
                     FormMode.NEW_PRODUCT,
                     loading = false,
                     entry = defaultEntry,
-                    product = ProductForm(
-                        name = item?.name.orEmpty(),
-                        packageSize = item?.packageSize?.toPlainString().orEmpty(),
-                        unitId = unitId,
-                    ),
+                    product = ProductForm(name = shoppingItem?.name.orEmpty()),
                 )
             }
         }

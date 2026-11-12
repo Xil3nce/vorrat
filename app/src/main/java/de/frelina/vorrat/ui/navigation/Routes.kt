@@ -46,6 +46,8 @@ import kotlinx.serialization.Serializable
     /** Artikel aus dem Einkauf ("+ Bestand") ergänzen – gespeichert wird in den Einkauf, nicht in den Bestand. */
     val draftId: String? = null,
 )
+/** Artikel der Einkaufsliste als gekauft erfassen: erst Barcode scannen, ohne Barcode manuell anlegen. */
+@Serializable data class BoughtScanRoute(val shoppingItemId: String, val name: String)
 /** Einkauf ("+ Bestand"): gescannte Artikel prüfen und in den Bestand übernehmen. */
 @Serializable data object PurchaseRoute
 /** Entnehmen: im Scanner vorgemerkte Entnahmen prüfen und gesammelt ausbuchen. */

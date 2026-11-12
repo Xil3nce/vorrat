@@ -140,7 +140,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 @Composable
 fun ShoppingScreen(
     /** Erfassen nach dem Kauf: Produkt-ID (bekanntes Produkt) bzw. Listeneintrag. */
-    onBought: (productId: String?, shoppingItemId: String?) -> Unit,
+    onBought: (productId: String?, shoppingItemId: String?, name: String) -> Unit,
     onOpenDepartments: () -> Unit,
     onOpenMealPlan: () -> Unit,
     viewModel: ShoppingViewModel = hiltViewModel(),
@@ -203,7 +203,7 @@ fun ShoppingScreen(
                             ShortageRow(
                                 s,
                                 units = state.units,
-                                onBought = { onBought(s.product.id, null) },
+                                onBought = { onBought(s.product.id, null, s.product.name) },
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -215,7 +215,7 @@ fun ShoppingScreen(
                                 entry = e,
                                 onCheck = { viewModel.check(e.item.id) },
                                 onEdit = { editTarget = e },
-                                onBought = { onBought(e.item.productId, e.item.id) },
+                                onBought = { onBought(e.item.productId, e.item.id, e.item.name) },
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -344,7 +344,7 @@ private fun ChangeDepartmentDialog(
 @Composable
 private fun GroupedList(
     state: ShoppingUiState,
-    onBought: (productId: String?, shoppingItemId: String?) -> Unit,
+    onBought: (productId: String?, shoppingItemId: String?, name: String) -> Unit,
     onCheck: (String) -> Unit,
     onEdit: (ShoppingEntry) -> Unit,
     onMoveToDepartment: (ShoppingPayload, String) -> Unit,
@@ -441,7 +441,7 @@ private fun GroupedList(
                         is ShoppingPayload.Short -> ShortageRow(
                             s = payload.shortage,
                             units = state.units,
-                            onBought = { onBought(payload.shortage.product.id, null) },
+                            onBought = { onBought(payload.shortage.product.id, null, payload.shortage.product.name) },
                             modifier = dragModifier,
                             onChangeDepartment = change,
                         )
@@ -449,7 +449,7 @@ private fun GroupedList(
                             entry = payload.entry,
                             onCheck = { onCheck(payload.entry.item.id) },
                             onEdit = { onEdit(payload.entry) },
-                            onBought = { onBought(payload.entry.item.productId, payload.entry.item.id) },
+                            onBought = { onBought(payload.entry.item.productId, payload.entry.item.id, payload.entry.item.name) },
                             modifier = dragModifier,
                             onChangeDepartment = change,
                         )

@@ -12,6 +12,9 @@
     <string name="shopping_title">Einkaufsliste</string>
     <string name="shopping_add_hint">Artikel hinzufügen</string>
     <string name="shopping_add">Hinzufügen</string>
+    <string name="bought_scan_title">„%1$s“ gekauft</string>
+    <string name="bought_scan_hint">Barcode des gekauften Artikels in den Rahmen halten – die Produktdaten werden dann vorausgefüllt.</string>
+    <string name="bought_scan_manual">Ohne Barcode – manuell anlegen</string>
     <string name="shopping_add_search_hint">Name, Marke oder Kategorie – Vorschläge erscheinen beim Tippen</string>
     <string name="shopping_add_own_products">Eigene Produkte</string>
     <string name="shopping_add_search_off">Bei Open Food Facts suchen</string>
