@@ -12,12 +12,15 @@ import de.frelina.vorrat.R
 import de.frelina.vorrat.data.chefkoch.ChefkochResult
 import de.frelina.vorrat.data.chefkoch.ChefkochSource
 import de.frelina.vorrat.data.image.ImageStore
+import de.frelina.vorrat.data.ocr.RecipeTextRecognizer
 import de.frelina.vorrat.data.repo.RecipeRepository
 import de.frelina.vorrat.domain.ChefkochLink
 import de.frelina.vorrat.domain.IngredientMatcher
 import de.frelina.vorrat.domain.Recipe
 import de.frelina.vorrat.domain.RecipeIngredient
 import de.frelina.vorrat.domain.RecipeJson
+import de.frelina.vorrat.domain.RecipeTextLayout
+import de.frelina.vorrat.domain.RecipeTextParser
 import de.frelina.vorrat.domain.Validated
 import de.frelina.vorrat.domain.Validation
 import de.frelina.vorrat.domain.ValidationError
@@ -58,6 +61,8 @@ data class EditRecipeState(
     val saved: Boolean = false,
     /** Rezept wird gerade von Chefkoch geladen. */
     val importing: Boolean = false,
+    /** Text eines Rezeptfotos wird gerade erkannt. */
+    val scanning: Boolean = false,
     /** Foto (Dateiname im Bildordner). */
     val imagePath: String? = null,
     val imageError: Boolean = false,
@@ -70,6 +75,7 @@ class EditRecipeViewModel @Inject constructor(
     private val messages: UiMessages,
     private val chefkoch: ChefkochSource,
     private val imageStore: ImageStore,
+    private val textRecognizer: RecipeTextRecognizer,
     @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -100,7 +106,7 @@ class EditRecipeViewModel @Inject constructor(
             messages.show(UiMessage(R.string.recipe_import_invalid_link, tone = MessageTone.ERROR))
             return
         }
-        if (_state.value.importing) return
+        if (_state.value.importing || _state.value.scanning) return
         _state.update { it.copy(importing = true) }
         viewModelScope.launch {
             when (val result = chefkoch.load(id)) {
@@ -117,6 +123,33 @@ class EditRecipeViewModel @Inject constructor(
             _state.update { it.copy(importing = false) }
         }
     }
+
+    /**
+     * Liest ein fotografiertes Rezept (gedruckt oder handgeschrieben; mehrere Fotos = mehrere Seiten) und füllt
+     * das Formular damit. Die Texterkennung läuft nur auf dem Gerät. [temporary]: Kamerafotos danach löschen.
+     */
+    fun importFromPhotos(uris: List<Uri>, temporary: Boolean = false) {
+        if (uris.isEmpty() || _state.value.importing || _state.value.scanning) return
+        _state.update { it.copy(scanning = true) }
+        viewModelScope.launch {
+            val pages = uris.map { textRecognizer.read(it) }
+            if (temporary) uris.forEach { textRecognizer.discard(it) }
+            val recipe = RecipeTextParser.parse(pages.filterNotNull().joinToString("\n\n") { RecipeTextLayout.toText(it) })
+            when {
+                pages.all { it == null } ->
+                    messages.show(UiMessage(R.string.recipe_scan_failed, tone = MessageTone.ERROR))
+                recipe.title.isBlank() && recipe.ingredients.isEmpty() && recipe.steps.isEmpty() ->
+                    messages.show(UiMessage(R.string.recipe_scan_no_text, tone = MessageTone.ERROR))
+                else -> {
+                    fill(recipe, editingExisting = false)
+                    messages.show(UiMessage(R.string.recipe_import_done))
+                }
+            }
+            _state.update { it.copy(scanning = false) }
+        }
+    }
+
+    fun onScanCameraDenied() = messages.show(UiMessage(R.string.recipe_scan_camera_denied, tone = MessageTone.ERROR))
 
     /** Chefkoch-Bild als noch nicht gespeichertes Foto übernehmen; ohne Erfolg bleibt das Rezept einfach ohne Bild. */
     private suspend fun importImage(url: String) {
@@ -156,7 +189,7 @@ class EditRecipeViewModel @Inject constructor(
                 IngredientRowState(nextKey++, it.name, it.amount.orEmpty(), it.group, groupManual = it.group != null, optional = it.optional)
             }.ifEmpty { listOf(newRow()) },
             steps = RecipeJson.stepsToText(recipe.steps),
-            // Beim Chefkoch-Import ein schon gewähltes Foto behalten.
+            // Beim Import (Chefkoch, Foto) ein schon gewähltes Foto behalten.
             imagePath = recipe.imagePath ?: _state.value.imagePath,
         )
     }

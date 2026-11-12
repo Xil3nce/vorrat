@@ -1,5 +1,19 @@
 package de.frelina.vorrat.ui.recipes
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.outlined.DocumentScanner
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import java.io.File
+
 import de.frelina.vorrat.ui.components.SectionLabel
 import androidx.compose.ui.text.font.FontWeight
 import de.frelina.vorrat.ui.components.GlassIconButton
@@ -72,6 +86,48 @@ fun EditRecipeScreen(
         )
     }
 
+    // Rezept vom Foto: Kamera (ein Foto) oder Galerie (mehrere Seiten)
+    val context = LocalContext.current
+    var scanDialog by rememberSaveable { mutableStateOf(false) }
+    var scanCameraUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    val scanTakePicture = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        if (ok) scanCameraUri?.let { viewModel.importFromPhotos(listOf(it), temporary = true) }
+    }
+    val launchScanCamera = {
+        val dir = File(context.cacheDir, "camera").apply { mkdirs() }
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            File(dir, "scan_${System.currentTimeMillis()}.jpg"),
+        )
+        scanCameraUri = uri
+        scanTakePicture.launch(uri)
+    }
+    // Die App deklariert die Kamera-Berechtigung; ohne Freigabe verweigert Android auch die Kamera-App.
+    val scanCameraPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) launchScanCamera() else viewModel.onScanCameraDenied()
+    }
+    val scanPickImages = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(MAX_SCAN_PAGES),
+    ) { uris -> viewModel.importFromPhotos(uris.take(MAX_SCAN_PAGES)) }
+    if (scanDialog) {
+        RecipeScanDialog(
+            onDismiss = { scanDialog = false },
+            onCamera = {
+                scanDialog = false
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    launchScanCamera()
+                } else {
+                    scanCameraPermission.launch(Manifest.permission.CAMERA)
+                }
+            },
+            onGallery = {
+                scanDialog = false
+                scanPickImages.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -98,12 +154,20 @@ fun EditRecipeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (!state.editingExisting) {
-                OutlinedButton(onClick = { importDialog = true }, enabled = !state.importing) {
+                val busy = state.importing || state.scanning
+                OutlinedButton(onClick = { importDialog = true }, enabled = !busy) {
                     Icon(Icons.Outlined.Download, contentDescription = null)
                     Text(stringResource(R.string.recipe_import_action), modifier = Modifier.padding(start = 8.dp))
                 }
-                if (state.importing) {
-                    Text(stringResource(R.string.recipe_import_loading), style = MaterialTheme.typography.bodyMedium)
+                OutlinedButton(onClick = { scanDialog = true }, enabled = !busy) {
+                    Icon(Icons.Outlined.DocumentScanner, contentDescription = null)
+                    Text(stringResource(R.string.recipe_scan_action), modifier = Modifier.padding(start = 8.dp))
+                }
+                if (busy) {
+                    Text(
+                        stringResource(if (state.scanning) R.string.recipe_scan_loading else R.string.recipe_import_loading),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
             }
@@ -201,6 +265,33 @@ fun EditRecipeScreen(
             )
         }
     }
+}
+
+/** Höchstzahl Fotos (Seiten) für ein Rezept aus der Galerie. */
+private const val MAX_SCAN_PAGES = 4
+
+/** Auswahl für "Rezept fotografieren": Kamera oder Galerie, mit Hinweisen für gute Erkennung. */
+@Composable
+private fun RecipeScanDialog(onDismiss: () -> Unit, onCamera: () -> Unit, onGallery: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.recipe_scan_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.recipe_scan_text))
+                OutlinedButton(onClick = onCamera, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Outlined.PhotoCamera, contentDescription = null)
+                    Text(stringResource(R.string.image_take_photo), modifier = Modifier.padding(start = 8.dp))
+                }
+                OutlinedButton(onClick = onGallery, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Outlined.PhotoLibrary, contentDescription = null)
+                    Text(stringResource(R.string.image_pick_gallery), modifier = Modifier.padding(start = 8.dp))
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+    )
 }
 
 /** Dialog zum Einfügen eines Chefkoch-Links. */
