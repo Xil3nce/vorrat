@@ -194,7 +194,8 @@ fun ScanScreen(
         ) {
             if (hasPermission) {
                 // Während des Ablaufdatum-Scans gehört die Kamera dem Dialog; danach wird sie neu gebunden.
-                if (expiryFor == null) {
+                // Ebenso während des NFC-Dialogs: aktive Kamera stört auf manchen Geräten das NFC-Polling.
+                if (expiryFor == null && !de.frelina.vorrat.nfc.NfcReader.dialogOpen) {
                     CameraPreview(
                         analyzing = idle,
                         torchOn = torch,

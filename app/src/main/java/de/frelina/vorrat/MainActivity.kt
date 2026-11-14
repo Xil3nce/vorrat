@@ -67,6 +67,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Chips im Vordergrund immer selbst lesen, damit kein System-Fenster die App überlagert.
+        de.frelina.vorrat.nfc.NfcReader.enable(this) { tag ->
+            val read = de.frelina.vorrat.nfc.NfcTags.read(tag)
+            if (read.entryId != null) nfcTags.trySend(read)
+        }
+    }
+
+    override fun onPause() {
+        de.frelina.vorrat.nfc.NfcReader.disable(this)
+        super.onPause()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntent(intent)

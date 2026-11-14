@@ -42,7 +42,7 @@ sealed interface NfcMode {
 }
 
 /**
- * "Chip ans Handy halten": aktiviert den NFC-Lesemodus, solange der Dialog offen ist.
+ * "Chip ans Handy halten": empfängt Chips über [NfcReader], solange der Dialog offen ist.
  * Lesen → [onRead]; Beschreiben → [onWritten] mit der Chip-Kennung. Fehler werden im Dialog angezeigt
  * (der Dialog bleibt offen, ein neuer Versuch ist sofort möglich).
  */
@@ -89,10 +89,10 @@ fun NfcDialog(
                 }
             }
         }
-        val flags = NfcAdapter.FLAG_READER_NFC_A or NfcAdapter.FLAG_READER_NFC_B or
-            NfcAdapter.FLAG_READER_NFC_F or NfcAdapter.FLAG_READER_NFC_V
-        adapter.enableReaderMode(activity, callback, flags, null)
-        onDispose { runCatching { adapter.disableReaderMode(activity) } }
+        // Lesemodus selbst aktiviert MainActivity dauerhaft (NfcReader); der Dialog leiht sich nur die Chips.
+        val onTag: (android.nfc.Tag) -> Unit = { tag -> callback.onTagDiscovered(tag) }
+        NfcReader.attach(onTag)
+        onDispose { NfcReader.detach(onTag) }
     }
 
     AlertDialog(
