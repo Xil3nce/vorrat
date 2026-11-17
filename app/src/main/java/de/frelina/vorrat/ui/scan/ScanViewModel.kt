@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -139,7 +140,11 @@ class ScanViewModel @Inject constructor(
             if (last != null && last.first == barcode && System.currentTimeMillis() - last.second < SAME_BARCODE_PAUSE_MS) return
             job?.cancel()
             _state.value = ScanUiState.Loading(barcode)
-            job = viewModelScope.launch { _state.value = ScanUiState.PurchaseExpiry(scanRepository.resolve(barcode)) }
+            job = viewModelScope.launch {
+                val outcome = resolveForScan(barcode)
+                _state.value = ScanUiState.PurchaseExpiry(outcome)
+                loadImageLater(outcome)
+            }
             return
         }
         if (_mode.value == ScanMode.CONSUME) {
@@ -148,7 +153,7 @@ class ScanViewModel @Inject constructor(
             if (last != null && last.first == barcode && System.currentTimeMillis() - last.second < SAME_BARCODE_PAUSE_MS) return
             job?.cancel()
             _state.value = ScanUiState.Loading(barcode)
-            job = viewModelScope.launch { addToConsumeList(scanRepository.resolve(barcode)) }
+            job = viewModelScope.launch { addToConsumeList(resolveForScan(barcode)) }
             return
         }
         resolve(barcode, showLoading = true)
@@ -162,6 +167,7 @@ class ScanViewModel @Inject constructor(
         if (outcome.exactMatches.isEmpty()) {
             val onList = outcome.localProduct?.let { shoppingRepository.isOnList(it.id) } ?: false
             _state.value = ScanUiState.Result(outcome, onList)
+            loadImageLater(outcome)
             return
         }
         val result = consumeDrafts.addScan(outcome.exactMatches)
@@ -259,9 +265,34 @@ class ScanViewModel @Inject constructor(
         job?.cancel()
         if (showLoading) _state.value = ScanUiState.Loading(barcode)
         job = viewModelScope.launch {
-            val outcome = scanRepository.resolve(barcode)
+            val outcome = resolveForScan(barcode)
             val onList = outcome.localProduct?.let { shoppingRepository.isOnList(it.id) } ?: false
             _state.value = ScanUiState.Result(outcome, onList)
+            loadImageLater(outcome)
+        }
+    }
+
+    /** Scanner: Ergebnis sofort zeigen, das OFF-Produktbild wird danach nachgeladen ([loadImageLater]). */
+    private suspend fun resolveForScan(barcode: String) = scanRepository.resolve(barcode, awaitImage = false)
+
+    /**
+     * Lädt ein noch fehlendes OFF-Bild im Hintergrund und setzt es ins aktuelle Ergebnis, sofern noch dasselbe
+     * Produkt angezeigt wird. Läuft unabhängig von [job], damit "Weiter scannen" den Download nicht abbricht
+     * (das Bild landet trotzdem im Cache).
+     */
+    private fun loadImageLater(outcome: ScanOutcome) {
+        if (outcome.pendingImageUrl == null) return
+        viewModelScope.launch {
+            val updated = scanRepository.loadPendingImage(outcome) ?: return@launch
+            _state.update { current ->
+                when {
+                    current is ScanUiState.Result && current.outcome.barcode == updated.barcode ->
+                        current.copy(outcome = current.outcome.copy(remote = updated.remote, pendingImageUrl = null))
+                    current is ScanUiState.PurchaseExpiry && current.outcome.barcode == updated.barcode ->
+                        current.copy(outcome = current.outcome.copy(remote = updated.remote, pendingImageUrl = null))
+                    else -> current
+                }
+            }
         }
     }
 

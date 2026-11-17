@@ -40,6 +40,8 @@ data class ScanOutcome(
     val lookupError: LookupErrorKind?,
     val exactMatches: List<StockItem>,
     val alternatives: List<StockItem>,
+    /** OFF-Bild, das noch nicht geladen ist (nur bei `resolve(awaitImage = false)`), siehe [ScanRepository.loadPendingImage]. */
+    val pendingImageUrl: String? = null,
 ) {
     val displayName: String? get() = localProduct?.name ?: remote?.name
     val category: String? get() = localProduct?.category ?: remote?.category
@@ -57,8 +59,15 @@ class ScanRepository @Inject constructor(
      * 1. Lokal bekannter Barcode → komplett offline auflösen.
      * 2. Sonst OFF-Cache verwenden, sonst OFF abfragen (Ergebnis wird gecacht, Bild lokal abgelegt).
      * 3. Exakte Treffer bzw. Alternativen (gleiche Kategorie) aus dem Bestand ermitteln.
+     *
+     * [awaitImage] = false (Scanner): das Produktbild wird nicht abgewartet, sondern als
+     * [ScanOutcome.pendingImageUrl] gemeldet – das Ergebnis erscheint so eine Netzabfrage früher.
      */
-    suspend fun resolve(rawBarcode: String, now: Long = System.currentTimeMillis()): ScanOutcome {
+    suspend fun resolve(
+        rawBarcode: String,
+        now: Long = System.currentTimeMillis(),
+        awaitImage: Boolean = true,
+    ): ScanOutcome {
         val barcode = rawBarcode.trim()
         val local = productDao.getByBarcode(barcode)
         val allStock = stockDao.getAllItems()
@@ -74,13 +83,18 @@ class ScanRepository @Inject constructor(
         }
 
         var error: LookupErrorKind? = null
+        var pendingImageUrl: String? = null
         var cached = cacheDao.get(barcode)?.takeIf { it.found || now - it.fetchedAt < NOT_FOUND_TTL_MS }
         if (cached == null) {
             when (val result = source.lookup(barcode)) {
                 is LookupResult.Found -> {
                     val p = result.product
-                    val image = p.imageUrl?.let { url -> source.downloadImage(url) }
-                        ?.let { bytes -> imageStore.saveBytes(bytes) }
+                    val image = if (awaitImage) {
+                        p.imageUrl?.let { url -> source.downloadImage(url) }?.let { bytes -> imageStore.saveBytes(bytes) }
+                    } else {
+                        pendingImageUrl = p.imageUrl
+                        null
+                    }
                     cached = LookupCacheEntity(
                         barcode = barcode,
                         found = true,
@@ -116,7 +130,26 @@ class ScanRepository @Inject constructor(
             lookupError = error,
             exactMatches = emptyList(),
             alternatives = alternatives,
+            pendingImageUrl = pendingImageUrl,
         )
+    }
+
+    /**
+     * Lädt das bei [resolve] (awaitImage = false) ausgelassene Bild nach, legt es im Cache ab und liefert das
+     * aktualisierte Ergebnis; null, wenn es nichts zu laden gab oder der Download fehlschlug.
+     */
+    suspend fun loadPendingImage(outcome: ScanOutcome): ScanOutcome? {
+        val url = outcome.pendingImageUrl ?: return null
+        val remote = outcome.remote ?: return null
+        val path = source.downloadImage(url)?.let { bytes -> imageStore.saveBytes(bytes) } ?: return null
+        val row = cacheDao.get(outcome.barcode)
+        if (row == null || !row.found) {
+            imageStore.delete(path)
+            return null
+        }
+        row.imagePath?.let { imageStore.delete(it) }
+        cacheDao.upsert(row.copy(imagePath = path))
+        return outcome.copy(remote = remote.copy(imagePath = path), pendingImageUrl = null)
     }
 
     /** Haltbarkeit nach dem Öffnen laut OFF-Lagerhinweis (nur aus dem Cache, keine Netzabfrage). */

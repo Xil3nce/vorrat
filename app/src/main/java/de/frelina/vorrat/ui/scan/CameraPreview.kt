@@ -1,11 +1,15 @@
 package de.frelina.vorrat.ui.scan
 
+import android.util.Size
 import androidx.annotation.OptIn
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
@@ -67,7 +71,17 @@ fun CameraPreview(
             future.addListener({ cont.resume(future.get()) }, ContextCompat.getMainExecutor(context))
         }
         val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
+        // Standard wären 640x480 – zu grob für die feinen EAN-Striche, Erkennung klappte dann oft erst nach
+        // mehreren Sekunden oder nur sehr nah. 1280x720 ist der von ML Kit empfohlene Wert für Barcodes.
         val analysis = ImageAnalysis.Builder()
+            .setResolutionSelector(
+                ResolutionSelector.Builder()
+                    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+                    .setResolutionStrategy(
+                        ResolutionStrategy(ANALYSIS_SIZE, ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER),
+                    )
+                    .build(),
+            )
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
         val mainExecutor = ContextCompat.getMainExecutor(context)
@@ -104,3 +118,5 @@ fun CameraPreview(
 
     AndroidView(factory = { previewView }, modifier = modifier)
 }
+
+private val ANALYSIS_SIZE = Size(1280, 720)

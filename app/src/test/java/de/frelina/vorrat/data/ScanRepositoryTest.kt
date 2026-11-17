@@ -88,6 +88,27 @@ class ScanRepositoryTest : DbTestBase() {
         assertEquals(1, source.calls)
     }
 
+    @Test fun `Scanner wartet nicht aufs Bild – wird nachgeladen und gecacht`() = runBlocking {
+        source.result = LookupResult.Found(
+            LookedUpProduct("999", "Nutella", "Ferrero", "en:hazelnut-spreads", null, null, "https://x/img.jpg"),
+        )
+        val first = repo.resolve("999", awaitImage = false)
+        assertEquals("Nutella", first.remote?.name)
+        assertNull(first.remote?.imagePath)
+        assertEquals("https://x/img.jpg", first.pendingImageUrl)
+
+        val loaded = repo.loadPendingImage(first)
+        assertNotNull(loaded?.remote?.imagePath)
+        assertNull(loaded?.pendingImageUrl)
+        assertEquals(loaded?.remote?.imagePath, db.lookupCacheDao().get("999")!!.imagePath)
+
+        // Nächster Scan: Bild kommt direkt aus dem Cache, nichts mehr nachzuladen
+        val second = repo.resolve("999", awaitImage = false)
+        assertEquals(loaded?.remote?.imagePath, second.remote?.imagePath)
+        assertNull(second.pendingImageUrl)
+        assertEquals(1, source.calls)
+    }
+
     @Test fun `nicht gefunden wird gemeldet und gecacht`() = runBlocking {
         source.result = LookupResult.NotFound
         assertTrue(repo.resolve("555").remoteNotFound)
