@@ -2,10 +2,20 @@
 # Die installierte App findet das Release beim naechsten Start (bzw. Einstellungen -> Nach Updates suchen).
 #
 # Vorher: versionCode (+1) und versionName in app\build.gradle.kts erhoehen, committen und pushen.
-# Aufruf: powershell -ExecutionPolicy Bypass -File scripts\publish-release.ps1 [-Notes "Was ist neu"]
+# Aufruf: powershell -ExecutionPolicy Bypass -File scripts\publish-release.ps1 [-Notes "Was ist neu" | -NotesFile notizen.txt]
+# Text mit Anfuehrungszeichen immer per -NotesFile (UTF-8): "powershell -File" zerteilt ihn sonst.
 # Ziel-Repo ist UPDATE_REPO aus app\build.gradle.kts (muss oeffentlich sein, gh muss angemeldet sein).
-param([string]$Notes = '')
+# Ohne PositionalBinding bricht ein zerteilter -Notes-Text ab, statt gekuerzt veroeffentlicht zu werden.
+[CmdletBinding(PositionalBinding = $false)]
+param([string]$Notes = '', [string]$NotesFile = '')
 $ErrorActionPreference = 'Stop'
+if ($NotesFile) {
+  if ($Notes) { throw 'Nur -Notes oder -NotesFile angeben, nicht beides.' }
+  # Vor Set-Location lesen (relativer Pfad) und streng als UTF-8 (sonst kaputte Umlaute).
+  $path = (Resolve-Path -LiteralPath $NotesFile).ProviderPath
+  $Notes = [IO.File]::ReadAllText($path, (New-Object Text.UTF8Encoding $false, $true)).Trim()
+  if (-not $Notes) { throw "$NotesFile ist leer." }
+}
 $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 Set-Location $root
 
@@ -37,6 +47,13 @@ Copy-Item $built $apk -Force
 
 if (-not $Notes) { $Notes = "Vorrat $version" }
 $ErrorActionPreference = 'Continue'
-gh release create "v$version" $apk --repo $repo --target $head --title "Vorrat $version" --notes $Notes
-if ($LASTEXITCODE -ne 0) { throw 'gh release create fehlgeschlagen' }
+# Als Datei uebergeben: PowerShell 5.1 verliert Anfuehrungszeichen in Argumenten an gh.
+$notesTemp = [IO.Path]::GetTempFileName()
+try {
+  [IO.File]::WriteAllText($notesTemp, $Notes)
+  gh release create "v$version" $apk --repo $repo --target $head --title "Vorrat $version" --notes-file $notesTemp
+  if ($LASTEXITCODE -ne 0) { throw 'gh release create fehlgeschlagen' }
+} finally {
+  Remove-Item -LiteralPath $notesTemp -Force
+}
 Write-Output "Veroeffentlicht: v$version in $repo ($apk)"
