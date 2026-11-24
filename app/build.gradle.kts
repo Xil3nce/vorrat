@@ -21,15 +21,18 @@ val keystoreProps = Properties().apply {
 
 android {
     namespace = "de.frelina.vorrat"
-    compileSdk = 37
+    // Compose 1.13 / CameraX 1.7 verlangen mindestens API 37.1 (Unterversion); targetSdk bleibt 37.
+    compileSdk {
+        version = release(37) { minorApiLevel = 2 }
+    }
 
     defaultConfig {
         applicationId = "de.frelina.vorrat"
         minSdk = 34
         targetSdk = 37
         // Für ein Update beide erhöhen (versionCode immer +1); scripts/publish-release.ps1 liest versionName.
-        versionCode = 43
-        versionName = "2.16.5"
+        versionCode = 44
+        versionName = "2.16.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
