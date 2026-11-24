@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.shopping
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -133,7 +135,8 @@ class ShoppingViewModel @Inject constructor(
             online = o,
             canSearchOnline = OpenFoodFactsSource.searchQuery(q) != null,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AddSearchState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AddSearchState())
 
     /** Eingabe im Namensfeld; ein geänderter Begriff verwirft alte Online-Treffer. */
     fun setAddQuery(query: String) {
@@ -180,7 +183,8 @@ class ShoppingViewModel @Inject constructor(
             assignments = assignments,
             rows = if (grouped) ShoppingBoard.build(departments, assignments, shoppingInputs(list)) else emptyList(),
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ShoppingUiState())
 
     /** Neuer Artikel aus dem Hinzufügen-Dialog (Name passt zu Produkt → verknüpft; steht schon drauf → Menge erhöht). */
     fun add(name: String, quantity: Int = 1, packageSize: java.math.BigDecimal? = null, unitSymbol: String? = null) =

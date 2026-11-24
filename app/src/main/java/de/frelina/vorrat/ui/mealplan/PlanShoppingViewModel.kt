@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.mealplan
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -72,7 +74,8 @@ class PlanShoppingViewModel @Inject constructor(
         val meals = entries.mapNotNull { e -> byId[e.recipeId]?.let { PlannedMeal(it, e.persons) } }
         val listed = list.shortages.map { it.product.name } + list.items.map { it.item.name }
         MealPlanShopping.build(meals, items.map { it.toPantryEntry() }, stapleList.map { it.key }.toSet(), listed)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val state: StateFlow<PlanShoppingUiState> = combine(computed, overrides) { lines, over ->
         if (lines == null) {

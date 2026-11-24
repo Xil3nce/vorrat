@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.history
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,7 +57,8 @@ class HistoryViewModel @Inject constructor(
             outOfStockNames = events.filter { it.outOfStock && it.productName.isNotBlank() }
                 .map { it.productName }.distinct().take(MAX_SUGGESTIONS),
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HistoryUiState())
 
     fun setFilter(f: HistoryFilter) {
         filter.value = f

@@ -11,7 +11,12 @@ import de.frelina.vorrat.domain.IngredientMatcher
 import de.frelina.vorrat.domain.RecipeMatch
 import de.frelina.vorrat.domain.RecipeMatcher
 import de.frelina.vorrat.domain.toPantryEntry
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -34,7 +39,6 @@ data class RecipesUiState(
 )
 
 private data class Controls(
-    val query: String = "",
     val onlyOwn: Boolean = false,
     val onlyVegetarian: Boolean = false,
     val onlyPantry: Boolean = false,
@@ -50,42 +54,50 @@ class RecipesViewModel @Inject constructor(
 
     private val controls = MutableStateFlow(Controls())
 
-    val state: StateFlow<RecipesUiState> = combine(
+    /** Suchtext direkt fürs Eingabefeld (synchron, damit der Cursor beim Tippen nicht springt). */
+    private val queryText = MutableStateFlow("")
+    val query: StateFlow<String> = queryText.asStateFlow()
+
+    /** Teurer Abgleich Rezepte ↔ Vorrat: nur neu, wenn sich Daten oder "nur mit Vorrat" ändern – nicht beim Tippen. */
+    private val ranked = combine(
         recipeRepository.observeAll(),
         stockRepository.observeItems(),
-        settingsRepository.reminderSettings,
-        controls,
-    ) { recipes, items, settings, c ->
+        controls.map { it.onlyPantry }.distinctUntilChanged(),
+    ) { recipes, items, onlyPantry ->
         val today = LocalDate.now()
         val pantry = items.map { it.toPantryEntry() }
-        val ranked = if (c.onlyPantry) {
-            RecipeMatcher.rank(recipes, pantry, today)
-        } else {
-            RecipeMatcher.rankAll(recipes, pantry, today)
-        }
-        val q = IngredientMatcher.normalize(c.query)
-        val matches = ranked
-            .filter { !c.onlyOwn || !it.recipe.builtin }
-            .filter { !c.onlyVegetarian || it.recipe.vegetarian }
-            .filter { m -> c.selectedGroup == null || m.have.any { it.groupId == c.selectedGroup } }
-            .filter { m ->
-                q.isEmpty() || IngredientMatcher.normalize(m.recipe.title).contains(q) ||
-                    m.recipe.ingredients.any { IngredientMatcher.normalize(it.name).contains(q) }
-            }
+        val ranked = if (onlyPantry) RecipeMatcher.rank(recipes, pantry, today) else RecipeMatcher.rankAll(recipes, pantry, today)
+        Ranked(ranked.map { it to searchText(it) }, pantry, today)
+    }
+
+    val state: StateFlow<RecipesUiState> = combine(
+        ranked,
+        settingsRepository.reminderSettings,
+        controls,
+        queryText,
+    ) { r, settings, c, query ->
+        val q = IngredientMatcher.normalize(query)
+        val matches = r.matches
+            .filter { (m, _) -> !c.onlyOwn || !m.recipe.builtin }
+            .filter { (m, _) -> !c.onlyVegetarian || m.recipe.vegetarian }
+            .filter { (m, _) -> c.selectedGroup == null || m.have.any { it.groupId == c.selectedGroup } }
+            .filter { (_, text) -> q.isEmpty() || text.any { it.contains(q) } }
+            .map { it.first }
         RecipesUiState(
             loading = false,
             matches = matches,
-            expiring = RecipeMatcher.expiringGroups(pantry, today, settings.leadDays),
-            query = c.query,
+            expiring = RecipeMatcher.expiringGroups(r.pantry, r.today, settings.leadDays),
+            query = query,
             onlyOwn = c.onlyOwn,
             onlyVegetarian = c.onlyVegetarian,
             onlyPantry = c.onlyPantry,
             selectedGroup = c.selectedGroup,
-            today = today,
+            today = r.today,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipesUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipesUiState())
 
-    fun setQuery(q: String) = controls.value.let { controls.value = it.copy(query = q) }
+    fun setQuery(q: String) { queryText.value = q }
     fun toggleOwn() = controls.value.let { controls.value = it.copy(onlyOwn = !it.onlyOwn) }
     fun toggleVegetarian() = controls.value.let { controls.value = it.copy(onlyVegetarian = !it.onlyVegetarian) }
     fun togglePantry() = controls.value.let { controls.value = it.copy(onlyPantry = !it.onlyPantry) }
@@ -100,3 +112,13 @@ class RecipesViewModel @Inject constructor(
         controls.value = it.copy(selectedGroup = if (it.selectedGroup == groupId) null else groupId)
     }
 }
+
+private class Ranked(
+    /** Treffer mit vorab normalisierten Suchtexten (Titel + Zutaten). */
+    val matches: List<Pair<RecipeMatch, List<String>>>,
+    val pantry: List<de.frelina.vorrat.domain.PantryEntry>,
+    val today: LocalDate,
+)
+
+private fun searchText(m: RecipeMatch): List<String> =
+    listOf(IngredientMatcher.normalize(m.recipe.title)) + m.recipe.ingredients.map { IngredientMatcher.normalize(it.name) }

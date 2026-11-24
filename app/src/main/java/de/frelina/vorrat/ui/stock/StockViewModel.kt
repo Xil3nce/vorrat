@@ -20,7 +20,10 @@ import de.frelina.vorrat.domain.StockSort
 import de.frelina.vorrat.ui.components.UiMessage
 import de.frelina.vorrat.ui.components.UiMessages
 import de.frelina.vorrat.ui.navigation.StockRoute
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -58,7 +61,6 @@ private data class Controls(
     val locationId: String?,
     val level: Int? = null,
     val shelf: Int? = null,
-    val query: String = "",
 )
 
 @HiltViewModel
@@ -80,12 +82,17 @@ class StockViewModel @Inject constructor(
     /** Aus der Übersicht geöffnet: gleich nach diesem Ort filtern. */
     private val controls = MutableStateFlow(Controls(StockSort.EXPIRY, initialFilter, route.locationId))
 
+    /** Suchtext direkt fürs Eingabefeld (synchron, damit der Cursor beim Tippen nicht springt). */
+    private val queryText = MutableStateFlow("")
+    val query: StateFlow<String> = queryText.asStateFlow()
+
     val state: StateFlow<StockUiState> = combine(
         stockRepository.observeItems(),
         catalogRepository.observeLocations(),
         settingsRepository.reminderSettings,
         controls,
-    ) { items, locations, settings, c ->
+        queryText,
+    ) { items, locations, settings, c, query ->
         val today = LocalDate.now()
         val lead = settings.leadDays
         val statuses = items.map { ExpiryLogic.status(it.effectiveExpiry, today, lead) }
@@ -100,7 +107,7 @@ class StockViewModel @Inject constructor(
         StockUiState(
             loading = false,
             items = StockQueries.filter(items, c.filter, locationFilter, today, lead, c.level, c.shelf).let { filtered ->
-                if (c.query.isBlank()) StockQueries.sort(filtered, c.sort) else StockQueries.search(filtered, c.query)
+                if (query.isBlank()) StockQueries.sort(filtered, c.sort) else StockQueries.search(filtered, query)
             },
             totalCount = items.size,
             expiredCount = statuses.count { it == ExpiryStatus.EXPIRED },
@@ -112,13 +119,14 @@ class StockViewModel @Inject constructor(
             locations = locations,
             level = c.level,
             shelf = c.shelf,
-            query = c.query,
+            query = query,
             levelOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.level }, location?.levels),
             shelfOptions = if (noLocation) emptyList() else StockQueries.slotOptions(atLocation.map { it.shelf }, location?.shelves),
             today = today,
             leadDays = lead,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StockUiState())
 
     fun setSort(sort: StockSort) = controls.value.let { controls.value = it.copy(sort = sort) }
     fun setFilter(filter: StockFilter) = controls.value.let { controls.value = it.copy(filter = filter) }
@@ -128,7 +136,7 @@ class StockViewModel @Inject constructor(
     }
     fun setLevel(level: Int?) = controls.value.let { controls.value = it.copy(level = level) }
     fun setShelf(shelf: Int?) = controls.value.let { controls.value = it.copy(shelf = shelf) }
-    fun setQuery(query: String) = controls.value.let { controls.value = it.copy(query = query) }
+    fun setQuery(query: String) { queryText.value = query }
 
     /** Wischen nach links: Eintrag löschen, mit Rückgängig. */
     fun delete(entryId: String) = viewModelScope.launch {

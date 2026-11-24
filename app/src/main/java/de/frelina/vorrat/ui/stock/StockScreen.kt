@@ -110,9 +110,10 @@ fun StockScreen(
     viewModel: StockViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val query by viewModel.query.collectAsStateWithLifecycle()
     var sortMenu by remember { mutableStateOf(false) }
     var dialOpen by rememberSaveable { mutableStateOf(false) }
-    var searchOpen by rememberSaveable { mutableStateOf(state.query.isNotEmpty()) }
+    var searchOpen by rememberSaveable { mutableStateOf(query.isNotEmpty()) }
     val listState = rememberLazyListState()
     // Lupe: Liste nach oben scrollen und das Suchfeld fokussieren (auch wenn weit unten gescrollt war).
     var searchRequest by remember { mutableIntStateOf(0) }
@@ -214,7 +215,7 @@ fun StockScreen(
                 if (searchOpen) {
                     item(key = "search") {
                         SearchField(
-                            state.query,
+                            query,
                             viewModel::setQuery,
                             focusPending = focusPending,
                             onFocused = { focusPending = false },

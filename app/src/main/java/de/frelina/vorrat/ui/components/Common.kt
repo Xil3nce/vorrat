@@ -1,5 +1,8 @@
 package de.frelina.vorrat.ui.components
 
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import androidx.compose.runtime.produceState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -32,15 +35,33 @@ import de.frelina.vorrat.domain.ExpiryStatus
 import de.frelina.vorrat.domain.ValidationError
 import java.io.File
 
+/** Bereits gefundene Bilddateien: neue Listenzeilen zeigen das Bild sofort statt kurz den Platzhalter. */
+private val knownImageFiles = java.util.concurrent.ConcurrentHashMap<String, File>()
+
+/**
+ * Bilddatei zu [imagePath] oder null, solange sie fehlt. Die Plattenprüfung läuft im Hintergrund
+ * (nicht je Listenzeile im UI-Thread); [imagesVersion] löst nach neu abgelegten Bildern eine neue Prüfung aus.
+ */
+@Composable
+fun rememberImageFile(imagePath: String?, imagesVersion: Any?): File? {
+    val context = LocalContext.current
+    val file by produceState(imagePath?.let { knownImageFiles[it] }, imagePath, imagesVersion) {
+        value = imagePath?.let { name ->
+            withContext(Dispatchers.IO) {
+                File(File(context.filesDir, ImageStore.DIR_NAME), name).takeIf { it.exists() }
+            }.also { if (it != null) knownImageFiles[name] = it else knownImageFiles.remove(name) }
+        }
+    }
+    return file
+}
+
 /** Produktbild aus dem App-internen Speicher oder ein Platzhalter-Icon. */
 @Composable
 fun ProductImage(imagePath: String?, size: Dp, modifier: Modifier = Modifier, name: String? = null) {
     val context = LocalContext.current
     // Fehlt die Datei noch (Sync lädt sie im Hintergrund), nach jedem abgelegten Bild erneut prüfen.
     val imagesVersion by ImageStore.changes.collectAsState()
-    val file = remember(imagePath, imagesVersion) {
-        imagePath?.let { File(File(context.filesDir, ImageStore.DIR_NAME), it) }?.takeIf { it.exists() }
-    }
+    val file = rememberImageFile(imagePath, imagesVersion)
     val shape = RoundedCornerShape(if (size >= 48.dp) 16.dp else 12.dp)
     if (file != null) {
         AsyncImage(

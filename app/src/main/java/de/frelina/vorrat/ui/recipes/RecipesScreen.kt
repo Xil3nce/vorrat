@@ -68,6 +68,7 @@ fun RecipesScreen(
     viewModel: RecipesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val query by viewModel.query.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -132,7 +133,7 @@ fun RecipesScreen(
             }
             item(key = "search") {
                 OutlinedTextField(
-                    value = state.query,
+                    value = query,
                     onValueChange = viewModel::setQuery,
                     singleLine = true,
                     shape = RoundedCornerShape(24.dp),
@@ -144,7 +145,7 @@ fun RecipesScreen(
                     label = { Text(stringResource(R.string.recipes_search)) },
                     leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
                     trailingIcon = {
-                        if (state.query.isNotEmpty()) {
+                        if (query.isNotEmpty()) {
                             IconButton(onClick = { viewModel.setQuery("") }) {
                                 Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.action_clear))
                             }

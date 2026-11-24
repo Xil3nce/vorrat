@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.mealplan
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -101,7 +103,8 @@ class MealPlanViewModel @Inject constructor(
             suggestions = RecipeMatcher.rank(recipes, pantry, today).take(MAX_SUGGESTIONS).map { it.recipe },
             staples = stapleList,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MealPlanUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MealPlanUiState())
 
     fun previousWeek() { weekStart.value = weekStart.value.minusWeeks(1) }
 

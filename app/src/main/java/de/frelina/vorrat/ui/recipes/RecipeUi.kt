@@ -1,5 +1,6 @@
 package de.frelina.vorrat.ui.recipes
 
+import de.frelina.vorrat.ui.components.rememberImageFile
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -78,13 +79,11 @@ fun recipeMeta(recipe: Recipe): String {
 /** Großes Rezeptfoto (Detailansicht); nichts, solange die Datei fehlt (z. B. noch nicht synchronisiert). */
 @Composable
 fun RecipePhoto(imagePath: String?, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     val imagesVersion by ImageStore.changes.collectAsState()
-    val file = remember(imagePath, imagesVersion) {
-        imagePath?.let { File(File(context.filesDir, ImageStore.DIR_NAME), it) }?.takeIf { it.exists() }
-    } ?: return
+    val file = rememberImageFile(imagePath, imagesVersion)
+    val photo = file ?: return
     AsyncImage(
-        model = file,
+        model = photo,
         contentDescription = stringResource(R.string.recipe_photo),
         contentScale = ContentScale.Crop,
         modifier = modifier.fillMaxWidth().aspectRatio(16f / 10f).clip(RoundedCornerShape(20.dp)),

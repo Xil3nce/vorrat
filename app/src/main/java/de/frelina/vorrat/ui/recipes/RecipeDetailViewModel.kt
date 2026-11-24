@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.recipes
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,7 +59,8 @@ class RecipeDetailViewModel @Inject constructor(
             match = recipe?.let { RecipeMatcher.evaluate(it, items.map { item -> item.toPantryEntry() }, today) },
             today = today,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipeDetailUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), RecipeDetailUiState())
 
     /** Ausgewählte fehlende Zutaten (Menge und Rezept werden getrennt gespeichert) auf die Einkaufsliste – ohne Duplikate gleichen Namens. */
     fun addMissingToShopping(lines: List<MissingLine>) = viewModelScope.launch {

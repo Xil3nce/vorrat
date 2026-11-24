@@ -1,5 +1,7 @@
 package de.frelina.vorrat.ui.locations
 
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.Dispatchers
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
@@ -105,7 +107,8 @@ class LocationsViewModel @Inject constructor(
                 listOfNotNull(LocationStat(null, unassigned).takeIf { unassigned > 0 }),
             total = items.size,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LocationsUiState())
+    }.flowOn(Dispatchers.Default)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LocationsUiState())
 
     private val _inUse = MutableStateFlow<InUseInfo?>(null)
     val inUse: StateFlow<InUseInfo?> = _inUse.asStateFlow()
