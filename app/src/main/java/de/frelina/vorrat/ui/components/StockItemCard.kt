@@ -101,7 +101,8 @@ fun StockItemCard(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    val sub = listOfNotNull(item.brand?.takeIf { it.isNotBlank() }, locationText(item)).joinToString(" · ")
+                    // Marke zuletzt: ist am wenigsten wichtig und darf bei Platzmangel abgeschnitten werden.
+                    val sub = listOfNotNull(locationText(item), item.brand?.takeIf { it.isNotBlank() }).joinToString(" · ")
                     Text(
                         sub,
                         style = MaterialTheme.typography.bodySmall,
